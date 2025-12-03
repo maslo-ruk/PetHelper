@@ -207,17 +207,17 @@ fun AccountInfoScreen(onBack: () -> Unit) {
             Text("Телефон: +7 ХХХ ХХХ ХХ ХХ")
             Text("Email: example@mail.ru")
             Spacer(Modifier.height(12.dp))
-            Text("Район: будет выбран позже")
+            Text("Район: /*TODO*/")
             Spacer(Modifier.height(12.dp))
-            Text("Файл документов: (пока пусто)")
+            Text("Файл документов: (/*TODO*/)")
             Spacer(Modifier.height(20.dp))
-            AnimatedButton(text = "Изменить информацию", onClick = {})
+            AnimatedButton(text = "Изменить информацию", onClick = {/*TODO*/})
         }
     }
 }
 
 
-// -------- Информация о питомце --------
+//питомец
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetInfoScreen(pet: Pet, onBack: () -> Unit) {

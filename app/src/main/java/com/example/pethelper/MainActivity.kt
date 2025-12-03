@@ -1,6 +1,7 @@
 package com.example.pethelper
 
 import android.os.Bundle
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -44,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.pethelper.ui.theme.PetHelperTheme
+import androidx.core.R
 
 
 class MainActivity : ComponentActivity() {
