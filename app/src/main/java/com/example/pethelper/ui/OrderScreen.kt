@@ -1,231 +1,207 @@
 package com.example.pethelper.ui
 
+import androidx.compose.runtime.Composable
+
+
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import java.text.SimpleDateFormat
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import java.util.*
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.text.KeyboardOptions
 
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderRequestScreen() {
-    var dateTime by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var selectedDistrict by remember { mutableStateOf("") }
-
-    var showDateDialog by remember { mutableStateOf(false) }
-    var showDistrictDropdown by remember { mutableStateOf(false) }
-
-    val moscowDistricts = listOf(
-        "ЦАО (Центральный)",
-        "САО (Северный)",
-        "СВАО (Северо-Восточный)",
-        "ВАО (Восточный)",
-        "ЮВАО (Юго-Восточный)",
-        "ЮАО (Южный)",
-        "ЮЗАО (Юго-Западный)",
-        "ЗАО (Западный)",
-        "СЗАО (Северо-Западный)",
-        "ЗелАО (Зеленоградский)",
-        "ТиНАО (Троицкий и Новомосковский)",
-        "Арбат",
-        "Басманный",
-        "Замоскворечье",
-        "Красносельский",
-        "Мещанский",
-        "Пресненский",
-        "Таганский",
-        "Тверской",
-        "Хамовники",
-        "Якиманка",
-        "Аэропорт",
-        "Беговой",
-        "Бескудниковский",
-        "Войковский",
-        "Головинский",
-        "Дмитровский",
-        "Коптево",
-        "Левобережный",
-        "Молжаниновский",
-        "Савёловский",
-        "Сокол",
-        "Тимирязевский",
-        "Ховрино",
-        "Хорошёвский"
+fun OrderDialog(onClose: () -> Unit) {
+    val context = LocalContext.current
+    val districts = listOf(
+        "ЦАО", "САО", "СВАО", "ВАО", "ЮВАО", "ЮАО", "ЮЗАО", "ЗАО", "СЗАО", "ЗелАО"
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Text(
-            "Форма заказа",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 20.dp)
-        )
+    var selectedDistrict by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf("") }
+    var time by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
 
-        // Дата и время с диалогом
-        OutlinedTextField(
-            value = dateTime,
-            onValueChange = { },
+    var showFields by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { showFields = true }
+
+    Dialog(onDismissRequest = { onClose() }) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 8.dp,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { showDateDialog = true },
-            label = { Text("Дата и время") },
-            placeholder = { Text("Нажмите для выбора даты") },
-            readOnly = true,
-            trailingIcon = {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = "Выбрать дату")
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Район Москвы с выпадающим списком
-        Box(
-            modifier = Modifier.fillMaxWidth()
+                .padding(16.dp)
         ) {
-            OutlinedTextField(
-                value = selectedDistrict,
-                onValueChange = { },
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDistrictDropdown = true },
-                label = { Text("Район Москвы") },
-                placeholder = { Text("Выберите район") },
-                readOnly = true,
-                trailingIcon = {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Выбрать район")
-                }
-            )
-        }
-
-        // Выпадающий список районов
-        DropdownMenu(
-            expanded = showDistrictDropdown,
-            onDismissRequest = { showDistrictDropdown = false },
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-            moscowDistricts.forEach { district ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = district,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    },
-                    onClick = {
-                        selectedDistrict = district
-                        showDistrictDropdown = false
-                    }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Примечания
-        OutlinedTextField(
-            value = notes,
-            onValueChange = { notes = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp),
-            label = { Text("Примечания") },
-            placeholder = { Text("Порода, особенности животного, дополнительные пожелания...") },
-            singleLine = false,
-            maxLines = 5
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Цена
-        OutlinedTextField(
-            value = price,
-            onValueChange = { newValue ->
-                if (newValue.all { it.isDigit() }) {
-                    price = newValue
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Цена (руб.)") },
-            placeholder = { Text("1000") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            suffix = { Text("₽") }
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Кнопка отправки
-        Button(
-            onClick = { },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = dateTime.isNotEmpty() && selectedDistrict.isNotEmpty() && price.isNotEmpty()
-        ) {
-            Text("Создать заказ")
-        }
-    }
-
-    // Диалог выбора даты
-    if (showDateDialog) {
-        AlertDialog(
-            onDismissRequest = { showDateDialog = false },
-            title = { Text("Выберите дату и время") },
-            text = {
-                Column {
-                    // Простой выбор даты через текстовые поля
-                    // В реальном приложении здесь будет DatePicker и TimePicker
-                    Text("Дата будет реализована через DatePicker")
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Временное решение - кнопки для быстрого выбора
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                dateTime = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-                                    .format(Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
-                                showDateDialog = false
-                            },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Завтра 10:00")
-                        }
-                        Button(
-                            onClick = {
-                                dateTime = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-                                    .format(Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000))
-                                showDateDialog = false
-                            },
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Послезавтра 10:00")
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = { showDateDialog = false }
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Заголовок с крестиком
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Закрыть")
+                    Text("Создать заказ", style = MaterialTheme.typography.titleMedium)
+                    IconButton(onClick = { onClose() }) {
+                        Icon(Icons.Default.Close, contentDescription = "Закрыть окно")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Неизменяемая информация
+                AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("Имя: Иван", fontSize = 18.sp)
+                        Text("Фамилия: Петров", fontSize = 18.sp)
+                        Text("Телефон: +7 900 000 00 00", fontSize = 18.sp)
+                    }
+                }
+
+                // Дата
+                AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+                    OutlinedTextField(
+                        value = date,
+                        onValueChange = {},
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Дата") },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                val calendar = Calendar.getInstance()
+                                DatePickerDialog(
+                                    context,
+                                    { _, year, month, dayOfMonth ->
+                                        date = "$dayOfMonth/${month + 1}/$year"
+                                    },
+                                    calendar.get(Calendar.YEAR),
+                                    calendar.get(Calendar.MONTH),
+                                    calendar.get(Calendar.DAY_OF_MONTH)
+                                ).show()
+                            }) {
+                                Icon(Icons.Default.DateRange, contentDescription = "Выбрать дату")
+                            }
+                        }
+                    )
+                }
+
+                // Время
+                AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+                    OutlinedTextField(
+                        value = time,
+                        onValueChange = {},
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Время") },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                val calendar = Calendar.getInstance()
+                                TimePickerDialog(
+                                    context,
+                                    { _, hourOfDay, minute ->
+                                        time = String.format("%02d:%02d", hourOfDay, minute)
+                                    },
+                                    calendar.get(Calendar.HOUR_OF_DAY),
+                                    calendar.get(Calendar.MINUTE),
+                                    true
+                                ).show()
+                            }) {
+                                Icon(Icons.Default.AccessTime, contentDescription = "Выбрать время")
+                            }
+                        }
+                    )
+                }
+
+                // Районы
+                AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+                    ExposedDropdownMenuBox(
+                        expanded = selectedDistrict.isNotEmpty(),
+                        onExpandedChange = { selectedDistrict = if (it) selectedDistrict else "" }
+                    ) {
+                        OutlinedTextField(
+                            value = selectedDistrict,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Район Москвы") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = selectedDistrict.isNotEmpty()
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = selectedDistrict.isNotEmpty(),
+                            onDismissRequest = { selectedDistrict = "" }
+                        ) {
+                            districts.forEach { district ->
+                                DropdownMenuItem(
+                                    text = { Text(district) },
+                                    onClick = {/*TODO*/}
+                                )
+                            }
+                            }
+                        }
+                    }
+                }
+
+                // Цена
+                AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+                    OutlinedTextField(
+                        value = price,
+                        onValueChange = { if (it.all { char -> char.isDigit() }) price = it },
+                        label = { Text("Цена") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+
+                // Примечания
+                AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = { notes = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        label = { Text("Примечания по заказу") },
+                        maxLines = 10
+                    )
+                }
+
+                // Кнопка "Создать заказ" (ничего не делает)
+                AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+                    Button(
+                        onClick = { /* ничего не делаем */ },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Создать заказ")
+                    }
                 }
             }
-        )
+        }
     }
-}
-
