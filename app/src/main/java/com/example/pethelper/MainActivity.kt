@@ -46,6 +46,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.pethelper.ui.theme.PetHelperTheme
 import androidx.core.R
+import com.example.pethelper.ui.AccountScreen
+import com.example.pethelper.ui.AccountInfoScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -54,10 +56,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PetHelperTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    AccountInfoScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

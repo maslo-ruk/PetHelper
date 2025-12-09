@@ -62,39 +62,41 @@ val samplePets = listOf(
 )
 
 
-@Composable
-fun AccountRoot() {
-    var screen by remember { mutableStateOf("account") }
-    var selectedPet: Pet? by remember { mutableStateOf(null) }
-
-
-    when (screen) {
-        "account" -> AccountScreen(
-            pets = samplePets,
-            onEditAccount = {},
-            onOpenAccountInfo = { screen = "accountInfo" },
-            onOpenPet = {
-                selectedPet = it
-                screen = "pet"
-            }
-        )
-
-
-        "accountInfo" -> AccountInfoScreen(onBack = { screen = "account" })
-
-
-        "pet" -> selectedPet?.let { pet ->
-            PetInfoScreen(pet = pet, onBack = { screen = "account" })
-        }
-    }
-}
+//@Composable
+//fun AccountRoot() {
+//    var screen by remember { mutableStateOf("account") }
+//    var selectedPet: Pet? by remember { mutableStateOf(null) }
+//
+//
+//    when (screen) {
+//        "account" -> AccountScreen(
+//            pets = samplePets,
+//            onEditAccount = {},
+//            onOpenAccountInfo = { screen = "accountInfo" },
+//            onOpenPet = {
+//                selectedPet = it
+//                screen = "pet"
+//            },
+//            modifier = Modifier
+//        )
+//
+//
+//        "accountInfo" -> AccountInfoScreen(onBack = { screen = "account" })
+//
+//
+//        "pet" -> selectedPet?.let { pet ->
+//            PetInfoScreen(pet = pet, onBack = { screen = "account" })
+//        }
+//    }
+//}
 
 @Composable
 fun AccountScreen(
-    pets: List<Pet>,
-    onEditAccount: () -> Unit,
-    onOpenAccountInfo: () -> Unit,
-    onOpenPet: (Pet) -> Unit
+    pets: List<Pet> = samplePets,
+    onEditAccount: () -> Unit = {},
+    onOpenAccountInfo: () -> Unit = {},
+    onOpenPet: (Pet) -> Unit = {},
+    modifier: Modifier
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
 
@@ -190,7 +192,7 @@ fun PetListItem(pet: Pet, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountInfoScreen(onBack: () -> Unit) {
+fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
     Scaffold(
         topBar = {
             TopAppBar(
