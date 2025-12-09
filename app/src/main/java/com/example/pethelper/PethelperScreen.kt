@@ -8,6 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.pethelper.ui.AccountInfoScreen
+import com.example.pethelper.ui.PetInfoScreen
+import com.example.pethelper.ui.StartScreen
 
 enum class PetHelperScreens {
     Loading,
@@ -33,13 +36,15 @@ fun PetHelperApp(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(PetHelperScreens.Start.name) {
-
+                StartScreen(
+                    onFirstClick = { navController.navigate(PetHelperScreens.Account.name)},
+                    onSecondClick = {navController.navigate(PetHelperScreens.Order.name)}
+                )
             }
             composable(PetHelperScreens.Order.name) {
-
             }
             composable(PetHelperScreens.Account.name) {
-
+                AccountInfoScreen()
             }
         }
     }

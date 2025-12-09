@@ -1,7 +1,15 @@
 package com.example.pethelper.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,216 +20,230 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.tooling.preview.Preview
 
 data class Pet(
-    val id: Int,
+    val id: String,
     val name: String,
-    val age: Int,
+    val type: String,
+    val gender: String,
+    val age: String,
     val breed: String,
-    val specialFeatures: String
+    val details: String
 )
 
+val samplePets = listOf(
+    Pet("1", "Бим", "Собака", "М", "3 года", "Бигль", "Добрый и активный"),
+    Pet("2", "Майя", "Кошка", "Ж", "5 лет", "Британская", "Очень спокойная")
+)
+
+
+//@Composable
+//fun AccountRoot() {
+//    var screen by remember { mutableStateOf("account") }
+//    var selectedPet: Pet? by remember { mutableStateOf(null) }
+//
+//
+//    when (screen) {
+//        "account" -> AccountScreen(
+//            pets = samplePets,
+//            onEditAccount = {},
+//            onOpenAccountInfo = { screen = "accountInfo" },
+//            onOpenPet = {
+//                selectedPet = it
+//                screen = "pet"
+//            },
+//            modifier = Modifier
+//        )
+//
+//
+//        "accountInfo" -> AccountInfoScreen(onBack = { screen = "account" })
+//
+//
+//        "pet" -> selectedPet?.let { pet ->
+//            PetInfoScreen(pet = pet, onBack = { screen = "account" })
+//        }
+//    }
+//}
+
 @Composable
-fun AccountInfoScreen(
-    avatarResId: Int = 0,
-    nickname: String,
-    fullName: String,
-    pets: List<Pet>,
-    onEditAccountClick: () -> Unit,
-    onEditPetClick: (Pet) -> Unit,
-    onPetClick: (Pet) -> Unit
+fun AccountScreen(
+    pets: List<Pet> = samplePets,
+    onEditAccount: () -> Unit = {},
+    onOpenAccountInfo: () -> Unit = {},
+    onOpenPet: (Pet) -> Unit = {},
+    modifier: Modifier
 ) {
-    Scaffold(
-        bottomBar = {
-            Button(
-                onClick = onEditAccountClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text("Изменить информацию об аккаунте")
-            }
-        }
-    ) { paddingValues ->
+    val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
+
+
+    Scaffold { padding ->
         Column(
             modifier = Modifier
+                .padding(padding)
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(16.dp)
+                .alpha(alphaAnim.value)
         ) {
-            // Аватар и основная информация
-            Column(
+// Аватар
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .size(100.dp)
+                    .clip(CircleShape) // потом поменяем
             ) {
-                // Аватар
                 Image(
-                    painter = painterResource(id = avatarResId),
-                    contentDescription = "Аватар пользователя",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Никнейм
-                Text(
-                    text = nickname,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                // Имя и фамилия
-                Text(
-                    text = fullName,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    painter = painterResource(id = android.R.drawable.sym_def_app_icon),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
 
-            // Список домашних животных
-            Text(
-                text = "Мои питомцы",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+            Spacer(Modifier.height(12.dp))
+            Text("Имя Фамилия", fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-            ) {
+            AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
+            Spacer(Modifier.height(12.dp))
+
+
+            AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+
+
+            Spacer(Modifier.height(24.dp))
+            Text("Домашние животные", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+
+
+            LazyColumn {
                 items(pets) { pet ->
-                    PetCard(
-                        pet = pet,
-                        onEditClick = { onEditPetClick(pet) },
-                        onClick = { onPetClick(pet) }
-                    )
+                    AnimatedVisibility(visible = true, enter = fadeIn() + expandVertically()) {
+                        PetListItem(pet = pet, onClick = { onOpenPet(pet) })
+                    }
+                    Spacer(Modifier.height(12.dp))
                 }
             }
         }
     }
 }
 
+
+// Кнопка с анимацией
 @Composable
-fun PetCard(
-    pet: Pet,
-    onEditClick: () -> Unit,
-    onClick: () -> Unit
-) {
+fun AnimatedButton(text: String, onClick: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale by animateFloatAsState(if (pressed) 0.96f else 1f, tween(120))
+
+
+    Button(
+        onClick = onClick,
+        interactionSource = interaction,
+        modifier = Modifier.scale(scale)
+    ) {
+        Text(text)
+    }
+}
+
+@Composable
+fun PetListItem(pet: Pet, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        onClick = onClick
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    // Кличка
-                    Text(
-                        text = pet.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    // Возраст и порода
-                    Text(
-                        text = "${pet.age} лет • ${pet.breed}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    // Особенности
-                    Text(
-                        text = "Особенности: ${pet.specialFeatures}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                // Кнопка редактирования
-                IconButton(
-                    onClick = onEditClick,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Изменить информацию о животном"
-                    )
-                }
+        Row(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(pet.name, fontWeight = FontWeight.Bold)
+                Text(pet.type)
             }
+            Text("→", color = MaterialTheme.colorScheme.primary)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Информация об аккаунте") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+            Text("Телефон: +7 ХХХ ХХХ ХХ ХХ")
+            Text("Email: example@mail.ru")
+            Spacer(Modifier.height(12.dp))
+            Text("Район: /*TODO*/")
+            Spacer(Modifier.height(12.dp))
+            Text("Файл документов: (/*TODO*/)")
+            Spacer(Modifier.height(20.dp))
+            AnimatedButton(text = "Изменить информацию", onClick = {/*TODO*/})
         }
     }
 }
 
 
-@Preview
-// Пример использования
+//питомец
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountInfoScreenPreview() {
-    val samplePets = listOf(
-        Pet(
-            id = 1,
-            name = "Барсик",
-            age = 3,
-            breed = "Британская короткошерстная",
-            specialFeatures = "Любит спать на подоконнике"
-        ),
-        Pet(
-            id = 2,
-            name = "Шарик",
-            age = 5,
-            breed = "Лабрадор",
-            specialFeatures = "Очень дружелюбный, любит играть с мячиком"
-        )
-    )
-
-    AccountInfoScreen( // Я хуй знает, не будет работать без R
-        nickname = "cat_lover",
-        fullName = "Иван Иванов",
-        pets = samplePets,
-        onEditAccountClick = { /* Обработка нажатия на редактирование аккаунта */ },
-        onEditPetClick = { pet -> /* Обработка нажатия на редактирование животного */ },
-        onPetClick = { pet -> /* Обработка нажатия на карточку животного */ }
-    )
+fun PetInfoScreen(pet: Pet, onBack: () -> Unit) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(pet.name) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+            Text("Тип: ${pet.type}")
+            Text("Пол: ${pet.gender}")
+            Text("Возраст: ${pet.age}")
+            Text("Порода: ${pet.breed}")
+            Text("Особенности: ${pet.details}")
+            Spacer(Modifier.height(20.dp))
+            AnimatedButton(text = "Изменить", onClick = {})
+        }
+    }
 }
+
