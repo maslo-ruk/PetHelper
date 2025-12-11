@@ -6,21 +6,22 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.pethelper.data.entities.Pet
 import com.example.pethelper.data.entities.User
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface UserDao {
+interface PetsDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(item: User)
+    suspend fun insert(item: Pet)
     @Update
-    suspend fun update(item: User)
+    suspend fun update(item: Pet)
     @Delete
-    suspend fun delete(item: User)
+    suspend fun delete(item: Pet)
 
-    @Query("SELECT * from users WHERE id = :id")
-    fun getUser(id: Int): Flow<User>
+    @Query("SELECT * from pets WHERE id = :id")
+    fun getUser(id: Int): Flow<Pet>
 
-    @Query("SELECT * from users")
-    fun getAllUsers(): Flow<List<User>>
+    @Query("SELECT * from pets")
+    fun getAllUsers(): Flow<List<Pet>>
 }
