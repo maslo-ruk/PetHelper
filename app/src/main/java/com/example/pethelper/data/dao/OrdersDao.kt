@@ -20,8 +20,8 @@ interface OrdersDao {
     suspend fun delete(item: Orderr)
 
     @Query("SELECT * from orders WHERE id = :id")
-    fun getUser(id: Int): Flow<Orderr>
+    fun getOrder(id: Int): Flow<Orderr>
 
     @Query("SELECT * from orders")
-    fun getAllUsers(): Flow<List<Orderr>>
+    fun getAllOrders(): Flow<List<Orderr>>
 }

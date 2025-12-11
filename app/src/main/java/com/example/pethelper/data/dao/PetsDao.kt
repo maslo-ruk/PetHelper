@@ -20,8 +20,8 @@ interface PetsDao {
     suspend fun delete(item: Pet)
 
     @Query("SELECT * from pets WHERE id = :id")
-    fun getUser(id: Int): Flow<Pet>
+    fun getPet(id: Int): Flow<Pet>
 
     @Query("SELECT * from pets")
-    fun getAllUsers(): Flow<List<Pet>>
+    fun getAllPets(): Flow<List<Pet>>
 }
