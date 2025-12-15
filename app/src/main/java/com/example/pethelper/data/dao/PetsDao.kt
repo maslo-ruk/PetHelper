@@ -22,6 +22,12 @@ interface PetsDao {
     @Query("SELECT * from pets WHERE id = :id")
     fun getPet(id: Int): Flow<Pet>
 
+    @Query("SELECT * FROM pets WHERE name = :name")
+    fun getPetByName(name:String): Flow<Pet>
+
     @Query("SELECT * from pets")
     fun getAllPets(): Flow<List<Pet>>
+
+    @Query("SELECT * FROM users WHERE id = :ownerId")
+    fun getOwner(ownerId: Int): Flow<User>
 }

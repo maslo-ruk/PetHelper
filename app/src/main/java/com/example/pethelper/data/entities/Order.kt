@@ -6,4 +6,10 @@ import androidx.room.PrimaryKey
 data class Orderr(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    )
+    val petId: Int,
+    val address:String ,
+    val date:String,
+    val time: String,
+    val price:Int,
+    val notes: String
+)
