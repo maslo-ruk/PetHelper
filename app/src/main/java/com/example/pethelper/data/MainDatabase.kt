@@ -27,7 +27,7 @@ abstract class MainDatabase: RoomDatabase() {
         private var Instance: MainDatabase? = null
 
         fun getDatabase(context: Context): MainDatabase {
-            return Instance ?: synchronized(this) { Room.databaseBuilder(context, MainDatabase::class.java, "item_database").fallbackToDestructiveMigration().build()
+            return Instance ?: synchronized(this) { Room.databaseBuilder(context, MainDatabase::class.java, "pethelper").fallbackToDestructiveMigration().build()
                 .also { Instance = it }}
         }
     }

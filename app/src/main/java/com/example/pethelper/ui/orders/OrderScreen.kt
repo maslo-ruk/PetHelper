@@ -35,11 +35,7 @@ import kotlin.math.exp
 @Composable
 fun OrderDialog(modifier:Modifier = Modifier,
                 viewModel: OrderDialogViewModel = viewModel(factory = AppViewModelProvider.Factory),
-                onClose:()->Unit,
-                currentUser:User
-) {
-
-
+                onClose:()->Unit) {
     var showFields by remember { mutableStateOf(true) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,9 +70,9 @@ fun OrderDialog(modifier:Modifier = Modifier,
             // Неизменяемая информация
             AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(currentUser.name, fontSize = 18.sp)
-                    Text(currentUser.surname, fontSize = 18.sp)
-                    Text("Телефон: ${currentUser.phoneNumber}", fontSize = 18.sp)
+                    Text("Ыбан", fontSize = 18.sp)
+                    Text("Боготыров", fontSize = 18.sp)
+                    Text("Телефон: 8 800 555 35 35", fontSize = 18.sp)
                 }
             }
 
@@ -85,7 +81,6 @@ fun OrderDialog(modifier:Modifier = Modifier,
                 onClick = viewModel::updateUiState,
                 onSave = viewModel::submitOrder,
                 onClose = onClose,
-                currentUser = currentUser,
                 uiState = uiState
                 )
         }
@@ -96,8 +91,9 @@ fun OrderDialog(modifier:Modifier = Modifier,
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderInputs(modifier:Modifier = Modifier,
-                onClick:(OrderDetails) -> Unit, onSave:() -> Unit, onClose:() -> Unit,
-                currentUser: User,
+                onClick:(OrderDetails) -> Unit,
+                onSave:() -> Unit,
+                onClose:() -> Unit,
                 uiState: OrderUiState)
 {
     val context = LocalContext.current

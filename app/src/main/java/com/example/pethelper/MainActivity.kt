@@ -48,6 +48,7 @@ import com.example.pethelper.ui.theme.PetHelperTheme
 import androidx.core.R
 import com.example.pethelper.ui.AccountScreen
 import com.example.pethelper.ui.AccountInfoScreen
+import com.example.pethelper.ui.PetInfoScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -56,7 +57,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PetHelperTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AccountInfoScreen(modifier = Modifier.padding(innerPadding))
+                    PetHelperApp(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.pethelper.data.entities.User
 import com.example.pethelper.ui.AccountInfoScreen
 import com.example.pethelper.ui.MainScreen
@@ -28,7 +29,8 @@ enum class PetHelperScreens {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetHelperApp(
-    navController: NavHostController
+    navController: NavHostController = rememberNavController(),
+    modifier: Modifier = Modifier
 ) {
     Scaffold {
         innerPadding ->
@@ -42,14 +44,7 @@ fun PetHelperApp(
                 MainScreen(onCreateOrder = {navController.navigate(PetHelperScreens.Order.name)})
             }
             composable(PetHelperScreens.Order.name) {
-                OrderDialog(Modifier, onClose = { navController.popBackStack() }, currentUser = User(0, 1,
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    ))
+                OrderDialog(Modifier, onClose = { navController.popBackStack() })
             }
             composable(PetHelperScreens.Account.name) {
                 AccountInfoScreen()
