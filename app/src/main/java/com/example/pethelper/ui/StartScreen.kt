@@ -1,6 +1,6 @@
 package com.example.pethelper.ui
 
-import ads_mobile_sdk.h4
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
