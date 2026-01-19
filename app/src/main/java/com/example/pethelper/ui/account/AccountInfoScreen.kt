@@ -45,6 +45,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.draw.scale
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.ui.AppViewModelProvider
 import com.example.pethelper.ui.auth.LoginViewModel
 
@@ -99,8 +100,8 @@ fun AccountScreen(
     onOpenAccountInfo: () -> Unit = {},
     onOpenPet: (Pet) -> Unit = {},
     onBack:() -> Unit = {},
-    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    modifier: Modifier
+    modifier: Modifier,
+    curUser: FUser
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
 
