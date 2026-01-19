@@ -2,25 +2,18 @@ package com.example.pethelper.ui.orders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pethelper.ui.orders.OrderUiState
-import com.example.pethelper.data.entities.Orderr
-import com.example.pethelper.data.repositories.OrderRepository
-import com.example.pethelper.data.repositories.PetsRepository
+import com.example.pethelper.data.fireBaseEntities.FOrder
+import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class OrderDialogViewModel(
-    private val ordersRepository: OrderRepository,
-    private val petsRepository: PetsRepository
-
+class OrderDialogViewModel(db: FirebaseFirestore
 ) : ViewModel() {
-
+    val fbRepository = FireStoreRepository(db)
     var _uiState = MutableStateFlow(OrderUiState())
     var uiState: StateFlow<OrderUiState> = _uiState.asStateFlow()
 
@@ -30,23 +23,20 @@ class OrderDialogViewModel(
 
     fun submitOrder() {
         val state = _uiState.value
-        // 1️⃣ Валидация
-        if (state.details.petId == -1) {
+        if (state.details.petId == "") {
             _uiState.update {
                 it.copy(error = "Заполните все поля")
             }
             return
         }
 
-        // 2️⃣ Создание Entity
-        val order = state.details.toOrderr()
+        val order = state.details.toFOrder()
 
-        // 3️⃣ Запись в БД
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
             try {
-                ordersRepository.insertOrder(order)
+                fbRepository.addOrder(order)
 
                 _uiState.update {
                     it.copy(isLoading = false, success = true)
@@ -63,8 +53,10 @@ class OrderDialogViewModel(
     }
 }
 
-fun OrderDetails.toOrderr(): Orderr = Orderr(
+fun OrderDetails.toFOrder(): FOrder = FOrder(
+    id = id,
     petId = petId,
+    userId = userId,
     date = date,
     time = time,
     address = address,

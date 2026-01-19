@@ -8,11 +8,12 @@ data class OrderUiState(
 )
 
 data class OrderDetails(
-    val id:Int = 0,
-    val petId: Int = -1,
-    val address:String = "",
-    val date:String = "",
-    val time: String = "",
-    val price:Int = 0,
-    val notes: String = "",
+    val id:String="",
+    val petId: String="",
+    val userId: String="",
+    val address:String="",
+    val date:String="",
+    val time: String="",
+    val price:Int=0,
+    val notes: String=""
 )

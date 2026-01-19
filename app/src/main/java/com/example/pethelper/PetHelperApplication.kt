@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.pethelper.data.AppContainer
 import com.example.pethelper.data.AppDataContainer
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class PetHelperApplication : Application() {
 

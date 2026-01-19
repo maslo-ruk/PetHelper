@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import ads_mobile_sdk.h4
+import android.app.DatePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
@@ -42,173 +44,25 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import com.example.pethelper.data.fireBaseEntities.FUser
+import com.google.firebase.auth.FirebaseAuth
+import java.util.Calendar
 
 @Composable
-fun StartScreen(modifier:Modifier = Modifier,
-                userId:Int = 0) {
-    var screen by remember {mutableStateOf("registration")}
-    when (screen) {
-        "registration" -> RegistrationScreen { screen = "login" }
-        "login" -> LoginScreen { screen = "registration" }
-        "main" -> MainScreen()
+fun MainScreen(auth: FirebaseAuth, ifAuth:() -> Unit, ifNoAuth:() -> Unit) {
+    if (auth.currentUser != null) {
+        ifAuth()
     }
-
-}
-
-@Composable
-fun RegistrationScreen(onLoginClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-    ) {
-
-        Text(
-            text = "Регистрация",
-            modifier = Modifier.padding(bottom = 32.dp) // добавить шрифт
-        )
-
-        var name by remember { mutableStateOf("") }
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var role by remember { mutableStateOf("Я работник") }
-
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("ФИО") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Электронная почта") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Пароль") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        val roles = listOf("Я работник", "Я рабочий")
-        var expanded by remember { mutableStateOf(false) }
-
-        Box {
-            OutlinedTextField(
-                value = role,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Выберите роль") },
-                trailingIcon = {
-                    Icon(
-                        Icons.Default.ArrowDropDown, contentDescription = null,
-                        Modifier.clickable { expanded = true })
-                }
-            )
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                roles.forEach {
-                    DropdownMenuItem(text = { Text(it) },
-                        onClick = {
-                        role = it
-                        expanded = false
-                    })
-                }
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        Button(
-            onClick = { /* TODO */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Регистрация")
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Уже есть аккаунт?")
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = "Войти",
-                modifier = Modifier.clickable { onLoginClick() }
-            )
-        }
-    }
-}
-
-
-@Composable
-fun LoginScreen(onBack: () -> Unit) {
-
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-    ) {
-
-        IconButton(onClick = onBack) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
-        }
-
-        Text(
-            text = "Вход",
-            modifier = Modifier.padding(vertical = 24.dp)
-        )
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Электронная почта") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Пароль") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        Button(
-            onClick = { /* TODO */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Войти")
-        }
+    else {
+        ifNoAuth()
     }
 }
 
 @Composable
-fun MainScreen(onCreateOrder: () -> Unit = {}) {
+fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onBack:() ->Unit, onAccount:() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -223,13 +77,14 @@ fun MainScreen(onCreateOrder: () -> Unit = {}) {
                 text = "PetHelper",
             )
 
-            IconButton(onClick = { /* TODO: профиль */ }) {
+            IconButton(onClick = { onAccount() }) {
                 Icon(Icons.Default.AccountCircle, contentDescription = "Аккаунт")
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
-
+        Text("")
+        Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = onCreateOrder,
             modifier = Modifier.fillMaxWidth()
@@ -238,11 +93,41 @@ fun MainScreen(onCreateOrder: () -> Unit = {}) {
         }
 
         Spacer(modifier = Modifier.height(32.dp))
-
-        // Пустое пространство под будущее
+        Button(
+            onClick = {
+                onLogout()
+                onBack()
+                      },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Выйти")
+        }
     }
 }
 
-
+@Composable
+fun AuthFalse(onLogin: () -> Unit, onReg: () -> Unit, onBack:() ->Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Зарегистрируйтесь, или войдите в аккаунт"
+        )
+        Button(
+            onClick = onLogin,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Войти")
+        }
+        Button(
+            onClick = onReg,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Зарегистрироваться")
+        }
+    }
+}
 
 

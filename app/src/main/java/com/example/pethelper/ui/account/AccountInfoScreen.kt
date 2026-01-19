@@ -1,5 +1,6 @@
-package com.example.pethelper.ui
+package com.example.pethelper.ui.account
 
+import android.R
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -27,24 +28,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pethelper.ui.AppViewModelProvider
+import com.example.pethelper.ui.auth.LoginViewModel
 
 data class Pet(
     val id: String,
@@ -96,6 +98,8 @@ fun AccountScreen(
     onEditAccount: () -> Unit = {},
     onOpenAccountInfo: () -> Unit = {},
     onOpenPet: (Pet) -> Unit = {},
+    onBack:() -> Unit = {},
+    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
@@ -116,13 +120,16 @@ fun AccountScreen(
                     .clip(CircleShape) // потом поменяем
             ) {
                 Image(
-                    painter = painterResource(id = android.R.drawable.sym_def_app_icon),
+                    painter = painterResource(id = R.drawable.sym_def_app_icon),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
             }
 
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
+            }
 
             Spacer(Modifier.height(12.dp))
             Text("Имя Фамилия", fontWeight = FontWeight.Bold)
@@ -199,7 +206,7 @@ fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
                 title = { Text("Информация об аккаунте") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                        Icon(painterResource(id = R.drawable.ic_media_previous), contentDescription = "Назад")
                     }
                 }
             )
@@ -229,7 +236,7 @@ fun PetInfoScreen(pet: Pet, onBack: () -> Unit) {
                 title = { Text(pet.name) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                        Icon(painterResource(id = R.drawable.ic_media_previous), contentDescription = "Назад")
                     }
                 }
             )
