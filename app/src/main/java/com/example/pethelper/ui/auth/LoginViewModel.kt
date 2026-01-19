@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.firebaseRepositories.IAuthRepository
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
+import com.example.pethelper.data.firebaseRepositories.UserSessionManager
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    val authRepository: IAuthRepository
+    val fbRepository: FireStoreRepository,
+    val authRepository: IAuthRepository,
+    val userManager: UserSessionManager
 ): ViewModel() {
     var _uiState = MutableStateFlow(LoginUiState())
     var uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -31,6 +34,7 @@ class LoginViewModel(
             _uiState.update { it.copy(isLoading = true) }
             authRepository.login(details.email, details.password)
                 .onSuccess { uid ->
+                    userManager.loadCurrentUser()
                     _uiState.update {
                         it.copy(isLoading = false, success = true)
                     }

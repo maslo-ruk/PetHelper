@@ -48,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.ui.AppViewModelProvider
 import com.example.pethelper.ui.auth.LoginViewModel
+import androidx.compose.runtime.collectAsState
 
 data class Pet(
     val id: String,
@@ -101,11 +102,10 @@ fun AccountScreen(
     onOpenPet: (Pet) -> Unit = {},
     onBack:() -> Unit = {},
     modifier: Modifier,
-    curUser: FUser
+    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
-
-
+    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -133,7 +133,7 @@ fun AccountScreen(
             }
 
             Spacer(Modifier.height(12.dp))
-            Text("Имя Фамилия", fontWeight = FontWeight.Bold)
+            Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
 

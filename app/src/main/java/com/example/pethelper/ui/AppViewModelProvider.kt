@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.pethelper.PetHelperApplication
 import com.example.pethelper.data.firebaseRepositories.AuthRepository
+import com.example.pethelper.data.session.AppSession
 import com.example.pethelper.ui.auth.LoginViewModel
 import com.example.pethelper.ui.auth.RegViewModel
 import com.example.pethelper.ui.orders.OrderDialogViewModel
@@ -15,13 +16,13 @@ import com.google.firebase.firestore.firestore
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            OrderDialogViewModel(Firebase.firestore)
+            OrderDialogViewModel(AppSession.userRepository)
         }
         initializer {
-            RegViewModel(Firebase.firestore, AuthRepository())
+            RegViewModel(AppSession.userRepository, AppSession.authRepository, AppSession.sessionManager)
         }
         initializer {
-            LoginViewModel(AuthRepository())
+            LoginViewModel(AppSession.userRepository, AppSession.authRepository, AppSession.sessionManager)
         }
     }
 

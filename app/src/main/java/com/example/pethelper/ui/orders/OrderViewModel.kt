@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pethelper.data.fireBaseEntities.FOrder
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
+import com.example.pethelper.data.repositories.OrderRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,9 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class OrderDialogViewModel(db: FirebaseFirestore
+class OrderDialogViewModel(val fbRepository: FireStoreRepository
 ) : ViewModel() {
-    val fbRepository = FireStoreRepository(db)
     var _uiState = MutableStateFlow(OrderUiState())
     var uiState: StateFlow<OrderUiState> = _uiState.asStateFlow()
 

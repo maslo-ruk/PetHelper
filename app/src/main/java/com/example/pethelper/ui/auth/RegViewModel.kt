@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.firebaseRepositories.IAuthRepository
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
+import com.example.pethelper.data.firebaseRepositories.UserSessionManager
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,10 +14,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RegViewModel(
-    val db: FirebaseFirestore,
-    val authRepository: IAuthRepository
+    val fbRepository: FireStoreRepository,
+    val authRepository: IAuthRepository,
+    val userManager: UserSessionManager
     ): ViewModel() {
-    val fbRepository = FireStoreRepository(db)
     var _uiState = MutableStateFlow(RegUiState())
     var uiState: StateFlow<RegUiState> = _uiState.asStateFlow()
 
@@ -35,6 +36,7 @@ class RegViewModel(
             authRepository.register(user.login, details.password)
                 .onSuccess { uid ->
                     fbRepository.addUser(uid, user)
+                    userManager.loadCurrentUser()
                     _uiState.update {
                         it.copy(isLoading = false, success = true)
                     }
