@@ -26,6 +26,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.entities.User
+import com.example.pethelper.data.fireBaseEntities.FPet
+import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.ui.AppViewModelProvider
 import java.util.*
 import kotlin.math.exp
@@ -37,7 +39,8 @@ fun OrderDialog(modifier:Modifier = Modifier,
                 viewModel: OrderDialogViewModel = viewModel(factory = AppViewModelProvider.Factory),
                 onClose:()->Unit) {
     var showFields by remember { mutableStateOf(true) }
-
+    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
+    val pets = viewModel.userManager.pets.collectAsState().value
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) { showFields = true }
     Surface(
@@ -70,9 +73,9 @@ fun OrderDialog(modifier:Modifier = Modifier,
             // Неизменяемая информация
             AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Ыбан", fontSize = 18.sp)
-                    Text("Боготыров", fontSize = 18.sp)
-                    Text("Телефон: 8 800 555 35 35", fontSize = 18.sp)
+                    Text(curUser!!.name, fontSize = 18.sp)
+                    Text(curUser.surname, fontSize = 18.sp)
+                    Text("Телефон: ${curUser.phoneNumber}", fontSize = 18.sp)
                 }
             }
 
@@ -81,7 +84,8 @@ fun OrderDialog(modifier:Modifier = Modifier,
                 onClick = viewModel::updateUiState,
                 onSave = viewModel::submitOrder,
                 onClose = onClose,
-                uiState = uiState
+                uiState = uiState,
+                pets = pets
                 )
         }
 
@@ -94,13 +98,50 @@ fun OrderInputs(modifier:Modifier = Modifier,
                 onClick:(OrderDetails) -> Unit,
                 onSave:() -> Unit,
                 onClose:() -> Unit,
-                uiState: OrderUiState)
+                uiState: OrderUiState,
+                pets:List<FPet>
+                )
 {
     val context = LocalContext.current
+    var showFields by remember { mutableStateOf(true) }
     val districts = listOf(
         "ЦАО", "САО", "СВАО", "ВАО", "ЮВАО", "ЮАО", "ЮЗАО", "ЗАО", "СЗАО", "ЗелАО"
     )
-    var showFields by remember { mutableStateOf(true) }
+
+    var expanded1 by remember { mutableStateOf(false) }
+    // Выбор питомца
+    AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+        ExposedDropdownMenuBox(
+            expanded = expanded1,
+            onExpandedChange = { expanded1 = it }
+        ) {
+            OutlinedTextField(
+                value = uiState.details.pet.name,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Выберите нужного питомца") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = expanded1
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded1,
+                onDismissRequest = { onClick(uiState.details.copy(pet = FPet())) }
+            ) {
+                pets.forEach { pet ->
+                    DropdownMenuItem(
+                        text = { pet.name },
+                        onClick = {onClick(uiState.details.copy(pet = pet))}
+                    )
+                }
+            }
+        }
+    }
+
     AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
         OutlinedTextField(
             value = uiState.details.date,
@@ -126,6 +167,7 @@ fun OrderInputs(modifier:Modifier = Modifier,
             }
         )
     }
+
 
     // Время
     AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {

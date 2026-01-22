@@ -8,6 +8,7 @@ data class FPet(
     val age: Int=0,
     val type: PetTypes= PetTypes.DOG,
     val description: String="",
-
+    val gender: String="",
+    val breed: String="",
     val ownerId: Int=0
 )

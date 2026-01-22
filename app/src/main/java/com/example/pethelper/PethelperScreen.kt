@@ -14,6 +14,7 @@ import com.example.pethelper.ui.AuthFalse
 import com.example.pethelper.ui.AuthTrue
 
 import com.example.pethelper.ui.MainScreen
+import com.example.pethelper.ui.account.AccountScreen
 import com.example.pethelper.ui.auth.LoginScreen
 import com.example.pethelper.ui.auth.RegistrationScreen
 import com.example.pethelper.ui.orders.OrderDialog
@@ -29,6 +30,7 @@ enum class PetHelperScreens {
     HelpersCatalogue,
     Order,
     Account,
+    AccountInfo,
     Reg,
     Auth
 }
@@ -74,18 +76,23 @@ fun PetHelperApp(
                 OrderDialog(Modifier, onClose = { navController.popBackStack() })
             }
             composable(PetHelperScreens.Account.name) {
-                AccountInfoScreen(
-                    onBack = {navController.popBackStack()}
+                AccountScreen(
+                    onBack = {navController.popBackStack()},
+                    onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)}
                 )
+            }
+            composable(PetHelperScreens.AccountInfo.name) {
+                AccountInfoScreen(onBack = {navController.popBackStack()})
             }
             composable(PetHelperScreens.Reg.name) {
                 RegistrationScreen(
                     onBack = { navController.popBackStack() },
-                    onLoginClick = {navController.navigate(PetHelperScreens.Auth)}
+                    onLoginClick = {navController.navigate(PetHelperScreens.Auth)},
+                    goToMain = {navController.navigate(PetHelperScreens.Start.name)}
                 )
             }
             composable(PetHelperScreens.Auth.name) {
-                LoginScreen({navController.popBackStack()})
+                LoginScreen({navController.popBackStack()}, goToMain = {navController.navigate(PetHelperScreens.Start.name)})
             }
         }
     }

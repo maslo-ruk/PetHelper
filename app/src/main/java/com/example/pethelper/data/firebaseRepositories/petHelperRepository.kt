@@ -6,6 +6,7 @@ import com.example.pethelper.data.fireBaseEntities.FUser
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.tasks.await
 
 class FireStoreRepository(
@@ -22,6 +23,15 @@ class FireStoreRepository(
             .get()
             .await()
             .toObject(FUser::class.java)
+    }
+
+    suspend fun getPetsOfUser(userId:String): List<FPet> {
+        return db.collection("users")
+            .document(userId)
+            .collection("pets")
+            .get()
+            .await()
+            .toObjects(FPet::class.java)
     }
 
     suspend fun addPet(userId: String, pet: FPet) {

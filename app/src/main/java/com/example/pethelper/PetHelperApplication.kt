@@ -14,10 +14,6 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 
 class PetHelperApplication : Application() {
-
-    /**
-     * AppContainer instance used by the rest of classes to obtain dependencies
-     */
     lateinit var container: AppContainer
     lateinit var sessionManager: UserSessionManager
         private set

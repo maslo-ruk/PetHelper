@@ -1,9 +1,12 @@
 package com.example.pethelper.ui.orders
 
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pethelper.data.fireBaseEntities.FOrder
+import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
+import com.example.pethelper.data.firebaseRepositories.UserSessionManager
 import com.example.pethelper.data.repositories.OrderRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,10 +15,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class OrderDialogViewModel(val fbRepository: FireStoreRepository
+class OrderDialogViewModel(
+    val fbRepository: FireStoreRepository,
+    val userManager: UserSessionManager
 ) : ViewModel() {
     var _uiState = MutableStateFlow(OrderUiState())
     var uiState: StateFlow<OrderUiState> = _uiState.asStateFlow()
+
 
     fun updateUiState(details: OrderDetails) {
         _uiState.update { it.copy(details = details) }
@@ -23,13 +29,6 @@ class OrderDialogViewModel(val fbRepository: FireStoreRepository
 
     fun submitOrder() {
         val state = _uiState.value
-        if (state.details.petId == "") {
-            _uiState.update {
-                it.copy(error = "Заполните все поля")
-            }
-            return
-        }
-
         val order = state.details.toFOrder()
 
         viewModelScope.launch {
@@ -55,11 +54,11 @@ class OrderDialogViewModel(val fbRepository: FireStoreRepository
 
 fun OrderDetails.toFOrder(): FOrder = FOrder(
     id = id,
-    petId = petId,
+    pet = pet,
     userId = userId,
     date = date,
     time = time,
     address = address,
     price = price,
-    notes = notes
+    notes = notes,
 )

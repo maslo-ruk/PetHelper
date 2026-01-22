@@ -50,7 +50,8 @@ fun RegistrationScreen(
     onLoginClick: () -> Unit,
     viewModel: RegViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onClick:(RegDetails) -> Unit = viewModel::updateUiState,
-    onSubmit:() -> Unit = viewModel::submitRegistration
+    onSubmit:() -> Unit = viewModel::submitRegistration,
+    goToMain:() -> Unit = {}
     ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
@@ -212,7 +213,7 @@ fun RegistrationScreen(
             )
         }
         if (uiState.success) {
-            onBack()
+            goToMain()
         }
         else {
             Text(uiState.error)

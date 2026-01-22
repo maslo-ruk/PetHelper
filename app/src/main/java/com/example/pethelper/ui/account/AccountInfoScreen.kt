@@ -1,6 +1,5 @@
 package com.example.pethelper.ui.account
 
-import android.R
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -49,6 +48,8 @@ import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.ui.AppViewModelProvider
 import com.example.pethelper.ui.auth.LoginViewModel
 import androidx.compose.runtime.collectAsState
+import com.example.pethelper.data.fireBaseEntities.FPet
+import com.example.pethelper.R
 
 data class Pet(
     val id: String,
@@ -96,16 +97,16 @@ val samplePets = listOf(
 
 @Composable
 fun AccountScreen(
-    pets: List<Pet> = samplePets,
     onEditAccount: () -> Unit = {},
     onOpenAccountInfo: () -> Unit = {},
-    onOpenPet: (Pet) -> Unit = {},
+    onOpenPet: (FPet) -> Unit = {},
     onBack:() -> Unit = {},
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
-    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value
+    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
+    val pets = viewModel.userManager.pets.collectAsState().value
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -121,7 +122,7 @@ fun AccountScreen(
                     .clip(CircleShape) // потом поменяем
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.sym_def_app_icon),
+                    painter = painterResource(R.drawable.cot),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -180,7 +181,7 @@ fun AnimatedButton(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun PetListItem(pet: Pet, onClick: () -> Unit) {
+fun PetListItem(pet: FPet, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -191,7 +192,7 @@ fun PetListItem(pet: Pet, onClick: () -> Unit) {
         Row(modifier = Modifier.padding(16.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(pet.name, fontWeight = FontWeight.Bold)
-                Text(pet.type)
+                Text(pet.type.name)
             }
             Text("→", color = MaterialTheme.colorScheme.primary)
         }
@@ -200,26 +201,27 @@ fun PetListItem(pet: Pet, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
+fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier,
+                      curUser:FUser? = null) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Информация об аккаунте") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(painterResource(id = R.drawable.ic_media_previous), contentDescription = "Назад")
+                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
                     }
                 }
             )
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).padding(16.dp)) {
-            Text("Телефон: +7 ХХХ ХХХ ХХ ХХ")
-            Text("Email: example@mail.ru")
+            Text("Телефон: ${curUser!!.phoneNumber}")
+            Text("Email: ${curUser.login}")
             Spacer(Modifier.height(12.dp))
-            Text("Район: /*TODO*/")
+            Text("Адрес: ${curUser.address}")
             Spacer(Modifier.height(12.dp))
-            Text("Файл документов: (/*TODO*/)")
+            Text("Дата рождения ${curUser.birthDate}")
             Spacer(Modifier.height(20.dp))
             AnimatedButton(text = "Изменить информацию", onClick = {/*TODO*/})
         }
@@ -230,14 +232,14 @@ fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
 //питомец
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetInfoScreen(pet: Pet, onBack: () -> Unit) {
+fun PetInfoScreen(pet: FPet, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(pet.name) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(painterResource(id = R.drawable.ic_media_previous), contentDescription = "Назад")
+                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
                     }
                 }
             )
@@ -248,7 +250,7 @@ fun PetInfoScreen(pet: Pet, onBack: () -> Unit) {
             Text("Пол: ${pet.gender}")
             Text("Возраст: ${pet.age}")
             Text("Порода: ${pet.breed}")
-            Text("Особенности: ${pet.details}")
+            Text("Особенности: ${pet.description}")
             Spacer(Modifier.height(20.dp))
             AnimatedButton(text = "Изменить", onClick = {})
         }

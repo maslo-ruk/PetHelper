@@ -31,7 +31,8 @@ import com.example.pethelper.ui.AppViewModelProvider
 fun LoginScreen(onBack: () -> Unit,
                 viewModel: LoginViewModel = viewModel(factory = AppViewModelProvider.Factory),
                 onSubmit:() -> Unit = viewModel::submitRegistration,
-                onUpdate:(LoginDetails) -> Unit = viewModel::updateUiState) {
+                onUpdate:(LoginDetails) -> Unit = viewModel::updateUiState,
+                goToMain:() -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
     Column(
@@ -76,7 +77,7 @@ fun LoginScreen(onBack: () -> Unit,
             Text("Войти")
         }
         if (uiState.success) {
-            onBack()
+            goToMain()
         }
         else {
             Text(uiState.error)
