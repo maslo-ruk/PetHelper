@@ -10,7 +10,7 @@ class UserSessionManager(
     private val authRepository: IAuthRepository,
     private val userRepository: FireStoreRepository
 ) {
-
+    private val isLoggedIn:Boolean = false
     private val _currentUser = MutableStateFlow<UserData?>(null)
     val currentUser: StateFlow<UserData?> = _currentUser.asStateFlow()
 

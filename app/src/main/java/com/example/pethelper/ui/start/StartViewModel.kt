@@ -1,0 +1,37 @@
+package com.example.pethelper.ui.start
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.pethelper.data.firebaseRepositories.AuthRepository
+import com.example.pethelper.data.firebaseRepositories.UserSessionManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+class StartViewModel(
+    val userManager: UserSessionManager,
+    val authRepository: AuthRepository
+    ): ViewModel() {
+    val _uiState = MutableStateFlow(StartUiState())
+    val uiState: StateFlow<StartUiState> = _uiState.asStateFlow()
+    val _isLogged = MutableStateFlow(authRepository.isLogged())
+    val isLogged: StateFlow<Boolean> = _isLogged.asStateFlow()
+
+    fun load() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(state = "LoadUser") }
+            userManager.loadCurrentUser()
+            _uiState.update { it.copy(state = "Idle") }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout()
+            userManager.loadCurrentUser()
+        }
+    }
+
+}

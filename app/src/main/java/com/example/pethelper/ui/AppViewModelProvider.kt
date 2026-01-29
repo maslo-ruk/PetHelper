@@ -12,6 +12,7 @@ import com.example.pethelper.ui.auth.LoginViewModel
 import com.example.pethelper.ui.auth.RegViewModel
 import com.example.pethelper.ui.orders.OrderDialogViewModel
 import com.example.pethelper.ui.pets.PetCreateViewModel
+import com.example.pethelper.ui.start.StartViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
@@ -39,6 +40,10 @@ object AppViewModelProvider {
         initializer {
             val app = petApplication()
             PetCreateViewModel(AppSession.sessionManager, AppSession.userRepository)
+        }
+        initializer {
+            val app = petApplication()
+            StartViewModel(AppSession.sessionManager, AppSession.authRepository)
         }
     }
 

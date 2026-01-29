@@ -13,7 +13,6 @@ interface IAuthRepository {
 class AuthRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : IAuthRepository {
-
     override suspend fun register(email: String, password: String): Result<String> {
         return try {
             val result = auth
@@ -43,6 +42,10 @@ class AuthRepository(
 
     override fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
+    }
+
+    fun isLogged():Boolean {
+        return auth.currentUser != null
     }
 
 }

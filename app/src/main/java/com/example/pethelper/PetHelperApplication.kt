@@ -12,6 +12,9 @@ import com.example.pethelper.data.session.AppSession
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class PetHelperApplication : Application() {
     lateinit var container: AppContainer
@@ -21,6 +24,9 @@ class PetHelperApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         AppSession.init(Firebase.firestore)
+        CoroutineScope(Dispatchers.IO).launch {
+            AppSession.sessionManager.loadCurrentUser()
+        }
         container = AppDataContainer(this)
     }
 }

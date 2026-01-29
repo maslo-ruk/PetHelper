@@ -10,15 +10,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.pethelper.ui.account.AccountInfoScreen
-import com.example.pethelper.ui.AuthFalse
-import com.example.pethelper.ui.AuthTrue
+import com.example.pethelper.ui.start.AuthFalse
+import com.example.pethelper.ui.start.AuthTrue
 
-import com.example.pethelper.ui.MainScreen
+import com.example.pethelper.ui.start.MainScreen
 import com.example.pethelper.ui.account.AccountScreen
 import com.example.pethelper.ui.auth.LoginScreen
 import com.example.pethelper.ui.auth.RegistrationScreen
 import com.example.pethelper.ui.orders.OrderDialog
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 enum class PetHelperScreens {
     Loading,
@@ -52,24 +54,11 @@ fun PetHelperApp(
         ) {
             composable(PetHelperScreens.Start.name) {
                 MainScreen(
-                    auth = auth,
-                    ifAuth = {navController.navigate(PetHelperScreens.StartAuth.name)},
-                    ifNoAuth = {navController.navigate(PetHelperScreens.StartNOAuth.name)}
-                )
-            }
-            composable(route= PetHelperScreens.StartAuth.name) {
-                AuthTrue(
-                    onCreateOrder = {navController.navigate(PetHelperScreens.Order.name)},
-                    onLogout = { auth.signOut() },
-                    onAccount = {navController.navigate(PetHelperScreens.Account.name)},
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(route= PetHelperScreens.StartNOAuth.name) {
-                AuthFalse(
-                    onReg = {navController.navigate(PetHelperScreens.Reg.name)},
+                    auth = Firebase.auth,
                     onLogin = {navController.navigate(PetHelperScreens.Auth.name)},
-                    onBack = { navController.popBackStack() }
+                    onReg = {navController.navigate(PetHelperScreens.Reg.name)},
+                    onCreateOrder = {navController.navigate(PetHelperScreens.Order.name)},
+                    onAccount =  {navController.navigate(PetHelperScreens.Account.name)}
                 )
             }
             composable(PetHelperScreens.Order.name) {
