@@ -11,5 +11,6 @@ data class FPet(
     val gender: String="",
     val breed: String="",
     val ownerId: String="",
-    val weight: Int=0
+    val weight: Int=0,
+    val photoId: String="",
 )
