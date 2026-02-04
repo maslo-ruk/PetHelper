@@ -1,7 +1,11 @@
 package com.example.pethelper.ui.walk
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.pethelper.data.rtdb.RealtimeOrderRepository
+import com.example.pethelper.service.WalkServiceController
+import com.example.pethelper.ui.auth.LoginScreen
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,11 +18,41 @@ class WalkViewModel(val rtdbRepository: RealtimeOrderRepository): ViewModel() {
     private var listener: ValueEventListener? = null
 
     fun startObserving(orderId:String) {
-        if (listener != null) return
-
-        listener = rtdbRepository.observeLocation(orderId) { lat, lng ->
-            _location.value = lat to lng
+        Log.d("WalkViewModel", "startObserving")
+        if (listener != null) {
+            Log.d("WalkViewModel","Listener is not null")
+            return
         }
+        Log.d("WalkViewModel", "listenerIsNull")
+        listener = rtdbRepository.observeLocation(orderId) { lat, lon ->
+            _location.value = Pair(lat, lon)
+        }
+        Log.d("WalkViewModel", "Location updated: ${location.value?.first}, ${location.value?.second}")
+    }
+
+    fun stopObserving(orderId: String) {
+        listener?.let {
+            rtdbRepository.removeListener(orderId, it)
+            listener = null
+        }
+    }
+
+    fun onWalkStarted(
+        context: Context,
+        orderId: String
+    ) {
+        startObserving(orderId)
+        Log.d("WalkViewModel", "onWalkStarted")
+        WalkServiceController.startWalkService(context, orderId)
+        Log.d("WalkViewModel", "onWalkStarted success")
+    }
+
+    fun onWalkFinished(
+        context: Context,
+        orderId: String
+    ) {
+        stopObserving(orderId)
+        WalkServiceController.stopWalkService(context)
     }
 
     override fun onCleared() {

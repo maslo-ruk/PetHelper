@@ -22,6 +22,8 @@ import com.example.pethelper.ui.auth.LoginScreen
 
 import com.example.pethelper.ui.orders.OrderDialog
 import com.example.pethelper.ui.pets.PetCreate
+import com.example.pethelper.ui.walk.LocationPermissionScreen
+import com.example.pethelper.ui.walk.WalkScreen
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -40,7 +42,9 @@ enum class PetHelperScreens {
     AddPet,
     PetInfo,
     Reg,
-    Auth
+    Auth,
+    Location,
+    Permissions
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +68,8 @@ fun PetHelperApp(
                     onLogin = {navController.navigate(PetHelperScreens.Auth.name)},
                     onReg = {navController.navigate(PetHelperScreens.Reg.name)},
                     onCreateOrder = {navController.navigate(PetHelperScreens.Order.name)},
-                    onAccount =  {navController.navigate(PetHelperScreens.Account.name)}
+                    onAccount =  {navController.navigate(PetHelperScreens.Account.name)},
+                    onLoc = { navController.navigate(PetHelperScreens.Location.name) }
                 )
             }
             composable(PetHelperScreens.Order.name) {
@@ -102,6 +107,9 @@ fun PetHelperApp(
             }
             composable(route = PetHelperScreens.PetInfo.name) {
                 PetInfoScreen(onBack = {navController.popBackStack()})
+            }
+            composable(route = PetHelperScreens.Location.name) {
+                WalkScreen()
             }
         }
     }

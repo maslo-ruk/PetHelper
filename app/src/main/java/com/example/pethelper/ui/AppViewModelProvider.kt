@@ -15,6 +15,7 @@ import com.example.pethelper.ui.auth.RegViewModel
 import com.example.pethelper.ui.orders.OrderDialogViewModel
 import com.example.pethelper.ui.pets.PetCreateViewModel
 import com.example.pethelper.ui.start.StartViewModel
+import com.example.pethelper.ui.walk.WalkViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
@@ -53,6 +54,9 @@ object AppViewModelProvider {
         }
         initializer {
             PetViewModel()
+        }
+        initializer {
+            WalkViewModel(AppSession.rtdbRepository)
         }
     }
 

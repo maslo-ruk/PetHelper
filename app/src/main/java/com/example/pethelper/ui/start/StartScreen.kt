@@ -35,12 +35,13 @@ fun MainScreen(
     onCreateOrder:() -> Unit,
     onAccount: () -> Unit,
     onLogin: () -> Unit,
+    onLoc:() -> Unit,
     onReg: () -> Unit,
     load:() -> Unit = viewModel::load
 ) {
     val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
     if (isLogged) {
-        AuthTrue(onCreateOrder, onLogout, onAccount)
+        AuthTrue(onCreateOrder, onLogout, onAccount, onLoc)
     }
     else {
         AuthFalse(onLogin, onReg)
@@ -48,7 +49,7 @@ fun MainScreen(
 }
 
 @Composable
-fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Unit) {
+fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Unit, onLoc: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,6 +87,14 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Выйти")
+        }
+        Button(
+            onClick = {
+                onLoc()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Чек геолокации")
         }
     }
 }
