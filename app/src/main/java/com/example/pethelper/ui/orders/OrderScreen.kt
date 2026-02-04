@@ -9,6 +9,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
@@ -19,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -104,165 +107,163 @@ fun OrderInputs(modifier:Modifier = Modifier,
 {
     val context = LocalContext.current
     var showFields by remember { mutableStateOf(true) }
-    val districts = listOf(
-        "ЦАО", "САО", "СВАО", "ВАО", "ЮВАО", "ЮАО", "ЮЗАО", "ЗАО", "СЗАО", "ЗелАО"
-    )
 
     var expanded1 by remember { mutableStateOf(false) }
-    // Выбор питомца
-    AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-        ExposedDropdownMenuBox(
-            expanded = expanded1,
-            onExpandedChange = { expanded1 = it }
-        ) {
-            OutlinedTextField(
-                value = uiState.details.pet.name,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Выберите нужного питомца") },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = expanded1
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            ExposedDropdownMenu(
+    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+            ExposedDropdownMenuBox(
                 expanded = expanded1,
-                onDismissRequest = { onClick(uiState.details.copy(pet = FPet())) }
+                onExpandedChange = { expanded1 = it }
             ) {
-                pets.forEach { pet ->
-                    DropdownMenuItem(
-                        text = { pet.name },
-                        onClick = {onClick(uiState.details.copy(pet = pet))}
-                    )
+                OutlinedTextField(
+                    value = uiState.details.pet.name,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Выберите нужного питомца") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded1
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded1,
+                    onDismissRequest = { onClick(uiState.details.copy(pet = FPet())) }
+                ) {
+                    pets.forEach { pet ->
+                        DropdownMenuItem(
+                            text = { pet.name },
+                            onClick = {onClick(uiState.details.copy(pet = pet))}
+                        )
+                    }
                 }
             }
         }
-    }
 
-    AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-        OutlinedTextField(
-            value = uiState.details.date,
-            onValueChange = {/*onClick(viewModel._uiState.value.details.copy(date = it))*/},
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Дата") },
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = {
-                    val calendar = Calendar.getInstance()
-                    DatePickerDialog(
-                        context,
-                        { _, year, month, dayOfMonth ->
-                            onClick(uiState.details.copy(date = "$dayOfMonth/${month + 1}/$year"))
-                        },
-                        calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH)
-                    ).show()
-                }) {
-                    Icon(Icons.Default.DateRange, contentDescription = "Выбрать дату")
-                }
-            }
-        )
-    }
-
-
-    // Время
-    AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-        OutlinedTextField(
-            value = uiState.details.time,
-            onValueChange = {},
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Время") },
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = {
-                    val calendar = Calendar.getInstance()
-                    TimePickerDialog(
-                        context,
-                        { _, hourOfDay, minute ->
-                            onClick(uiState.details.copy(
-                                time = String.format("%02d:%02d", hourOfDay, minute))
-                            )
-                        },
-                        calendar.get(Calendar.HOUR_OF_DAY),
-                        calendar.get(Calendar.MINUTE),
-                        true
-                    ).show()
-                }) {
-                    Icon(Icons.Default.AccessTime, contentDescription = "Выбрать время")
-                }
-            }
-        )
-    }
-    var expanded by remember { mutableStateOf(false) }
-    // Районы
-    AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it }
-        ) {
+        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
             OutlinedTextField(
-                value = uiState.details.address,
-                onValueChange = {},
+                value = uiState.details.date,
+                onValueChange = {/*onClick(viewModel._uiState.value.details.copy(date = it))*/},
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Дата") },
                 readOnly = true,
-                label = { Text("Район Москвы") },
                 trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = expanded
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { onClick(uiState.details.copy(address = "")) }
-            ) {
-                districts.forEach { district ->
-                    DropdownMenuItem(
-                        text = { Text(district) },
-                        onClick = {onClick(uiState.details.copy(address = district))}
-                    )
+                    IconButton(onClick = {
+                        val calendar = Calendar.getInstance()
+                        DatePickerDialog(
+                            context,
+                            { _, year, month, dayOfMonth ->
+                                onClick(uiState.details.copy(date = "$dayOfMonth/${month + 1}/$year"))
+                            },
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH)
+                        ).show()
+                    }) {
+                        Icon(Icons.Default.DateRange, contentDescription = "Выбрать дату")
+                    }
                 }
+            )
+        }
+
+
+        // Время
+        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+            OutlinedTextField(
+                value = uiState.details.time,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Время") },
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = {
+                        val calendar = Calendar.getInstance()
+                        TimePickerDialog(
+                            context,
+                            { _, hourOfDay, minute ->
+                                onClick(uiState.details.copy(
+                                    time = String.format("%02d:%02d", hourOfDay, minute))
+                                )
+                            },
+                            calendar.get(Calendar.HOUR_OF_DAY),
+                            calendar.get(Calendar.MINUTE),
+                            true
+                        ).show()
+                    }) {
+                        Icon(Icons.Default.AccessTime, contentDescription = "Выбрать время")
+                    }
+                }
+            )
+        }
+        var expanded by remember { mutableStateOf(false) }
+        // Районы
+        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = it }
+            ) {
+                OutlinedTextField(
+                    value = uiState.details.address,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Адрес") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+//                ExposedDropdownMenu(
+//                    expanded = expanded,
+//                    onDismissRequest = { onClick(uiState.details.copy(address = "")) }
+//                ) {
+//                    districts.forEach { district ->
+//                        DropdownMenuItem(
+//                            text = { Text(district) },
+//                            onClick = {onClick(uiState.details.copy(address = district))}
+//                        )
+//                    }
+//                }
             }
         }
-    }
 
 
-    // Цена
-    AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-        OutlinedTextField(
-            value = uiState.details.price.toString(),
-            onValueChange = { onClick(uiState.details.copy(price=it.toInt())) },
-            label = { Text("Цена") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-    }
+        // Цена
+        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+            OutlinedTextField(
+                value = uiState.details.price.toString(),
+                onValueChange = { onClick(uiState.details.copy(price=it.toInt())) },
+                label = { Text("Цена") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
 
-    // Примечания
-    AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-        OutlinedTextField(
-            value = uiState.details.notes,
-            onValueChange = { onClick(uiState.details.copy(notes = it)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp),
-            label = { Text("Примечания по заказу") },
-            maxLines = 10
-        )
-    }
+        // Примечания
+        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+            OutlinedTextField(
+                value = uiState.details.notes,
+                onValueChange = { onClick(uiState.details.copy(notes = it)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                label = { Text("Примечания по заказу") },
+                maxLines = 10
+            )
+        }
 
-    // Кнопка "Создать заказ"
-    AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-        Button(
-            onClick = onSave,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Создать заказ")
+        // Кнопка "Создать заказ"
+        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+            Button(
+                onClick = onSave,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Создать заказ")
+            }
         }
     }
 }
