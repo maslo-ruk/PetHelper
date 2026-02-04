@@ -21,14 +21,13 @@ class PetCreateViewModel(val userManager: UserSessionManager, val fbRepository: 
 
     fun submitPet() {
         val state = _uiState.value
-        val pet = state.details
-
+        val pet = state.details.copy( ownerId = userManager.currentUser.value!!.uid)
         viewModelScope.launch {
             _uiState.update {it.copy(isLoading = true)}
 
             try {
                 fbRepository.addPet(userManager.currentUser.value!!.uid, pet)
-
+                userManager.loadCurrentUser()
                 _uiState.update {
                     it.copy(isLoading = false, isSuccess = true)
                 }

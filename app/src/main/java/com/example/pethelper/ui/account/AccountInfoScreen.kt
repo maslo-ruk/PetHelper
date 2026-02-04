@@ -48,6 +48,8 @@ import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.ui.AppViewModelProvider
 import com.example.pethelper.ui.auth.LoginViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.R
 
@@ -83,14 +85,17 @@ import com.example.pethelper.R
 fun AccountScreen(
     onEditAccount: () -> Unit = {},
     onOpenAccountInfo: () -> Unit = {},
-    onOpenPet: (FPet) -> Unit = {},
+    onOpenPet: () -> Unit = {},
+    onAddPet: () -> Unit = {},
     onBack:() -> Unit = {},
     modifier: Modifier = Modifier,
-    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    petViewModel: PetViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     val pets = viewModel.userManager.pets.collectAsState().value
+    val petUiState by viewModel.uiState.collectAsStateWithLifecycle()
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -137,11 +142,17 @@ fun AccountScreen(
             LazyColumn {
                 items(pets) { pet ->
                     AnimatedVisibility(visible = true, enter = fadeIn() + expandVertically()) {
-                        PetListItem(pet = pet, onClick = { onOpenPet(pet) })
+                        PetListItem(pet = pet,
+                            onClick = {
+                                petViewModel.updateStateFlow(pet)
+                                onOpenPet()
+                            })
                     }
                     Spacer(Modifier.height(12.dp))
                 }
             }
+
+            AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
         }
     }
 }
@@ -185,8 +196,12 @@ fun PetListItem(pet: FPet, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier,
-                      curUser:FUser? = null) {
+fun AccountInfoScreen(onBack: () -> Unit = {},
+                      viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory),
+                      onEditAccount :() ->Unit = {},
+                      modifier: Modifier = Modifier) {
+    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
+    val pets = viewModel.userManager.pets.collectAsState().value
     Scaffold(
         topBar = {
             TopAppBar(
@@ -207,7 +222,7 @@ fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier,
             Spacer(Modifier.height(12.dp))
             Text("Дата рождения ${curUser.birthDate}")
             Spacer(Modifier.height(20.dp))
-            AnimatedButton(text = "Изменить информацию", onClick = {/*TODO*/})
+            AnimatedButton(text = "Изменить информацию", onClick = {onEditAccount()})
         }
     }
 }
@@ -216,7 +231,9 @@ fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier,
 //питомец
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetInfoScreen(pet: FPet, onBack: () -> Unit) {
+fun PetInfoScreen(viewModel: PetViewModel = viewModel(factory = AppViewModelProvider.Factory), onBack: () -> Unit) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pet = uiState.pet
     Scaffold(
         topBar = {
             TopAppBar(

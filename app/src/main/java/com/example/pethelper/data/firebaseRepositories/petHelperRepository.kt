@@ -5,6 +5,7 @@ import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.tasks.await
@@ -23,6 +24,13 @@ class FireStoreRepository(
             .get()
             .await()
             .toObject(FUser::class.java)
+    }
+
+    suspend fun updateUser(userId: String, user: FUser) {
+        db.collection("users")
+            .document(userId)
+            .set(user, SetOptions.merge())
+            .await()
     }
 
     suspend fun getPetsOfUser(userId:String): List<FPet> {
@@ -45,6 +53,19 @@ class FireStoreRepository(
     suspend fun addOrder(order: FOrder) {
         db.collection("orders")
             .add(order)
+            .await()
+        db.collection("users")
+            .document(order.userId)
+            .collection("orders")
+            .add(order)
+            .await()
+    }
+
+    suspend fun addWorkerToOrder(orderId:String, worker:FUser) {
+        db.collection("orders")
+            .document(orderId)
+            .collection("workers")
+            .add(worker)
             .await()
     }
 }

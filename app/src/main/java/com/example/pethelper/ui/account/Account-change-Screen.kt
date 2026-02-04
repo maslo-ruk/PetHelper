@@ -56,14 +56,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountChange(onBack:()-> Unit = {}, modifier: Modifier,
-                  viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun AccountChange(onBack:()-> Unit = {},
+                  viewModel: AccountChangeViewModel = viewModel(factory = AppViewModelProvider.Factory),
+                  onValChange:(FUser) -> Unit = viewModel::updateUiState,
+                  onSubmit:() -> Unit = viewModel::submit,
+                  modifier: Modifier = Modifier,) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
-    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pets = viewModel.userManager.pets.collectAsState().value
     Scaffold(
         topBar = {
@@ -83,7 +87,10 @@ fun AccountChange(onBack:()-> Unit = {}, modifier: Modifier,
             .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(modifier=Modifier, contentAlignment = Alignment.BottomEnd) {
                 Image(painter = painterResource(R.drawable.cot), contentDescription = "Аватар",
-                    Modifier.size(120.dp).background(MaterialTheme.colorScheme.primary).clip(CircleShape))
+                    Modifier
+                        .size(120.dp)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clip(CircleShape))
                 IconButton(onClick = {/*TODO*/},
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.primary, CircleShape)
@@ -94,81 +101,86 @@ fun AccountChange(onBack:()-> Unit = {}, modifier: Modifier,
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
-//            OutlinedTextField(
-//                value = curUser?.name,
-//                onValueChange = {/*TODO*/},
-//                label = Text("Имя"),
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//
-//            Spacer(modifier = Modifier.height(12.dp))
-//
-//            OutlinedTextField(value = curUser?.surname,
-//                onValueChange = {/*TODO*/},
-//                label = Text("Фамилия"),
-//                modifier = Modifier.fillMaxWidth())
-//
-//            Spacer(modifier = Modifier.height(12.dp))
-//
-//            OutlinedTextField(
-//                value = curUser?.address,
-//                onValueChange = {/*TODO*/},
-//                label = Text("Почта"),
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//            Spacer(modifier = Modifier.height(12.dp))
-//            OutlinedTextField(
-//                value = curUser?.phoneNumber,
-//                onValueChange = {/*TODO*/},
-//                label = { Text("Телефон") },
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-//                modifier = Modifier.fillMaxWidth()
-//            )
+            OutlinedTextField(
+                value = uiState.user.name,
+                onValueChange = {onValChange(uiState.user.copy(name = it))},
+                label = { Text("Имя") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(value = uiState.user.surname,
+                onValueChange = {onValChange(uiState.user.copy(surname = it))},
+                label = { Text("Фамилия") },
+                modifier = Modifier.fillMaxWidth())
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = uiState.user.address,
+                onValueChange = {onValChange(uiState.user.copy(address = it))},
+                label = { Text("Адрес") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedTextField(
+                value = uiState.user.phoneNumber,
+                onValueChange = {onValChange(uiState.user.copy(phoneNumber = it))},
+                label = { Text("Телефон") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier= Modifier.height(12.dp))
             var showDatePicker by remember { mutableStateOf(false) }
             val datePickerState = rememberDatePickerState()
-            OutlinedTextField(
-                value = curUser?.birthDate.let {
-                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                        .format(Date(it))
-                } ?: "",
-                onValueChange = {},
-                label = { Text("Дата рождения") },
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDatePicker = true }
-            )
-            if (showDatePicker) {
-                DatePickerDialog(
-                    onDismissRequest = { showDatePicker = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showDatePicker = false /*тут нужно добавить изменение даты*/
-                        }) {
-                            Text("ОК")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDatePicker = false }) {
-                            Text("Отмена")
-                        }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
-                }
-            }
+//            OutlinedTextField(
+//                value = uiState.user.birthDate.let {
+//                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+//                        .format(Date(it))
+//                } ?: "",
+//                onValueChange = {},
+//                label = { Text("Дата рождения") },
+//                readOnly = true,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .clickable { showDatePicker = true }
+//            )
+//            if (showDatePicker) {
+//                DatePickerDialog(
+//                    onDismissRequest = { showDatePicker = false },
+//                    confirmButton = {
+//                        TextButton(onClick = {
+//                            showDatePicker = false /*тут нужно добавить изменение даты*/
+//                        }) {
+//                            Text("ОК")
+//                        }
+//                    },
+//                    dismissButton = {
+//                        TextButton(onClick = { showDatePicker = false }) {
+//                            Text("Отмена")
+//                        }
+//                    }
+//                ) {
+//                    DatePicker(state = datePickerState)
+//                }
+//            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedButton(
-                onClick = { /* не ебу */ },
+                onClick = { onSubmit() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Изменить пароль")
+                Text("Готово")
             }
-
+            if (uiState.isLoading) {
+                Text("Загрузка...")
+            }
+            if (uiState.success) {
+                onBack()
+            }
         }
         }
 

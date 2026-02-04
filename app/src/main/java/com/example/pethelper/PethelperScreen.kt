@@ -9,15 +9,19 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.pethelper.ui.RegistrationScreen
+import com.example.pethelper.ui.account.AccountChange
 import com.example.pethelper.ui.account.AccountInfoScreen
 import com.example.pethelper.ui.start.AuthFalse
 import com.example.pethelper.ui.start.AuthTrue
 
 import com.example.pethelper.ui.start.MainScreen
 import com.example.pethelper.ui.account.AccountScreen
+import com.example.pethelper.ui.account.PetInfoScreen
 import com.example.pethelper.ui.auth.LoginScreen
-import com.example.pethelper.ui.auth.RegistrationScreen
+
 import com.example.pethelper.ui.orders.OrderDialog
+import com.example.pethelper.ui.pets.PetCreate
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -26,13 +30,15 @@ enum class PetHelperScreens {
     Loading,
     Start,
     StartAuth,
-    StartNOAuth,
     StartForClients,
     StartForHelpers,
     HelpersCatalogue,
     Order,
     Account,
     AccountInfo,
+    AccountEdit,
+    AddPet,
+    PetInfo,
     Reg,
     Auth
 }
@@ -67,11 +73,16 @@ fun PetHelperApp(
             composable(PetHelperScreens.Account.name) {
                 AccountScreen(
                     onBack = {navController.popBackStack()},
-                    onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)}
+                    onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)},
+                    onAddPet = {navController.navigate(PetHelperScreens.AddPet.name)},
+                    onOpenPet = {navController.navigate(PetHelperScreens.PetInfo.name)}
                 )
             }
             composable(PetHelperScreens.AccountInfo.name) {
-                AccountInfoScreen(onBack = {navController.popBackStack()})
+                AccountInfoScreen(
+                    onBack = {navController.popBackStack()},
+                    onEditAccount = {navController.navigate(PetHelperScreens.AccountEdit.name)}
+                )
             }
             composable(PetHelperScreens.Reg.name) {
                 RegistrationScreen(
@@ -82,6 +93,15 @@ fun PetHelperApp(
             }
             composable(PetHelperScreens.Auth.name) {
                 LoginScreen({navController.popBackStack()}, goToMain = {navController.navigate(PetHelperScreens.Start.name)})
+            }
+            composable(PetHelperScreens.AccountEdit.name) {
+                AccountChange(onBack = {navController.popBackStack()})
+            }
+            composable(PetHelperScreens.AddPet.name) {
+                PetCreate(onBack = {navController.popBackStack()})
+            }
+            composable(route = PetHelperScreens.PetInfo.name) {
+                PetInfoScreen(onBack = {navController.popBackStack()})
             }
         }
     }
