@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -26,14 +27,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.Update
+import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.ui.AppViewModelProvider
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetCreate(onBack: () -> Unit, modifier: Modifier,
-              viewModel: PetCreateViewModel = viewModel(factory = AppViewModelProvider.Factory)
+fun PetCreate(onBack: () -> Unit,
+              modifier: Modifier,
+              viewModel: PetCreateViewModel = viewModel(factory = AppViewModelProvider.Factory),
+              onUpdate: (FPet) -> Unit = viewModel::updateStateFlow,
+              onSubmit: () -> Unit = viewModel::submitPet
  ) {
     /*я не разобаралась с классом животного, потом изменим*/
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+
     var petName by remember { mutableStateOf("") }
     var breed by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
@@ -59,7 +71,7 @@ fun PetCreate(onBack: () -> Unit, modifier: Modifier,
             horizontalAlignment = Alignment.CenterHorizontally, ) {
             /*Изображение питомца*/
             OutlinedButton(
-                onClick = { /* TODO: добавить позже */ },
+                onClick = { /*диалог выбора изображения*/ },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Добавить изображение")
@@ -68,7 +80,7 @@ fun PetCreate(onBack: () -> Unit, modifier: Modifier,
 
             OutlinedTextField(
                 value = petName,
-                onValueChange = { petName = it },
+                onValueChange = { onUpdate(uiState.details.copy(name = it)) },
                 label = { Text("Имя питомца") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -79,10 +91,8 @@ fun PetCreate(onBack: () -> Unit, modifier: Modifier,
             /*порода, сделала первую букву заглавной, чтобы в бд было легче искать всегда*/
             OutlinedTextField(
                 value = breed,
-                onValueChange = { input ->
-                    breed = input.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase() else it.toString()
-                    }
+                onValueChange = { input -> onUpdate(uiState.details.copy(breed = input.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase() else it.toString()}))
                 },
                 label = { Text("Порода") },
                 modifier = Modifier.fillMaxWidth(),
@@ -92,7 +102,7 @@ fun PetCreate(onBack: () -> Unit, modifier: Modifier,
 
             OutlinedTextField(
                 value = age,
-                onValueChange = { age = it },
+                onValueChange = { onUpdate(uiState.details.copy(age = it.toInt())) },
                 label = { Text("Возраст") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -102,7 +112,7 @@ fun PetCreate(onBack: () -> Unit, modifier: Modifier,
 
             OutlinedTextField(
                 value = weight,
-                onValueChange = { weight = it },
+                onValueChange = { onUpdate(uiState.details.copy(weight = it.toInt())) },
                 label = { Text("Вес (кг)") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -111,7 +121,7 @@ fun PetCreate(onBack: () -> Unit, modifier: Modifier,
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
                 value = notes,
-                onValueChange = { notes = it },
+                onValueChange = { onUpdate(uiState.details.copy(description = it)) },
                 label = { Text("Примечания по характеру, особенности") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -121,7 +131,7 @@ fun PetCreate(onBack: () -> Unit, modifier: Modifier,
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedButton(onClick = {/*TODO*/}, modifier = Modifier
+            OutlinedButton(onClick = { onSubmit() }, modifier = Modifier
                 .fillMaxWidth()) {
                 Text("Сохранить")
             }
