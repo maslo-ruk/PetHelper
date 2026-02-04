@@ -38,12 +38,6 @@ fun MainScreen(
     onReg: () -> Unit,
     load:() -> Unit = viewModel::load
 ) {
-//    if (auth.currentUser != null) {
-//        ifAuth()
-//    }
-//    else {
-//        ifNoAuth()
-//    }
     val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
     if (isLogged) {
         AuthTrue(onCreateOrder, onLogout, onAccount)

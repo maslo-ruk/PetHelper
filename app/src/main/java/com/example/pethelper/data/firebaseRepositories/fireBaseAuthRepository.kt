@@ -1,6 +1,9 @@
 package com.example.pethelper.data.firebaseRepositories
 
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
 interface IAuthRepository {
@@ -44,8 +47,7 @@ class AuthRepository(
         return auth.currentUser?.uid
     }
 
-    fun isLogged():Boolean {
-        return auth.currentUser != null
-    }
+    private val _isLogged = MutableStateFlow(auth.currentUser != null)
+    val isLogged: StateFlow<Boolean> = _isLogged.asStateFlow()
 
 }

@@ -16,8 +16,7 @@ class StartViewModel(
     ): ViewModel() {
     val _uiState = MutableStateFlow(StartUiState())
     val uiState: StateFlow<StartUiState> = _uiState.asStateFlow()
-    val _isLogged = MutableStateFlow(authRepository.isLogged())
-    val isLogged: StateFlow<Boolean> = _isLogged.asStateFlow()
+    val isLogged: StateFlow<Boolean> = authRepository.isLogged
 
     fun load() {
         viewModelScope.launch {
