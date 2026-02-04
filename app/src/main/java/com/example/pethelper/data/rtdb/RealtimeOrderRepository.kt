@@ -6,7 +6,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class RealtimeOrderRepository {
-    private val db = FirebaseDatabase.getInstance()
+    private val db = FirebaseDatabase.getInstance("https://pethelper-4efbe-default-rtdb.europe-west1.firebasedatabase.app")
     private val rootRef = db.getReference("activeOrders")
 
     fun updateLocation(
@@ -15,8 +15,8 @@ class RealtimeOrderRepository {
         lon:Double
     ) {
         val data = mapOf(
-            "location/lat" to lat,
-            "location/lng" to lon,
+            "lat" to lat,
+            "lon" to lon,
             "lastPing" to System.currentTimeMillis()
         )
 
@@ -27,7 +27,7 @@ class RealtimeOrderRepository {
         orderId:String,
         onChange: (lat:Double, lon:Double) -> Unit
     ): ValueEventListener {
-        val ref = rootRef.child(orderId).child("location")
+        val ref = rootRef.child(orderId)
 
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
