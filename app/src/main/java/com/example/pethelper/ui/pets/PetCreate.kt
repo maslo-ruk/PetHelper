@@ -1,5 +1,8 @@
 package com.example.pethelper.ui.pets
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +34,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Update
 import com.example.pethelper.data.fireBaseEntities.FPet
+import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.AppViewModelProvider
+import android.content.Context
+import androidx.compose.material3.Button
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,13 +86,7 @@ fun PetCreate(onBack: () -> Unit,
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally, ) {
-            /*Изображение питомца*/
-            OutlinedButton(
-                onClick = { /*диалог выбора изображения*/ },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Добавить изображение")
-            }
+            UploadPhotoButton()
             Spacer(modifier= Modifier.height(12.dp))
 
             OutlinedTextField(
@@ -144,4 +155,57 @@ fun PetCreate(onBack: () -> Unit,
         }
     }
 
+}
+
+suspend fun uploadPhotoToServer(
+    context: Context,
+    uri: Uri,
+    baseUrl: String = NetworkConfig.BASE_URL,
+    client: OkHttpClient = OkHttpClient()): String {
+    val bytes = withContext(Dispatchers.IO) {
+        context.contentResolver.openInputStream(uri)?.use {it.readBytes()} ?: error("Не могу прочитать")
+    }
+    val body = MultipartBody.Builder().setType(MultipartBody.FORM)
+        .addFormDataPart(name = "photo",
+            filename = "image.png",
+            body = bytes.toRequestBody("image/jpeg".toMediaType())).build()
+    val request = Request.Builder().url("$baseUrl/upload").post(body).build()
+    val resp = withContext(Dispatchers.IO) {
+        client.newCall(request).execute()
+    }
+    if (!resp.isSuccessful) {
+        error("Upload failed")
+    }
+    val json = resp.body?.string() ?: error("Empty response")
+    return JSONObject(json).getString("fileId")
+}
+
+
+@Composable
+fun UploadPhotoButton() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var uploading by remember { mutableStateOf(false) }
+    var lastFileId by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val pickImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+        uri: Uri? -> if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            try {
+                error = null
+                uploading = true
+                val fileId = uploadPhotoToServer(context, uri)
+                lastFileId = fileId} catch (e: Exception) {
+                    error = e.message } finally {
+                        uploading = false
+                    }
+            }
+        }
+    Button(
+        onClick = { pickImageLauncher.launch(arrayOf("image/*")) },
+        enabled = !uploading) {
+        Text(if (uploading) "загружаю" else "Выбрать фото")
+        lastFileId?.let { Text("fileId: $it") }
+        error?.let { Text("Ошибка: $it")}
+    }
 }
