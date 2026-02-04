@@ -9,6 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.pethelper.ui.RegistrationScreen
+import com.example.pethelper.ui.account.AccountChange
 import com.example.pethelper.ui.account.AccountInfoScreen
 import com.example.pethelper.ui.start.AuthFalse
 import com.example.pethelper.ui.start.AuthTrue
@@ -16,7 +18,7 @@ import com.example.pethelper.ui.start.AuthTrue
 import com.example.pethelper.ui.start.MainScreen
 import com.example.pethelper.ui.account.AccountScreen
 import com.example.pethelper.ui.auth.LoginScreen
-import com.example.pethelper.ui.auth.RegistrationScreen
+
 import com.example.pethelper.ui.orders.OrderDialog
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -26,13 +28,13 @@ enum class PetHelperScreens {
     Loading,
     Start,
     StartAuth,
-    StartNOAuth,
     StartForClients,
     StartForHelpers,
     HelpersCatalogue,
     Order,
     Account,
     AccountInfo,
+    AccountEdit,
     Reg,
     Auth
 }
@@ -71,7 +73,10 @@ fun PetHelperApp(
                 )
             }
             composable(PetHelperScreens.AccountInfo.name) {
-                AccountInfoScreen(onBack = {navController.popBackStack()})
+                AccountInfoScreen(
+                    onBack = {navController.popBackStack()},
+                    onEditAccount = {navController.navigate(PetHelperScreens.AccountEdit.name)}
+                )
             }
             composable(PetHelperScreens.Reg.name) {
                 RegistrationScreen(
@@ -82,6 +87,9 @@ fun PetHelperApp(
             }
             composable(PetHelperScreens.Auth.name) {
                 LoginScreen({navController.popBackStack()}, goToMain = {navController.navigate(PetHelperScreens.Start.name)})
+            }
+            composable(PetHelperScreens.AccountEdit.name) {
+                AccountChange(onBack = {navController.popBackStack()})
             }
         }
     }

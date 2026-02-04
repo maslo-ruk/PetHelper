@@ -185,8 +185,12 @@ fun PetListItem(pet: FPet, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier,
-                      curUser:FUser? = null) {
+fun AccountInfoScreen(onBack: () -> Unit = {},
+                      viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory),
+                      onEditAccount :() ->Unit = {},
+                      modifier: Modifier = Modifier) {
+    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
+    val pets = viewModel.userManager.pets.collectAsState().value
     Scaffold(
         topBar = {
             TopAppBar(
@@ -207,7 +211,7 @@ fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier,
             Spacer(Modifier.height(12.dp))
             Text("Дата рождения ${curUser.birthDate}")
             Spacer(Modifier.height(20.dp))
-            AnimatedButton(text = "Изменить информацию", onClick = {/*TODO*/})
+            AnimatedButton(text = "Изменить информацию", onClick = {onEditAccount()})
         }
     }
 }

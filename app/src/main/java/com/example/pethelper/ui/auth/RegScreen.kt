@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.ui.AppViewModelProvider
+import com.example.pethelper.ui.auth.RegDetails
+import com.example.pethelper.ui.auth.RegViewModel
 import com.example.pethelper.ui.orders.OrderDetails
 import com.example.pethelper.ui.orders.OrderDialogViewModel
 import java.util.Calendar
@@ -48,7 +50,7 @@ import java.util.Calendar
 fun RegistrationScreen(
     onBack:() -> Unit,
     onLoginClick: () -> Unit,
-    viewModel: RegViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: RegViewModel= viewModel(factory = AppViewModelProvider.Factory),
     onClick:(RegDetails) -> Unit = viewModel::updateUiState,
     onSubmit:() -> Unit = viewModel::submitRegistration,
     goToMain:() -> Unit = {}

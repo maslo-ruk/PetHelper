@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.pethelper.PetHelperApplication
 import com.example.pethelper.data.firebaseRepositories.AuthRepository
 import com.example.pethelper.data.session.AppSession
+import com.example.pethelper.ui.account.AccountChangeViewModel
 import com.example.pethelper.ui.account.AccountViewModel
 import com.example.pethelper.ui.auth.LoginViewModel
 import com.example.pethelper.ui.auth.RegViewModel
@@ -44,6 +45,10 @@ object AppViewModelProvider {
         initializer {
             val app = petApplication()
             StartViewModel(AppSession.sessionManager, AppSession.authRepository)
+        }
+        initializer {
+            val app = petApplication()
+            AccountChangeViewModel(AppSession.sessionManager, AppSession.userRepository)
         }
     }
 
