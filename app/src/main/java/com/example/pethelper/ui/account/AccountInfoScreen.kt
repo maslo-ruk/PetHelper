@@ -51,22 +51,6 @@ import androidx.compose.runtime.collectAsState
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.R
 
-data class Pet(
-    val id: String,
-    val name: String,
-    val type: String,
-    val gender: String,
-    val age: String,
-    val breed: String,
-    val details: String
-)
-
-val samplePets = listOf(
-    Pet("1", "Бим", "Собака", "М", "3 года", "Бигль", "Добрый и активный"),
-    Pet("2", "Майя", "Кошка", "Ж", "5 лет", "Британская", "Очень спокойная")
-)
-
-
 //@Composable
 //fun AccountRoot() {
 //    var screen by remember { mutableStateOf("account") }
