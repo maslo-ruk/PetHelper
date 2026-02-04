@@ -4,6 +4,7 @@ import com.example.pethelper.data.fireBaseEntities.FOrder
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
@@ -42,12 +43,32 @@ class FireStoreRepository(
             .toObjects(FPet::class.java)
     }
 
-    suspend fun addPet(userId: String, pet: FPet) {
-        db.collection("users")
+    suspend fun addPetPhoto(photoId:String, petId:String) {
+        db.collection("pets")
+            .document(petId)
+            .update("photoId", photoId)
+            .await()
+    }
+
+    suspend fun getPetPhoto(photoId:String, petId:String) {
+        db.collection("pets")
+            .document(petId)
+            .update("photoId", photoId)
+            .await()
+    }
+
+    suspend fun addPet(userId: String, pet: FPet): DocumentReference {
+        return db.collection("users")
             .document(userId)
             .collection("pets")
             .add(pet)
             .await()
+    }
+
+    suspend fun updatePet(petId: String, pet: FPet) {
+        db.collection("pets")
+            .document(petId)
+            .set(pet, SetOptions.merge())
     }
 
     suspend fun addOrder(order: FOrder) {
