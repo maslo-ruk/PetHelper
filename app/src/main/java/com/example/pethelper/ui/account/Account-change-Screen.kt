@@ -175,7 +175,12 @@ fun AccountChange(onBack:()-> Unit = {},
             ) {
                 Text("Готово")
             }
-
+            if (uiState.isLoading) {
+                Text("Загрузка...")
+            }
+            if (uiState.success) {
+                onBack()
+            }
         }
         }
 

@@ -37,7 +37,7 @@ import com.example.pethelper.ui.AppViewModelProvider
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetCreate(onBack: () -> Unit,
-              modifier: Modifier,
+              modifier: Modifier= Modifier,
               viewModel: PetCreateViewModel = viewModel(factory = AppViewModelProvider.Factory),
               onUpdate: (FPet) -> Unit = viewModel::updateStateFlow,
               onSubmit: () -> Unit = viewModel::submitPet
@@ -79,7 +79,7 @@ fun PetCreate(onBack: () -> Unit,
             Spacer(modifier= Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = petName,
+                value = uiState.details.name,
                 onValueChange = { onUpdate(uiState.details.copy(name = it)) },
                 label = { Text("Имя питомца") },
                 modifier = Modifier.fillMaxWidth(),
@@ -90,7 +90,7 @@ fun PetCreate(onBack: () -> Unit,
 
             /*порода, сделала первую букву заглавной, чтобы в бд было легче искать всегда*/
             OutlinedTextField(
-                value = breed,
+                value = uiState.details.breed,
                 onValueChange = { input -> onUpdate(uiState.details.copy(breed = input.replaceFirstChar {
                     if (it.isLowerCase()) it.titlecase() else it.toString()}))
                 },
@@ -101,7 +101,7 @@ fun PetCreate(onBack: () -> Unit,
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = age,
+                value = uiState.details.age.toString(),
                 onValueChange = { onUpdate(uiState.details.copy(age = it.toInt())) },
                 label = { Text("Возраст") },
                 modifier = Modifier.fillMaxWidth(),
@@ -111,7 +111,7 @@ fun PetCreate(onBack: () -> Unit,
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = weight,
+                value = uiState.details.weight.toString(),
                 onValueChange = { onUpdate(uiState.details.copy(weight = it.toInt())) },
                 label = { Text("Вес (кг)") },
                 modifier = Modifier.fillMaxWidth(),
@@ -120,7 +120,7 @@ fun PetCreate(onBack: () -> Unit,
             )
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
-                value = notes,
+                value = uiState.details.description,
                 onValueChange = { onUpdate(uiState.details.copy(description = it)) },
                 label = { Text("Примечания по характеру, особенности") },
                 modifier = Modifier
@@ -134,6 +134,12 @@ fun PetCreate(onBack: () -> Unit,
             OutlinedButton(onClick = { onSubmit() }, modifier = Modifier
                 .fillMaxWidth()) {
                 Text("Сохранить")
+            }
+            if (uiState.isLoading) {
+                Text("Загрузка...")
+            }
+            if (uiState.isSuccess) {
+                onBack()
             }
         }
     }

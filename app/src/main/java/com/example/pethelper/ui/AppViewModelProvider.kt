@@ -9,6 +9,7 @@ import com.example.pethelper.data.firebaseRepositories.AuthRepository
 import com.example.pethelper.data.session.AppSession
 import com.example.pethelper.ui.account.AccountChangeViewModel
 import com.example.pethelper.ui.account.AccountViewModel
+import com.example.pethelper.ui.account.PetViewModel
 import com.example.pethelper.ui.auth.LoginViewModel
 import com.example.pethelper.ui.auth.RegViewModel
 import com.example.pethelper.ui.orders.OrderDialogViewModel
@@ -49,6 +50,9 @@ object AppViewModelProvider {
         initializer {
             val app = petApplication()
             AccountChangeViewModel(AppSession.sessionManager, AppSession.userRepository)
+        }
+        initializer {
+            PetViewModel()
         }
     }
 
