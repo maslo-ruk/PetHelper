@@ -54,5 +54,18 @@ class FireStoreRepository(
         db.collection("orders")
             .add(order)
             .await()
+        db.collection("users")
+            .document(order.userId)
+            .collection("orders")
+            .add(order)
+            .await()
+    }
+
+    suspend fun addWorkerToOrder(orderId:String, worker:FUser) {
+        db.collection("orders")
+            .document(orderId)
+            .collection("workers")
+            .add(worker)
+            .await()
     }
 }
