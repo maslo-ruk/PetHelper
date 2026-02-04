@@ -36,6 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +51,8 @@ import com.example.pethelper.ui.AppViewModelProvider
 import com.example.pethelper.ui.auth.LoginViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.R
@@ -81,6 +85,8 @@ import com.example.pethelper.R
 //    }
 //}
 
+
+@ExperimentalMaterial3Api
 @Composable
 fun AccountScreen(
     onEditAccount: () -> Unit = {},
@@ -96,7 +102,18 @@ fun AccountScreen(
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     val pets = viewModel.userManager.pets.collectAsState().value
     val petUiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Scaffold { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Аккаунт", textAlign = TextAlign.Center) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                    }
+                }
+            )
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -108,7 +125,7 @@ fun AccountScreen(
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(CircleShape) // потом поменяем
+                    .clip(CircleShape).verticalScroll(rememberScrollState()) // потом поменяем
             ) {
                 Image(
                     painter = painterResource(R.drawable.cot),
@@ -116,10 +133,6 @@ fun AccountScreen(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
-            }
-
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
             }
 
             Spacer(Modifier.height(12.dp))
@@ -132,6 +145,10 @@ fun AccountScreen(
 
 
             AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+
+            Spacer(Modifier.height(12.dp))
+
+            AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
 
 
             Spacer(Modifier.height(24.dp))
@@ -148,11 +165,8 @@ fun AccountScreen(
                                 onOpenPet()
                             })
                     }
-                    Spacer(Modifier.height(12.dp))
                 }
             }
-
-            AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
         }
     }
 }
@@ -213,8 +227,8 @@ fun AccountInfoScreen(onBack: () -> Unit = {},
                 }
             )
         }
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
             Text("Телефон: ${curUser!!.phoneNumber}")
             Text("Email: ${curUser.login}")
             Spacer(Modifier.height(12.dp))

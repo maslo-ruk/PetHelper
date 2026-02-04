@@ -37,6 +37,7 @@ import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.AppViewModelProvider
 import android.content.Context
+import androidx.compose.animation.core.spring
 import androidx.compose.material3.Button
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +50,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,14 +82,17 @@ fun PetCreate(onBack: () -> Unit,
                 }
             )
         }
-    ) { padding ->
+    ) { innerPadding ->
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally, ) {
-            UploadPhotoButton()
             Spacer(modifier= Modifier.height(12.dp))
+
+            UploadPhotoButton()
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = uiState.details.name,
@@ -188,13 +193,18 @@ fun UploadPhotoButton() {
     var uploading by remember { mutableStateOf(false) }
     var lastFileId by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    val httpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .callTimeout(90, TimeUnit.SECONDS).build()
     val pickImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
         uri: Uri? -> if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
             try {
                 error = null
                 uploading = true
-                val fileId = uploadPhotoToServer(context, uri)
+                val fileId = uploadPhotoToServer(context, uri, client = httpClient)
                 lastFileId = fileId} catch (e: Exception) {
                     error = e.message } finally {
                         uploading = false

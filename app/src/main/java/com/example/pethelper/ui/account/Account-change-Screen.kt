@@ -80,11 +80,11 @@ fun AccountChange(onBack:()-> Unit = {},
                 }
             )
         }
-    ) { padding ->
+    ) { innerPadding ->
         Column(modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            .padding(innerPadding), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(modifier=Modifier, contentAlignment = Alignment.BottomEnd) {
                 Image(painter = painterResource(R.drawable.cot), contentDescription = "Аватар",
                     Modifier
