@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648892113470",
+    "project_id": "pethelper-4efbe",
+    "storage_bucket": "pethelper-4efbe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648892113470:android:8af34909b100825292a76f",
+        "android_client_info": {
+          "package_name": "com.example.pethelper"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb-ud5e2RH2vTOArpDD73TAGyvAH0ajg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

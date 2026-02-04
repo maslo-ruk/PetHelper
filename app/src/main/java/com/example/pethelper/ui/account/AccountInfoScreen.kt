@@ -1,4 +1,4 @@
-package com.example.pethelper.ui
+package com.example.pethelper.ui.account
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -27,40 +27,29 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.tooling.preview.Preview
-
-data class Pet(
-    val id: String,
-    val name: String,
-    val type: String,
-    val gender: String,
-    val age: String,
-    val breed: String,
-    val details: String
-)
-
-val samplePets = listOf(
-    Pet("1", "Бим", "Собака", "М", "3 года", "Бигль", "Добрый и активный"),
-    Pet("2", "Майя", "Кошка", "Ж", "5 лет", "Британская", "Очень спокойная")
-)
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pethelper.data.fireBaseEntities.FUser
+import com.example.pethelper.ui.AppViewModelProvider
+import com.example.pethelper.ui.auth.LoginViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.pethelper.data.fireBaseEntities.FPet
+import com.example.pethelper.R
 
 //@Composable
 //fun AccountRoot() {
@@ -92,15 +81,16 @@ val samplePets = listOf(
 
 @Composable
 fun AccountScreen(
-    pets: List<Pet> = samplePets,
     onEditAccount: () -> Unit = {},
     onOpenAccountInfo: () -> Unit = {},
-    onOpenPet: (Pet) -> Unit = {},
-    modifier: Modifier
+    onOpenPet: (FPet) -> Unit = {},
+    onBack:() -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
-
-
+    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
+    val pets = viewModel.userManager.pets.collectAsState().value
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -116,16 +106,19 @@ fun AccountScreen(
                     .clip(CircleShape) // потом поменяем
             ) {
                 Image(
-                    painter = painterResource(id = android.R.drawable.sym_def_app_icon),
+                    painter = painterResource(R.drawable.cot),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
             }
 
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
+            }
 
             Spacer(Modifier.height(12.dp))
-            Text("Имя Фамилия", fontWeight = FontWeight.Bold)
+            Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
 
@@ -172,7 +165,7 @@ fun AnimatedButton(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun PetListItem(pet: Pet, onClick: () -> Unit) {
+fun PetListItem(pet: FPet, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -183,7 +176,7 @@ fun PetListItem(pet: Pet, onClick: () -> Unit) {
         Row(modifier = Modifier.padding(16.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(pet.name, fontWeight = FontWeight.Bold)
-                Text(pet.type)
+                Text(pet.type.name)
             }
             Text("→", color = MaterialTheme.colorScheme.primary)
         }
@@ -192,7 +185,8 @@ fun PetListItem(pet: Pet, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
+fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier,
+                      curUser:FUser? = null) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -206,12 +200,12 @@ fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).padding(16.dp)) {
-            Text("Телефон: +7 ХХХ ХХХ ХХ ХХ")
-            Text("Email: example@mail.ru")
+            Text("Телефон: ${curUser!!.phoneNumber}")
+            Text("Email: ${curUser.login}")
             Spacer(Modifier.height(12.dp))
-            Text("Район: /*TODO*/")
+            Text("Адрес: ${curUser.address}")
             Spacer(Modifier.height(12.dp))
-            Text("Файл документов: (/*TODO*/)")
+            Text("Дата рождения ${curUser.birthDate}")
             Spacer(Modifier.height(20.dp))
             AnimatedButton(text = "Изменить информацию", onClick = {/*TODO*/})
         }
@@ -222,7 +216,7 @@ fun AccountInfoScreen(onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
 //питомец
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetInfoScreen(pet: Pet, onBack: () -> Unit) {
+fun PetInfoScreen(pet: FPet, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -240,7 +234,7 @@ fun PetInfoScreen(pet: Pet, onBack: () -> Unit) {
             Text("Пол: ${pet.gender}")
             Text("Возраст: ${pet.age}")
             Text("Порода: ${pet.breed}")
-            Text("Особенности: ${pet.details}")
+            Text("Особенности: ${pet.description}")
             Spacer(Modifier.height(20.dp))
             AnimatedButton(text = "Изменить", onClick = {})
         }

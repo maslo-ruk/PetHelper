@@ -8,21 +8,41 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.pethelper.ui.account.AccountInfoScreen
+import com.example.pethelper.ui.start.AuthFalse
+import com.example.pethelper.ui.start.AuthTrue
+
+import com.example.pethelper.ui.start.MainScreen
+import com.example.pethelper.ui.account.AccountScreen
+import com.example.pethelper.ui.auth.LoginScreen
+import com.example.pethelper.ui.auth.RegistrationScreen
+import com.example.pethelper.ui.orders.OrderDialog
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 enum class PetHelperScreens {
     Loading,
     Start,
+    StartAuth,
+    StartNOAuth,
     StartForClients,
     StartForHelpers,
     HelpersCatalogue,
     Order,
-    Account
+    Account,
+    AccountInfo,
+    Reg,
+    Auth
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetHelperApp(
-    navController: NavHostController
+    navController: NavHostController = rememberNavController(),
+    modifier: Modifier = Modifier,
+    auth: FirebaseAuth
 ) {
     Scaffold {
         innerPadding ->
@@ -33,13 +53,35 @@ fun PetHelperApp(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(PetHelperScreens.Start.name) {
-
+                MainScreen(
+                    auth = Firebase.auth,
+                    onLogin = {navController.navigate(PetHelperScreens.Auth.name)},
+                    onReg = {navController.navigate(PetHelperScreens.Reg.name)},
+                    onCreateOrder = {navController.navigate(PetHelperScreens.Order.name)},
+                    onAccount =  {navController.navigate(PetHelperScreens.Account.name)}
+                )
             }
             composable(PetHelperScreens.Order.name) {
-
+                OrderDialog(Modifier, onClose = { navController.popBackStack() })
             }
             composable(PetHelperScreens.Account.name) {
-
+                AccountScreen(
+                    onBack = {navController.popBackStack()},
+                    onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)}
+                )
+            }
+            composable(PetHelperScreens.AccountInfo.name) {
+                AccountInfoScreen(onBack = {navController.popBackStack()})
+            }
+            composable(PetHelperScreens.Reg.name) {
+                RegistrationScreen(
+                    onBack = { navController.popBackStack() },
+                    onLoginClick = {navController.navigate(PetHelperScreens.Auth)},
+                    goToMain = {navController.navigate(PetHelperScreens.Start.name)}
+                )
+            }
+            composable(PetHelperScreens.Auth.name) {
+                LoginScreen({navController.popBackStack()}, goToMain = {navController.navigate(PetHelperScreens.Start.name)})
             }
         }
     }
