@@ -50,11 +50,13 @@ class FireStoreRepository(
             .await()
     }
 
-    suspend fun getPetPhoto(photoId:String, petId:String) {
-        db.collection("pets")
+    suspend fun getPetPhoto(petId:String):String {
+        val ref = db.collection("pets")
             .document(petId)
-            .update("photoId", photoId)
+            .get()
             .await()
+        val photoId = ref.getString("photoId")
+        return photoId ?: ""
     }
 
     suspend fun addPet(userId: String, pet: FPet): DocumentReference {
