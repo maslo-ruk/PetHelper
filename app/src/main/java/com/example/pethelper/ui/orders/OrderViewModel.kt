@@ -4,11 +4,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pethelper.data.fireBaseEntities.FOrder
-import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
 import com.example.pethelper.data.firebaseRepositories.UserSessionManager
-import com.example.pethelper.data.repositories.OrderRepository
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

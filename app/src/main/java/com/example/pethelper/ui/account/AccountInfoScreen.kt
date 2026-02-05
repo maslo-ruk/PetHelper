@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -54,8 +55,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.R
+import com.example.pethelper.network.NetworkConfig
 
 //@Composable
 //fun AccountRoot() {
@@ -127,12 +130,7 @@ fun AccountScreen(
                     .size(100.dp)
                     .clip(CircleShape).verticalScroll(rememberScrollState()) // потом поменяем
             ) {
-                Image(
-                    painter = painterResource(R.drawable.cot),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+                GetPhoto(currentUser = curUser)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -272,3 +270,18 @@ fun PetInfoScreen(viewModel: PetViewModel = viewModel(factory = AppViewModelProv
     }
 }
 
+@Composable // функция загрузки изображения я хз, куда ее вставить так, чтобы из бд взять fileID
+fun GetPhoto(currentUser: FUser?,
+             baseUrl: String = NetworkConfig.BASE_URL
+) {
+    val fileId = currentUser?.photoId
+    if (fileId.isNullOrBlank()) {
+        val fileId = "AgACAgIAAyEGAATg8gLnAAMLaYTCFI9dRSeI88DyNt6ogiUdRbYAAiELaxta7ylIb8a6idUj0X0BAAMCAAN4AAM4BA"
+    }
+    AsyncImage(
+        model = "$baseUrl/photo/$fileId",
+        contentDescription = "photo",
+        modifier = Modifier.size(160.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant,CircleShape),
+        contentScale = ContentScale.Crop,
+    )
+}

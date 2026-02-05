@@ -1,5 +1,8 @@
 package com.example.pethelper.ui.account
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -22,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
@@ -55,8 +59,16 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pethelper.data.fireBaseEntities.FPet
+import com.example.pethelper.ui.pets.PetCreateViewModel
+import com.example.pethelper.ui.pets.uploadPhotoToServer
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,21 +97,7 @@ fun AccountChange(onBack:()-> Unit = {},
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(innerPadding), horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(modifier=Modifier, contentAlignment = Alignment.BottomEnd) {
-                Image(painter = painterResource(R.drawable.cot), contentDescription = "Аватар",
-                    Modifier
-                        .size(120.dp)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .clip(CircleShape))
-                IconButton(onClick = {/*TODO*/},
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        .size(36.dp)) {
-                            Icon(imageVector = Icons.Default.Edit,
-                                contentDescription = "Изменить аватар",
-                                tint = MaterialTheme.colorScheme.secondary)
-                }
-            }
+            UploadPhotoButton()
             Spacer(modifier = Modifier.height(24.dp))
             OutlinedTextField(
                 value = uiState.user.name,
@@ -183,6 +181,41 @@ fun AccountChange(onBack:()-> Unit = {},
             }
         }
         }
+}
 
-
+@Composable
+fun UploadPhotoButton(viewModel: AccountChangeViewModel = viewModel(factory = AppViewModelProvider.Factory),
+                      onUpdate: (FUser) -> Unit = viewModel::updateUiState) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var uploading by remember { mutableStateOf(false) }
+    var lastFileId by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val httpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .callTimeout(90, TimeUnit.SECONDS).build()
+    val pickImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+            uri: Uri? -> if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            try {
+                error = null
+                uploading = true
+                val fileId = uploadPhotoToServer(context, uri, client = httpClient)
+                lastFileId = fileId} catch (e: Exception) {
+                error = e.message } finally {
+                uploading = false
+            }
+        }
+        onUpdate(uiState.user.copy(photoId = lastFileId.toString())) // сохранение в бд
+    }
+    Button(
+        onClick = { pickImageLauncher.launch(arrayOf("image/*")) },
+        enabled = !uploading) {
+        Text(if (uploading) "загружаю" else "Выбрать фото")
+        lastFileId?.let { Text("fileId: $it") }
+        error?.let { Text("Ошибка: $it")}
+    }
 }

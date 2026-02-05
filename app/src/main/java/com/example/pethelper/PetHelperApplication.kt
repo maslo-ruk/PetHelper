@@ -3,8 +3,6 @@ package com.example.pethelper
 import android.app.Application
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.example.pethelper.data.AppContainer
-import com.example.pethelper.data.AppDataContainer
 import com.example.pethelper.data.firebaseRepositories.AuthRepository
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
 import com.example.pethelper.data.firebaseRepositories.UserSessionManager
@@ -17,7 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PetHelperApplication : Application() {
-    lateinit var container: AppContainer
     lateinit var sessionManager: UserSessionManager
         private set
 
@@ -27,6 +24,5 @@ class PetHelperApplication : Application() {
         CoroutineScope(Dispatchers.IO).launch {
             AppSession.sessionManager.loadCurrentUser()
         }
-        container = AppDataContainer(this)
     }
 }
