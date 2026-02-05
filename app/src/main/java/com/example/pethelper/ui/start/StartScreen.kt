@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
@@ -26,10 +27,10 @@ import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pethelper.data.fireBaseEntities.FUser
 
 @Composable
 fun MainScreen(
-    auth: FirebaseAuth,
     viewModel: StartViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onLogout:() -> Unit= viewModel::logout,
     onCreateOrder:() -> Unit,
@@ -37,11 +38,13 @@ fun MainScreen(
     onLogin: () -> Unit,
     onLoc:() -> Unit,
     onReg: () -> Unit,
-    load:() -> Unit = viewModel::load
+    onShowOrders:() -> Unit = {},
+    onShowOrdersUser:() -> Unit = {}
 ) {
     val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
     if (isLogged) {
-        AuthTrue(onCreateOrder, onLogout, onAccount, onLoc)
+        val curUser:FUser = viewModel.userManager.currentUser.collectAsState().value!!.user
+        AuthTrue(onCreateOrder, onLogout, onAccount, onLoc, curUser)
     }
     else {
         AuthFalse(onLogin, onReg)
@@ -49,7 +52,10 @@ fun MainScreen(
 }
 
 @Composable
-fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Unit, onLoc: () -> Unit) {
+fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Unit, onLoc: () -> Unit,
+             curUser:FUser,
+             onShowOrders:() -> Unit = {},
+             onShowOrdersUser:() -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -95,6 +101,26 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Чек геолокации")
+        }
+        if (curUser.type == 0) {
+            Button(
+                onClick = {
+                    onShowOrders()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Доступные заказы")
+            }
+        }
+        else {
+            Button(
+                onClick = {
+                    onShowOrdersUser()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Данные по заказам")
+            }
         }
     }
 }

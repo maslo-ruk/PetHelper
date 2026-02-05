@@ -14,33 +14,43 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
+import com.example.pethelper.ui.AppViewModelProvider
 import com.example.pethelper.ui.account.PetListItem
+import com.example.pethelper.ui.orders.OrderDialogViewModel
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import com.example.pethelper.data.fireBaseEntities.FOrder
 
 
 @Composable
-fun AvailableOrders() {
-    val orders: MutableList<String> = mutableListOf("names")
+fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+    val orders by viewModel.orders.collectAsState()
+
     LazyColumn {
         items(orders) { order ->
-            OrderCard() }
+            OrderCard(order) }
         }
     }
 
 
 @Composable
-fun OrderCard() {
+fun OrderCard(order: FOrder) {
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Box() {
-            Text(text = "Имя Фамилия Пользователя")
-            Text("Заказ инфо")
-            Text(text = "Адрес")
+            Text(text = "${order.user.name} ${order.user.surname}")
+            Text(order.notes)
+            Text(text = order.address)
         }
         Box() {
-            Text(text = "Дата")
-            Text(text = "Цена")
+            Text(text = order.date)
+            Text(text = order.price.toString())
         }
     }
 }

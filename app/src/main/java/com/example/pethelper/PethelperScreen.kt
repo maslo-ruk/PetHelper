@@ -21,6 +21,7 @@ import com.example.pethelper.ui.account.PetInfoScreen
 import com.example.pethelper.ui.auth.LoginScreen
 
 import com.example.pethelper.ui.orders.OrderDialog
+import com.example.pethelper.ui.ordersView.AvailableOrders
 import com.example.pethelper.ui.pets.PetCreate
 import com.example.pethelper.ui.walk.LocationPermissionScreen
 import com.example.pethelper.ui.walk.WalkScreen
@@ -44,7 +45,8 @@ enum class PetHelperScreens {
     Reg,
     Auth,
     Location,
-    Permissions
+    Permissions,
+    OrdersAvailable
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,12 +66,12 @@ fun PetHelperApp(
         ) {
             composable(PetHelperScreens.Start.name) {
                 MainScreen(
-                    auth = Firebase.auth,
                     onLogin = {navController.navigate(PetHelperScreens.Auth.name)},
                     onReg = {navController.navigate(PetHelperScreens.Reg.name)},
                     onCreateOrder = {navController.navigate(PetHelperScreens.Order.name)},
                     onAccount =  {navController.navigate(PetHelperScreens.Account.name)},
-                    onLoc = { navController.navigate(PetHelperScreens.Location.name) }
+                    onLoc = { navController.navigate(PetHelperScreens.Location.name) },
+                    onShowOrders = {navController.navigate(PetHelperScreens.Location.name)}
                 )
             }
             composable(PetHelperScreens.Order.name) {
@@ -110,6 +112,9 @@ fun PetHelperApp(
             }
             composable(route = PetHelperScreens.Location.name) {
                 WalkScreen()
+            }
+            composable(PetHelperScreens.OrdersAvailable.name) {
+                AvailableOrders()
             }
         }
     }

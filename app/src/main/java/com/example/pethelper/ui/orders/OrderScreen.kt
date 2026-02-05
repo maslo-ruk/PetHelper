@@ -85,7 +85,7 @@ fun OrderDialog(modifier:Modifier = Modifier,
                 modifier = Modifier,
                 onClick = viewModel::updateUiState,
                 onSave = viewModel::submitOrder,
-                onClose = onClose,
+                onBack = onClose,
                 uiState = uiState,
                 pets = pets
                 )
@@ -99,7 +99,7 @@ fun OrderDialog(modifier:Modifier = Modifier,
 fun OrderInputs(modifier:Modifier = Modifier,
                 onClick:(OrderDetails) -> Unit,
                 onSave:() -> Unit,
-                onClose:() -> Unit,
+                onBack:() -> Unit,
                 uiState: OrderUiState,
                 pets:List<FPet>
                 )
@@ -217,35 +217,12 @@ fun OrderInputs(modifier:Modifier = Modifier,
         var expanded by remember { mutableStateOf(false) }
         // Районы
         AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it }
-            ) {
-                OutlinedTextField(
+            OutlinedTextField(
                     value = uiState.details.address,
-                    onValueChange = {},
+                    onValueChange = {onClick(uiState.details.copy(address = it)) },
                     readOnly = true,
-                    label = { Text("Адрес") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = expanded
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-//                ExposedDropdownMenu(
-//                    expanded = expanded,
-//                    onDismissRequest = { onClick(uiState.details.copy(address = "")) }
-//                ) {
-//                    districts.forEach { district ->
-//                        DropdownMenuItem(
-//                            text = { Text(district) },
-//                            onClick = {onClick(uiState.details.copy(address = district))}
-//                        )
-//                    }
-//                }
-            }
+                    label = { Text("Адрес") }
+            )
         }
 
 
@@ -276,11 +253,18 @@ fun OrderInputs(modifier:Modifier = Modifier,
         // Кнопка "Создать заказ"
         AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
             Button(
-                onClick = onSave,
+                onClick = { onSave() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Создать заказ")
             }
         }
+    }
+
+    if (uiState.isLoading) {
+        Text("Загрузка...")
+    }
+    if (uiState.success) {
+       onBack()
     }
 }

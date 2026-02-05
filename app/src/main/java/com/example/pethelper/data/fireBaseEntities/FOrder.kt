@@ -5,6 +5,7 @@ import com.example.pethelper.data.enums.OrderStatus
 data class FOrder (
     val id:String="",
     val pet: FPet = FPet(),
+    val user: FUser = FUser(),
     val userId: String="",
     val helperId: String="",
     val address:String="",

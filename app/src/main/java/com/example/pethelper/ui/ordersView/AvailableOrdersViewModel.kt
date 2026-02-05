@@ -4,11 +4,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.pethelper.data.fireBaseEntities.FOrder
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
+import com.example.pethelper.data.firebaseRepositories.UserSessionManager
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class AvailableOrdersViewModel(val fbRepository: FireStoreRepository): ViewModel() {
+class AvailableOrdersViewModel(
+    val fbRepository: FireStoreRepository,
+    val userManager: UserSessionManager
+): ViewModel() {
     private val _orders = MutableStateFlow<List<FOrder>>(emptyList())
     val orders = _orders.asStateFlow()
 
