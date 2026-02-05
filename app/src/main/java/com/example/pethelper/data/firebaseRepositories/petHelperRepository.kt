@@ -1,5 +1,6 @@
 package com.example.pethelper.data.firebaseRepositories
 
+import android.util.Log
 import com.example.pethelper.data.fireBaseEntities.FOrder
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
@@ -16,7 +17,6 @@ import kotlinx.coroutines.tasks.await
 class FireStoreRepository(
     private val db: FirebaseFirestore = Firebase.firestore
 ) {
-    private val ordersRef = db.collection("orders")
 
     suspend fun addUser(userId: String, user: FUser) {
         db.collection("users").document(userId).set(user).await()
@@ -99,9 +99,10 @@ class FireStoreRepository(
         onChange: (List<FOrder>) -> Unit,
         onError: (Throwable) -> Unit
     ): ListenerRegistration {
+        val ordersRef = db.collection("orders")
+        Log.d("FS", "Orders ref = ${ordersRef.get()}")
 
         return ordersRef
-            .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
 
                 if (error != null) {
@@ -114,6 +115,36 @@ class FireStoreRepository(
                 val orders = snapshot.documents.mapNotNull { doc ->
                     doc.toObject(FOrder::class.java)?.copy(id = doc.id)
                 }
+
+                Log.d("FS", "Docs count = ${snapshot.size()}") // ← ВАЖНО
+
+                onChange(orders)
+            }
+    }
+
+    fun observeMyOrders(
+        onChange: (List<FOrder>) -> Unit,
+        onError: (Throwable) -> Unit,
+        uid: String,
+    ): ListenerRegistration {
+        val ordersRef = db.collection("users").document(uid).collection("orders")
+        Log.d("FS", "Orders ref = ${ordersRef.get()}")
+
+        return ordersRef
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot == null) return@addSnapshotListener
+
+                val orders = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(FOrder::class.java)?.copy(id = doc.id)
+                }
+
+                Log.d("FS", "Docs count = ${snapshot.size()}") // ← ВАЖНО
 
                 onChange(orders)
             }

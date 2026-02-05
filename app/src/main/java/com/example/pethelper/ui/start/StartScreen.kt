@@ -42,9 +42,14 @@ fun MainScreen(
     onShowOrdersUser:() -> Unit = {}
 ) {
     val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
+    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     if (isLogged) {
-        val curUser:FUser = viewModel.userManager.currentUser.collectAsState().value!!.user
-        AuthTrue(onCreateOrder, onLogout, onAccount, onLoc, curUser)
+        if (curUser == null) {
+            Text("Загрузка пользователя")
+        }
+        else {
+            AuthTrue(onCreateOrder, onLogout, onAccount, onLoc, curUser, onShowOrders, onShowOrdersUser)
+        }
     }
     else {
         AuthFalse(onLogin, onReg)

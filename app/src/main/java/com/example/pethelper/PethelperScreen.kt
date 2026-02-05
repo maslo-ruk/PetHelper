@@ -71,7 +71,7 @@ fun PetHelperApp(
                     onCreateOrder = {navController.navigate(PetHelperScreens.Order.name)},
                     onAccount =  {navController.navigate(PetHelperScreens.Account.name)},
                     onLoc = { navController.navigate(PetHelperScreens.Location.name) },
-                    onShowOrders = {navController.navigate(PetHelperScreens.Location.name)}
+                    onShowOrders = { navController.navigate(PetHelperScreens.OrdersAvailable.name) }
                 )
             }
             composable(PetHelperScreens.Order.name) {
