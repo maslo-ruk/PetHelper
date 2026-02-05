@@ -139,7 +139,20 @@ class ChatRepository {
 
     suspend fun getOrderIdByChatId(chatId: String): FOrder? {
         val chatSnap = db.collection("chats").document(chatId).get().await()
-        return chatSnap.toObject(FOrder::class.java)
+        val orderId = chatSnap.getString("orderId") ?: return null
+
+        val orderSnap = db.collection("orders")
+            .document(orderId)
+            .get()
+            .await()
+        return orderSnap.toObject(FOrder::class.java)
+    }
+
+    suspend fun getChatById(chatId: String): Chat? {
+        Log.d("CHAT", "getChatById")
+        val chatSnap = db.collection("chats").document(chatId).get().await()
+        Log.d("CHAT", "${chatSnap.data}")
+        return chatSnap.toObject(Chat::class.java)
     }
 
 }

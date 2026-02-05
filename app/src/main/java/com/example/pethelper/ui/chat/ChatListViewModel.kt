@@ -16,8 +16,7 @@ class ChatListViewModel(private val repo: ChatRepository,
     private val myUid: UserSessionManager) : ViewModel() {
 
     val _chatsFlow = MutableStateFlow(emptyList<Chat>())
-    val chats: StateFlow<List<Chat>> = repo.chatsFlowListen(myUid.currentUser.value!!.uid).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
+    val chats: StateFlow<List<Chat>> = _chatsFlow
 
     private var listener: ListenerRegistration? = null
 

@@ -9,6 +9,6 @@ class ChatViewModelFactory(
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ChatScreenViewModel(repo = AppSession.chatRepository, chatId = chatId, userManager = AppSession.sessionManager) as T
+        return ChatScreenViewModel(repo = AppSession.chatRepository, chatId = chatId, userManager = AppSession.sessionManager,fbRepository = AppSession.userRepository) as T
     }
 }

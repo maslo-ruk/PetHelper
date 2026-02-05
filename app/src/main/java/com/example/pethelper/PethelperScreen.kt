@@ -138,7 +138,7 @@ fun PetHelperApp(
                 arguments = listOf(navArgument("chatId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val chatId = backStackEntry.arguments?.getString("chatId")
-                ChatScreen(chatId = chatId!!)
+                ChatScreen(chatId = chatId!!, checkposition = {ordId ->})
             }
         }
     }

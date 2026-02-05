@@ -1,5 +1,6 @@
 package com.example.pethelper.ui.chat
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,10 +24,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.Chat
 import com.example.pethelper.data.fireBaseEntities.FOrder
@@ -47,11 +51,11 @@ fun ChatScreen(chatId: String,
 //    fun onOrderStarted() : Unit = {}
 //    fun checkPosition():Unit = {}
 //    fun onOrderEnded():Unit = {}
-    val chat by viewModel.chat.collectAsState()
     val messages by viewModel.messages.collectAsState()
-    val isClosed = chat?.status == "CLOSED"
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     val myUid = viewModel.userManager.currentUser.collectAsState().value?.uid ?: ""
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isClosed = uiState.chat.status == "CLOSED"
 
     Scaffold(
         topBar = {
@@ -76,13 +80,21 @@ fun ChatScreen(chatId: String,
                     Spacer(Modifier.height(8.dp))
                 }
             }
-            ChatInput(text = viewModel.input,
-                onTextChange = viewModel::onInput,
-                onSend = viewModel::send,
-                enabled = !isClosed,
-                checkPosition = checkposition,
-                viewModel = viewModel
-            )
+            if (uiState.isLoading) {
+                Text("Загрузка...")
+            }
+            else {
+                ChatInput(text = viewModel.input,
+                    onTextChange = viewModel::onInput,
+                    onSend = viewModel::send,
+                    enabled = !isClosed,
+                    checkPosition = checkposition,
+                    viewModel = viewModel,
+                    chat = uiState.chat,
+                    order = uiState.order,
+                    uid = myUid
+                )
+            }
 
         }
     }
@@ -134,8 +146,11 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             Text("Отправить")
         }
     }
+    Log.d("CHAT",chat.participants[0])
+    Log.d("CHAT",chat.participants[1])
+    Log.d("CHAT",uid)
     if (uid == chat.participants[0]) {
-        if (order.STATUS == "PUBLISHED") {
+        if (order.STATUS == "CREATED") {
             Button(onClick = {
                 changeStatus("ACCEPTED")
                 addOrderWorker(chat.participants[1])

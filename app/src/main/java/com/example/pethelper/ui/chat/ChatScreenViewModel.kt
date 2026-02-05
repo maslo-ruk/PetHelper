@@ -29,13 +29,14 @@ class ChatScreenViewModel(
     val userManager: UserSessionManager,
     val fbRepository: FireStoreRepository
 ): ViewModel() {
-    val chat: StateFlow<Chat?> = repo.chatFlow(chatId).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     val messages: StateFlow<List<Message>> = repo.messagesFlow(chatId).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     var input by mutableStateOf("")
         private set
 
-    val _order = MutableStateFlow<FOrder?>(null)
-    val order: StateFlow<FOrder?> = _order
+
+    val _uiState = MutableStateFlow(ChatUiState())
+    val uiState: StateFlow<ChatUiState> = _uiState
 
     private var listener: ListenerRegistration? = null
 
@@ -52,26 +53,37 @@ class ChatScreenViewModel(
     }
 
     init {
+        Log.d("CHAT", "load start")
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            _order.value = repo.getOrderIdByChatId(chatId)
+            val ord = repo.getOrderIdByChatId(chatId)
+            val ch = repo.getChatById(chatId)
+            _uiState.update { it.copy(order = ord!!, chat = ch!!) }
+            _uiState.update { it.copy(isLoading = false) }
+            Log.d("CHAT", "viewmodel ${ch!!.orderId}")
         }
     }
 
     fun updateOrderStatus(status: String) {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            var ord = _order.value
-            ord = ord!!.copy(STATUS = status)
+            var ord = _uiState.value.order
+            ord = ord.copy(STATUS = status)
+            Log.d("CHAT", "ORDER ID ${ord}")
             fbRepository.updateOrder(ord.id, ord)
-            _order.value = ord
+            _uiState.update { it.copy(order = ord) }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
     fun addOrderWorker(workerId: String) {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            var ord = _order.value
-            ord = ord!!.copy(workerId = workerId)
+            var ord = _uiState.value.order
+            ord = ord.copy(workerId = workerId)
             fbRepository.updateOrder(ord.id, ord)
-            _order.value = ord
+            _uiState.update { it.copy(order = ord) }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -88,3 +100,10 @@ class ChatScreenViewModel(
         WalkServiceController.stopWalkService(context)
     }
 }
+data class ChatUiState(
+    val chat:Chat = Chat(),
+    val order:FOrder = FOrder(),
+    val error:String = "",
+    val success: Boolean = false,
+    val isLoading: Boolean = true
+)
