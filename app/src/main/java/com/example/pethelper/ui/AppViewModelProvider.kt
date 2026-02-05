@@ -12,6 +12,7 @@ import com.example.pethelper.ui.account.AccountViewModel
 import com.example.pethelper.ui.account.PetViewModel
 import com.example.pethelper.ui.auth.LoginViewModel
 import com.example.pethelper.ui.auth.RegViewModel
+import com.example.pethelper.ui.chat.ChatListViewModel
 import com.example.pethelper.ui.orders.OrderDialogViewModel
 import com.example.pethelper.ui.ordersView.AvailableOrders
 import com.example.pethelper.ui.ordersView.AvailableOrdersViewModel
@@ -61,7 +62,10 @@ object AppViewModelProvider {
             WalkViewModel(AppSession.rtdbRepository)
         }
         initializer {
-            AvailableOrdersViewModel(AppSession.userRepository, AppSession.sessionManager)
+            AvailableOrdersViewModel(AppSession.userRepository, AppSession.sessionManager, chatRepository = AppSession.chatRepository)
+        }
+        initializer {
+            ChatListViewModel(AppSession.chatRepository, AppSession.sessionManager)
         }
     }
 

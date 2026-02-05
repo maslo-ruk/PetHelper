@@ -16,17 +16,33 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.Chat
+import com.example.pethelper.ui.AppViewModelProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatListScreen(viewModel: ChatListViewModel, onOpenChat: (chatId: String) -> Unit) {
+fun ChatListScreen(viewModel: ChatListViewModel = viewModel(factory = AppViewModelProvider.Factory),
+                   onOpenChat: (chatId: String) -> Unit) {
     val chats by viewModel.chats.collectAsState()
+
+    LaunchedEffect (Unit) {
+        viewModel.startObservingChats()
+    }
+
+    DisposableEffect (Unit) {
+        onDispose {
+            viewModel.stopObservingChats()
+        }
+    }
+
     Scaffold(topBar = {
         TopAppBar(title = { Text("Чаты") }
         ) }

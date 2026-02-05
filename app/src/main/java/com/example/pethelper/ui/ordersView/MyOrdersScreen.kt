@@ -28,8 +28,7 @@ fun MyOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = AppViewMo
 
 
     LazyColumn {
-        items(orders) { order ->
-            OrderCard(order) }
+
     }
 }
 

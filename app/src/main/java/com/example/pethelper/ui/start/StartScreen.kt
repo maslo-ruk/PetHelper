@@ -39,7 +39,8 @@ fun MainScreen(
     onLoc:() -> Unit,
     onReg: () -> Unit,
     onShowOrders:() -> Unit = {},
-    onShowOrdersUser:() -> Unit = {}
+    onShowOrdersUser:() -> Unit = {},
+    onChat:()->Unit
 ) {
     val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
@@ -48,7 +49,8 @@ fun MainScreen(
             Text("Загрузка пользователя")
         }
         else {
-            AuthTrue(onCreateOrder, onLogout, onAccount, onLoc, curUser, onShowOrders, onShowOrdersUser)
+            AuthTrue(onCreateOrder, onLogout, onAccount, onLoc, curUser, onShowOrders, onShowOrdersUser
+            ,onChat)
         }
     }
     else {
@@ -60,7 +62,8 @@ fun MainScreen(
 fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Unit, onLoc: () -> Unit,
              curUser:FUser,
              onShowOrders:() -> Unit = {},
-             onShowOrdersUser:() -> Unit = {}) {
+             onShowOrdersUser:() -> Unit = {},
+             onChat:()->Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -125,6 +128,14 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Данные по заказам")
+            }
+            Button(
+                onClick = {
+                    onChat()
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text("Мои чаты")
             }
         }
     }

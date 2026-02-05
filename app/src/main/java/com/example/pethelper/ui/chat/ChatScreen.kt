@@ -22,23 +22,35 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pethelper.data.fireBaseEntities.Chat
+import com.example.pethelper.data.fireBaseEntities.FOrder
+import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.fireBaseEntities.Message
+import com.example.pethelper.ui.AppViewModelProvider
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(viewModel: ChatScreenViewModel,
-               onBack: () -> Unit, myUid: String) {
+fun ChatScreen(chatId: String,
+               onBack: () -> Unit = {}) {
+    val viewModel: ChatScreenViewModel = viewModel(
+        factory = ChatViewModelFactory(chatId)
+    )
     val chat by viewModel.chat.collectAsState()
     val messages by viewModel.messages.collectAsState()
     val isClosed = chat?.status == "CLOSED"
+    val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
+    val myUid = viewModel.userManager.currentUser.collectAsState().value?.uid ?: ""
 
     Scaffold(
         topBar = {
@@ -89,7 +101,13 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
 
 @Composable
 private fun ChatInput(text: String, onTextChange: (String) -> Unit,
-                      onSend: () -> Unit, enabled: Boolean) {
+                      onSend: () -> Unit, enabled: Boolean,
+                      onOrderAccepted:() -> Unit = {},
+                      onOrderStarted:() -> Unit = {},
+                      order: FOrder = FOrder(),
+                      chat: Chat = Chat(),
+                      uid:String = ""
+) {
     Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             TextField(
                 enabled = enabled,
@@ -99,6 +117,16 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
         Spacer(Modifier.width(8.dp))
         Button(onClick = onSend, enabled = enabled) {
             Text("Отправить")
+        }
+    }
+    if (uid == chat.participants[0]) {
+        Button(onClick = onOrderAccepted, enabled = enabled) {
+            Text("Принять заявку")
+        }
+    }
+    else if (uid == chat.participants[1] && order.STATUS == "ACCEPTED") {
+        Button(onClick = onOrderStarted, enabled = enabled) {
+            Text("Начать Заказ")
         }
     }
 }

@@ -6,9 +6,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.pethelper.data.session.AppSession
 import com.example.pethelper.ui.RegistrationScreen
 import com.example.pethelper.ui.account.AccountChange
 import com.example.pethelper.ui.account.AccountInfoScreen
@@ -19,6 +22,9 @@ import com.example.pethelper.ui.start.MainScreen
 import com.example.pethelper.ui.account.AccountScreen
 import com.example.pethelper.ui.account.PetInfoScreen
 import com.example.pethelper.ui.auth.LoginScreen
+import com.example.pethelper.ui.chat.ChatListScreen
+import com.example.pethelper.ui.chat.ChatScreen
+import com.example.pethelper.ui.chat.ChatScreenViewModel
 
 import com.example.pethelper.ui.orders.OrderDialog
 import com.example.pethelper.ui.ordersView.AvailableOrders
@@ -46,7 +52,9 @@ enum class PetHelperScreens {
     Auth,
     Location,
     Permissions,
-    OrdersAvailable
+    OrdersAvailable,
+    MyChats,
+    Chat
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,7 +79,8 @@ fun PetHelperApp(
                     onCreateOrder = {navController.navigate(PetHelperScreens.Order.name)},
                     onAccount =  {navController.navigate(PetHelperScreens.Account.name)},
                     onLoc = { navController.navigate(PetHelperScreens.Location.name) },
-                    onShowOrders = { navController.navigate(PetHelperScreens.OrdersAvailable.name) }
+                    onShowOrders = { navController.navigate(PetHelperScreens.OrdersAvailable.name) },
+                    onChat = {navController.navigate(PetHelperScreens.MyChats.name)}
                 )
             }
             composable(PetHelperScreens.Order.name) {
@@ -115,6 +124,21 @@ fun PetHelperApp(
             }
             composable(PetHelperScreens.OrdersAvailable.name) {
                 AvailableOrders()
+            }
+            composable(
+                route = PetHelperScreens.MyChats.name,
+                ) {
+                ChatListScreen(onOpenChat = {chatId ->
+
+                    navController.navigate("${PetHelperScreens.Chat.name}/$chatId")
+                })
+            }
+            composable(
+                route = "${PetHelperScreens.Chat.name}/{chatId}",
+                arguments = listOf(navArgument("chatId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val chatId = backStackEntry.arguments?.getString("chatId")
+                ChatScreen(chatId = chatId!!)
             }
         }
     }

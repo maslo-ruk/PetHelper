@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -32,7 +33,8 @@ import com.example.pethelper.data.fireBaseEntities.FOrder
 
 
 @Composable
-fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = AppViewModelProvider.Factory),
+                    onOrderClick:(order: FOrder)->Unit = viewModel::acceptOrder) {
     val orders by viewModel.orders.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -42,13 +44,13 @@ fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = Ap
 
     LazyColumn {
         items(orders) { order ->
-            OrderCard(order) }
+            OrderCard(order, onOrderClick) }
         }
     }
 
 
 @Composable
-fun OrderCard(order: FOrder) {
+fun OrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit) {
 
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
@@ -64,6 +66,11 @@ fun OrderCard(order: FOrder) {
                     Text(text = order.date)
                     Text(text = order.price.toString())
                 }
+            }
+            Button(
+                onClick = {onOrderClick(order)}
+            ) {
+                Text("Отозваться")
             }
         }
     }
