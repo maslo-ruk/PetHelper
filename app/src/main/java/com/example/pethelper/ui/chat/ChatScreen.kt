@@ -15,37 +15,38 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.Chat
 import com.example.pethelper.data.fireBaseEntities.FOrder
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.fireBaseEntities.Message
-import com.example.pethelper.ui.AppViewModelProvider
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(chatId: String,
-               onBack: () -> Unit = {}) {
+               onBack: () -> Unit = {},
+               checkposition:(ordId:String)->Unit = {}) {
     val viewModel: ChatScreenViewModel = viewModel(
         factory = ChatViewModelFactory(chatId)
     )
+//    fun onOrderAccepted(status:String) = viewModel::updateOrderStatus
+//    fun onOrderStarted() : Unit = {}
+//    fun checkPosition():Unit = {}
+//    fun onOrderEnded():Unit = {}
     val chat by viewModel.chat.collectAsState()
     val messages by viewModel.messages.collectAsState()
     val isClosed = chat?.status == "CLOSED"
@@ -57,12 +58,16 @@ fun ChatScreen(chatId: String,
             TopAppBar(title = {Text(text = "Чат")})}
     ) {padding ->
         Column(
-            modifier = Modifier.padding(padding).fillMaxSize()
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
         ) { if (isClosed) {
             Text(text = "Заказ завершен. Чат закрыт", modifier = Modifier.padding(12.dp),
                 style = MaterialTheme.typography.bodyLarge)
         }
-            LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth(),
+            LazyColumn(modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
                 contentPadding = PaddingValues(12.dp)
             ) {
                 items(items = messages, key = {it.id}) {
@@ -74,7 +79,10 @@ fun ChatScreen(chatId: String,
             ChatInput(text = viewModel.input,
                 onTextChange = viewModel::onInput,
                 onSend = viewModel::send,
-                enabled = !isClosed)
+                enabled = !isClosed,
+                checkPosition = checkposition,
+                viewModel = viewModel
+            )
 
         }
     }
@@ -102,13 +110,20 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
 @Composable
 private fun ChatInput(text: String, onTextChange: (String) -> Unit,
                       onSend: () -> Unit, enabled: Boolean,
-                      onOrderAccepted:() -> Unit = {},
-                      onOrderStarted:() -> Unit = {},
+                      checkPosition:(ordId:String)->Unit,
                       order: FOrder = FOrder(),
                       chat: Chat = Chat(),
-                      uid:String = ""
+                      uid:String = "",
+                      viewModel: ChatScreenViewModel
 ) {
-    Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+    val changeStatus = viewModel::updateOrderStatus
+    val addOrderWorker = viewModel::addOrderWorker
+    val startOrder = viewModel::startOrder
+    val stopOrder = viewModel::stopOrder
+    val context = LocalContext.current
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             TextField(
                 enabled = enabled,
                 value = text,
@@ -120,13 +135,44 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
         }
     }
     if (uid == chat.participants[0]) {
-        Button(onClick = onOrderAccepted, enabled = enabled) {
-            Text("Принять заявку")
+        if (order.STATUS == "PUBLISHED") {
+            Button(onClick = {
+                changeStatus("ACCEPTED")
+                addOrderWorker(chat.participants[1])
+                             }, enabled = enabled) {
+                Text("Принять заявку")
+            }
+        }
+        if (order.STATUS == "ACCEPTED") {
+            Row {
+                Text("Заказ Принят")
+            }
+        }
+        if (order.STATUS == "STARTED") {
+            Button(onClick = { checkPosition(order.id) }, enabled = enabled) {
+                Text("Посмотреть местоположение")
+            }
         }
     }
-    else if (uid == chat.participants[1] && order.STATUS == "ACCEPTED") {
-        Button(onClick = onOrderStarted, enabled = enabled) {
-            Text("Начать Заказ")
+    else if (uid == chat.participants[1]) {
+        if (order.STATUS == "PUBLISHED") {
+            Text("Ожидание подтверждения")
+        }
+        if (order.STATUS == "ACCEPTED") {
+            Button(onClick = {
+                changeStatus("STARTED")
+                startOrder(context,order.id)
+                             }, enabled = enabled) {
+                Text("Начать Заказ")
+            }
+        }
+        if (order.STATUS == "STARTED") {
+            Button(onClick = {
+                changeStatus("ENDED")
+                stopOrder(context)
+                             }, enabled = enabled) {
+                Text("Закончить Заказ")
+            }
         }
     }
 }

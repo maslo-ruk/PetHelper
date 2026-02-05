@@ -3,6 +3,8 @@ package com.example.pethelper.data.firebaseRepositories
 import android.util.Log
 import com.example.pethelper.data.enums.OrderStatus
 import com.example.pethelper.data.fireBaseEntities.Chat
+import com.example.pethelper.data.fireBaseEntities.FOrder
+import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.fireBaseEntities.Message
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -134,5 +136,11 @@ class ChatRepository {
         "closedAT" to FieldValue.serverTimestamp()))
         batch.commit().await()
     }
+
+    suspend fun getOrderIdByChatId(chatId: String): FOrder? {
+        val chatSnap = db.collection("chats").document(chatId).get().await()
+        return chatSnap.toObject(FOrder::class.java)
+    }
+
 }
 

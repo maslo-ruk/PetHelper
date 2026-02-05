@@ -87,6 +87,13 @@ class FireStoreRepository(
             .await()
     }
 
+    suspend fun updateOrder(orderId: String, order: FOrder) {
+        db.collection("orders")
+            .document(orderId)
+            .set(order, SetOptions.merge())
+            .await()
+    }
+
     suspend fun addWorkerToOrder(orderId:String, worker:FUser) {
         db.collection("orders")
             .document(orderId)

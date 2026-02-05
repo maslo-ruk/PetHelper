@@ -8,7 +8,7 @@ data class FOrder (
     val pet: FPet = FPet(),
     val user: FUser = FUser(),
     val userId: String="",
-    val helperId: String="",
+    val workerId: String="",
     val address:String="",
     val date:String="",
     val time: String="",
