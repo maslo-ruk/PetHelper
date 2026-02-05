@@ -5,11 +5,13 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "orders")
 data class Orderr(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: String = "",
     val petId: Int,
     val address:String ,
     val date:String,
     val time: String,
     val price:Int,
-    val notes: String
+    val notes: String,
+    val customerId: String = "",
+    val status: String = "ACTIVE" // ACTIVE OR DONE
 )
