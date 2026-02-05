@@ -137,7 +137,7 @@ class ChatRepository {
         batch.commit().await()
     }
 
-    suspend fun getOrderIdByChatId(chatId: String): FOrder? {
+    suspend fun getOrderByChatId(chatId: String): FOrder? {
         val chatSnap = db.collection("chats").document(chatId).get().await()
         val orderId = chatSnap.getString("orderId") ?: return null
 
@@ -145,7 +145,18 @@ class ChatRepository {
             .document(orderId)
             .get()
             .await()
-        return orderSnap.toObject(FOrder::class.java)
+        Log.d("CHAT", "ORDER REPO ${orderSnap.data}")
+        Log.d("CHAT", "ORDER REPO ${orderSnap.get("status")}")
+        val order = orderSnap.toObject(FOrder::class.java)
+        Log.d("CHAT", "ORDER REPO 2 ${order!!.status}")
+        return order
+    }
+
+    suspend fun getOrderIdByChatId(chatId: String): String? {
+        val chatSnap = db.collection("chats").document(chatId).get().await()
+        val orderId = chatSnap.getString("orderId") ?: return null
+
+        return orderId
     }
 
     suspend fun getChatById(chatId: String): Chat? {

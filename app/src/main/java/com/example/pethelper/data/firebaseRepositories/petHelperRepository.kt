@@ -88,10 +88,13 @@ class FireStoreRepository(
     }
 
     suspend fun updateOrder(orderId: String, order: FOrder) {
+        Log.d("FS", "updateOrder")
         db.collection("orders")
             .document(orderId)
             .set(order, SetOptions.merge())
             .await()
+        val ord = db.collection("orders").document(orderId).get().await()
+        Log.d("FS", "updateOrder ${ord.get("STATUS")}")
     }
 
     suspend fun addWorkerToOrder(orderId:String, worker:FUser) {

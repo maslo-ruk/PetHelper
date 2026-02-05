@@ -59,9 +59,6 @@ object AppViewModelProvider {
             PetViewModel()
         }
         initializer {
-            WalkViewModel(AppSession.rtdbRepository)
-        }
-        initializer {
             AvailableOrdersViewModel(AppSession.userRepository, AppSession.sessionManager, chatRepository = AppSession.chatRepository)
         }
         initializer {

@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class WalkViewModel(val rtdbRepository: RealtimeOrderRepository): ViewModel() {
+class WalkViewModel(
+    val rtdbRepository: RealtimeOrderRepository,
+    val orderId:String): ViewModel() {
     private val _location = MutableStateFlow<Pair<Double, Double>?>(null)
     val location: StateFlow<Pair<Double, Double>?> = _location.asStateFlow()
 
@@ -44,21 +46,15 @@ class WalkViewModel(val rtdbRepository: RealtimeOrderRepository): ViewModel() {
     }
 
     fun onWalkStarted(
-        context: Context,
         orderId: String
     ) {
         startObserving(orderId)
-        Log.d("WalkViewModel", "onWalkStarted")
-        WalkServiceController.startWalkService(context, orderId)
-        Log.d("WalkViewModel", "onWalkStarted success")
     }
 
     fun onWalkFinished(
-        context: Context,
         orderId: String
     ) {
         stopObserving(orderId)
-        WalkServiceController.stopWalkService(context)
     }
 
     override fun onCleared() {

@@ -54,7 +54,8 @@ enum class PetHelperScreens {
     Permissions,
     OrdersAvailable,
     MyChats,
-    Chat
+    Chat,
+    Tracking
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,7 +139,17 @@ fun PetHelperApp(
                 arguments = listOf(navArgument("chatId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val chatId = backStackEntry.arguments?.getString("chatId")
-                ChatScreen(chatId = chatId!!, checkposition = {ordId ->})
+                ChatScreen(
+                    chatId = chatId!!,
+                    checkposition = {ordId -> navController.navigate("${PetHelperScreens.Tracking.name}/$ordId")}
+                )
+            }
+            composable (
+                route = "${PetHelperScreens.Tracking.name}/{orderId}",
+                arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+            ) {
+                val orderId = it.arguments?.getString("orderId")
+                WalkScreen(orderId = orderId!!)
             }
         }
     }

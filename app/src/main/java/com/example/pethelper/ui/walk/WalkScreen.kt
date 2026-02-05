@@ -28,6 +28,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.pethelper.ui.chat.WalkViewModelFactory
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.PlacemarkMapObject
@@ -35,12 +36,12 @@ import com.yandex.mapkit.mapview.MapView
 
 @Composable
 fun WalkScreen(
-    viewModel: WalkViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onClick1:(c: Context, orderId: String)->Unit = viewModel::onWalkStarted,
-    onClick2:(c: Context, orderId: String)->Unit = viewModel::onWalkFinished,
     orderId:String = "ORDERBORDER1",
     modifier: Modifier = Modifier
 ) {
+    val viewModel: WalkViewModel = viewModel(factory = WalkViewModelFactory(orderId))
+    val onClick1 = viewModel::onWalkStarted
+    val onClick2 = viewModel::onWalkFinished
     val location by viewModel.location.collectAsState()
 
     val context = LocalContext.current
@@ -53,7 +54,7 @@ fun WalkScreen(
         Column {
             Button(
                 onClick = {
-                    onClick1(context, orderId)
+                    onClick1(orderId)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -62,7 +63,7 @@ fun WalkScreen(
 
             Button(
                 onClick = {
-                    onClick2(context, orderId)
+                    onClick2( orderId)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

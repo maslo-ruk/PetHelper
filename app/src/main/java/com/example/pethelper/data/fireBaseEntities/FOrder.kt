@@ -14,7 +14,7 @@ data class FOrder (
     val time: String="",
     val price:Int=0,
     val notes: String="",
-    val STATUS: String = OrderStatus.CREATED.toString(),
+    val status: String = OrderStatus.CREATED.toString(),
     val createdAt: Timestamp? = null,
     val closedAt: Timestamp? = null
 )

@@ -129,16 +129,17 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
             ) {
                 Text("Данные по заказам")
             }
-            Button(
-                onClick = {
-                    onChat()
-                },
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text("Мои чаты")
-            }
+        }
+        Button(
+            onClick = {
+                onChat()
+            },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text("Мои чаты")
         }
     }
+
 }
 
 @Composable

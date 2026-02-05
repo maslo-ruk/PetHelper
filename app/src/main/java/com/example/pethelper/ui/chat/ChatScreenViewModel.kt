@@ -56,9 +56,11 @@ class ChatScreenViewModel(
         Log.d("CHAT", "load start")
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val ord = repo.getOrderIdByChatId(chatId)
+            val ord = repo.getOrderByChatId(chatId)
+            Log.d("CHAT", "ORDER VIEWMODEL ${ord!!.status}")
+            val ordId = repo.getOrderIdByChatId(chatId)
             val ch = repo.getChatById(chatId)
-            _uiState.update { it.copy(order = ord!!, chat = ch!!) }
+            _uiState.update { it.copy(order = ord!!, chat = ch!!, orderId = ordId!!) }
             _uiState.update { it.copy(isLoading = false) }
             Log.d("CHAT", "viewmodel ${ch!!.orderId}")
         }
@@ -68,20 +70,22 @@ class ChatScreenViewModel(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             var ord = _uiState.value.order
-            ord = ord.copy(STATUS = status)
-            Log.d("CHAT", "ORDER ID ${ord}")
-            fbRepository.updateOrder(ord.id, ord)
+            Log.d("CHAT", "ORDER STATE before ${ord.status}")
+            ord = ord.copy(status = status)
+            Log.d("CHAT", "ORDER STATE ${ord.status}")
+            fbRepository.updateOrder(_uiState.value.orderId, ord)
+            Log.d("CHAT", "ORDER STATE after ${ord.status}")
             _uiState.update { it.copy(order = ord) }
             _uiState.update { it.copy(isLoading = false) }
         }
     }
 
-    fun addOrderWorker(workerId: String) {
+    fun addOrderWorker(workerId: String, status: String) {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             var ord = _uiState.value.order
-            ord = ord.copy(workerId = workerId)
-            fbRepository.updateOrder(ord.id, ord)
+            ord = ord.copy(workerId = workerId, status = status)
+            fbRepository.updateOrder(_uiState.value.orderId, ord)
             _uiState.update { it.copy(order = ord) }
             _uiState.update { it.copy(isLoading = false) }
         }
@@ -103,6 +107,7 @@ class ChatScreenViewModel(
 data class ChatUiState(
     val chat:Chat = Chat(),
     val order:FOrder = FOrder(),
+    val orderId:String = "",
     val error:String = "",
     val success: Boolean = false,
     val isLoading: Boolean = true

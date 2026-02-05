@@ -90,8 +90,7 @@ fun ChatScreen(chatId: String,
                     enabled = !isClosed,
                     checkPosition = checkposition,
                     viewModel = viewModel,
-                    chat = uiState.chat,
-                    order = uiState.order,
+                    uiState = uiState,
                     uid = myUid
                 )
             }
@@ -123,8 +122,7 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
 private fun ChatInput(text: String, onTextChange: (String) -> Unit,
                       onSend: () -> Unit, enabled: Boolean,
                       checkPosition:(ordId:String)->Unit,
-                      order: FOrder = FOrder(),
-                      chat: Chat = Chat(),
+                      uiState: ChatUiState,
                       uid:String = "",
                       viewModel: ChatScreenViewModel
 ) {
@@ -146,42 +144,42 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             Text("Отправить")
         }
     }
-    Log.d("CHAT",chat.participants[0])
-    Log.d("CHAT",chat.participants[1])
-    Log.d("CHAT",uid)
-    if (uid == chat.participants[0]) {
-        if (order.STATUS == "CREATED") {
+    Log.d("CHAT","ORDER STATE = ${uiState.order.status}")
+    Log.d("CHAT","ORDER STATE = ${uid}")
+    Log.d("CHAT","ORDER STATE = ${uiState.chat.participants[1]}")
+    Log.d("CHAT","ORDER id = ${uiState.orderId}")
+    if (uid == uiState.chat.participants[0]) {
+        if (uiState.order.status == "CREATED") {
             Button(onClick = {
-                changeStatus("ACCEPTED")
-                addOrderWorker(chat.participants[1])
+                addOrderWorker(uiState.chat.participants[1],"ACCEPTED")
                              }, enabled = enabled) {
                 Text("Принять заявку")
             }
         }
-        if (order.STATUS == "ACCEPTED") {
+        if (uiState.order.status == "ACCEPTED") {
             Row {
                 Text("Заказ Принят")
             }
         }
-        if (order.STATUS == "STARTED") {
-            Button(onClick = { checkPosition(order.id) }, enabled = enabled) {
+        if (uiState.order.status == "STARTED") {
+            Button(onClick = { checkPosition(uiState.order.id) }, enabled = enabled) {
                 Text("Посмотреть местоположение")
             }
         }
     }
-    else if (uid == chat.participants[1]) {
-        if (order.STATUS == "PUBLISHED") {
+    else if (uid == uiState.chat.participants[1]) {
+        if (uiState.order.status == "PUBLISHED") {
             Text("Ожидание подтверждения")
         }
-        if (order.STATUS == "ACCEPTED") {
+        if (uiState.order.status == "ACCEPTED") {
             Button(onClick = {
                 changeStatus("STARTED")
-                startOrder(context,order.id)
+                startOrder(context,uiState.order.id)
                              }, enabled = enabled) {
                 Text("Начать Заказ")
             }
         }
-        if (order.STATUS == "STARTED") {
+        if (uiState.order.status == "STARTED") {
             Button(onClick = {
                 changeStatus("ENDED")
                 stopOrder(context)
