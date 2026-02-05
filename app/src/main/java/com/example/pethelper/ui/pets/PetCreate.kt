@@ -38,9 +38,12 @@ import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.AppViewModelProvider
 import android.content.Context
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -187,12 +190,14 @@ suspend fun uploadPhotoToServer(
 
 
 @Composable
-fun UploadPhotoButton() {
+fun UploadPhotoButton(viewModel: PetCreateViewModel = viewModel(factory = AppViewModelProvider.Factory),
+                      onUpdate: (FPet) -> Unit = viewModel::updateStateFlow) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var uploading by remember { mutableStateOf(false) }
     var lastFileId by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val httpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
@@ -210,6 +215,7 @@ fun UploadPhotoButton() {
                         uploading = false
                     }
             }
+        onUpdate(uiState.details.copy(photoId = lastFileId.toString())) // сохранение в бд
         }
     Button(
         onClick = { pickImageLauncher.launch(arrayOf("image/*")) },
@@ -219,3 +225,15 @@ fun UploadPhotoButton() {
         error?.let { Text("Ошибка: $it")}
     }
 }
+
+@Composable // функция загрузки изображения я хз, куда ее вставить так, чтобы из бд взять fileID
+fun GetPhoto(fileId: String,
+    baseUrl: String = NetworkConfig.BASE_URL
+) {
+    AsyncImage(
+        model = "$baseUrl/photo/$fileId",
+        contentDescription = "photo",
+        modifier = Modifier.size(160.dp)
+    )
+}
+
