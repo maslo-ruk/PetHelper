@@ -3,7 +3,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "orders")
-data class Orderr(
+data class Order(
     @PrimaryKey(autoGenerate = true)
     val id: String = "",
     val petId: Int,
