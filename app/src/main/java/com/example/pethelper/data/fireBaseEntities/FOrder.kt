@@ -1,6 +1,7 @@
 package com.example.pethelper.data.fireBaseEntities
 
 import com.example.pethelper.data.enums.OrderStatus
+import com.google.firebase.Timestamp
 
 data class FOrder (
     val id:String="",
@@ -12,5 +13,7 @@ data class FOrder (
     val time: String="",
     val price:Int=0,
     val notes: String="",
-    val STATUS: String = OrderStatus.CREATED.toString()
+    val STATUS: String = OrderStatus.CREATED.toString(),
+    val createdAt: Timestamp? = null,
+    val closedAt: Timestamp? = null
 )
