@@ -274,9 +274,13 @@ fun PetInfoScreen(viewModel: PetViewModel = viewModel(factory = AppViewModelProv
 fun GetPhoto(currentUser: FUser?,
              baseUrl: String = NetworkConfig.BASE_URL
 ) {
-    val fileId = currentUser?.photoId
+    val fileId: String? = currentUser?.photoId
     if (fileId.isNullOrBlank()) {
-        val fileId = "AgACAgIAAyEGAATg8gLnAAMLaYTCFI9dRSeI88DyNt6ogiUdRbYAAiELaxta7ylIb8a6idUj0X0BAAMCAAN4AAM4BA"
+        Box(
+            Modifier.size(160.dp).clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
+        return
     }
     AsyncImage(
         model = "$baseUrl/photo/$fileId",
@@ -285,3 +289,4 @@ fun GetPhoto(currentUser: FUser?,
         contentScale = ContentScale.Crop,
     )
 }
+

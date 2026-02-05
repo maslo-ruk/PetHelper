@@ -1,6 +1,8 @@
 package com.example.pethelper.ui.account
 
+import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -64,10 +66,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pethelper.data.fireBaseEntities.FPet
+import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.pets.PetCreateViewModel
 import com.example.pethelper.ui.pets.uploadPhotoToServer
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 
@@ -183,6 +193,35 @@ fun AccountChange(onBack:()-> Unit = {},
         }
 }
 
+
+suspend fun uploadUserPhotoToServer(
+    context: Context,
+    uri: Uri,
+    baseUrl: String = NetworkConfig.BASE_URL,
+    client: OkHttpClient = OkHttpClient()): String {
+    Log.e("PHOTO", "UploadPhoto composed")
+    val bytes = withContext(Dispatchers.IO) {
+        context.contentResolver.openInputStream(uri)?.use {it.readBytes()} ?: error("Не могу прочитать")
+    }
+    val body = MultipartBody.Builder().setType(MultipartBody.FORM)
+        .addFormDataPart(name = "photo",
+            filename = "image.png",
+            body = bytes.toRequestBody("image/jpeg".toMediaType())).build()
+    val request = Request.Builder().url("$baseUrl/upload").post(body).build()
+    val respText = withContext(Dispatchers.IO) {
+        client.newCall(request).execute().use() { resp ->
+            val text = resp.body?.string().orEmpty()
+            if (!resp.isSuccessful) error("Upload failed: ${resp.code}\n$text")
+            text
+        }
+    }
+    if (respText.isBlank()) error("Empty response (server returned empty body")
+    val obj = JSONObject(respText)
+    val fileId = obj.optString("file_id").ifBlank { obj.optString("fileId") }
+    require(fileId.isNotBlank() && fileId != "null") {"Bad response: $respText"}
+    return fileId
+}
+
 @Composable
 fun UploadPhotoButton(viewModel: AccountChangeViewModel = viewModel(factory = AppViewModelProvider.Factory),
                       onUpdate: (FUser) -> Unit = viewModel::updateUiState) {
@@ -203,14 +242,19 @@ fun UploadPhotoButton(viewModel: AccountChangeViewModel = viewModel(factory = Ap
             try {
                 error = null
                 uploading = true
-                val fileId = uploadPhotoToServer(context, uri, client = httpClient)
-                lastFileId = fileId} catch (e: Exception) {
-                error = e.message } finally {
+                val fileId = uploadUserPhotoToServer(context, uri, client = httpClient)
+                lastFileId = fileId
+                onUpdate(uiState.user.copy(photoId = fileId))
+            // сохранение в бд
+            }
+            catch (e: Exception) {
+                error = e.message }
+            finally {
                 uploading = false
             }
         }
-        onUpdate(uiState.user.copy(photoId = lastFileId.toString())) // сохранение в бд
     }
+
     Button(
         onClick = { pickImageLauncher.launch(arrayOf("image/*")) },
         enabled = !uploading) {

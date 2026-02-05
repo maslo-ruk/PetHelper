@@ -1,6 +1,8 @@
 package com.example.pethelper.ui.chat
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -9,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -27,8 +31,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.fireBaseEntities.Message
+import com.example.pethelper.network.NetworkConfig
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -101,4 +110,25 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             Text("Отправить")
         }
     }
+}
+
+
+@Composable // функция загрузки изображения я хз, куда ее вставить так, чтобы из бд взять fileID
+fun GetPhoto(currentUser: FUser?,
+             baseUrl: String = NetworkConfig.BASE_URL
+) {
+    val fileId: String? = currentUser?.photoId
+    if (fileId.isNullOrBlank()) {
+        Box(
+            Modifier.size(160.dp).clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
+        return
+    }
+    AsyncImage(
+        model = "$baseUrl/photo/$fileId",
+        contentDescription = "photo",
+        modifier = Modifier.size(160.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant,CircleShape),
+        contentScale = ContentScale.Crop,
+    )
 }
