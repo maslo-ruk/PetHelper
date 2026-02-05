@@ -1,96 +1,159 @@
 package com.example.pethelper.ui.service
-//
-import android.app.Service
+
+import android.Manifest
+import android.app.*
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.IBinder
-import android.os.Looper
-import androidx.core.app.ActivityCompat
-import com.example.pethelper.data.rtdb.RealtimeOrderRepository
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import android.Manifest
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Build
+import android.os.IBinder
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import com.example.pethelper.data.rtdb.RealtimeOrderRepository
 import com.example.pethelper.R
 
-
-object c{
+object c {
     const val NOTIFICATION_ID = 1001
 }
 
-class WalkTrackingService: Service(){
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+class WalkTrackingService : Service() {
+
+    private lateinit var locationManager: LocationManager
     private lateinit var rtdbRepo: RealtimeOrderRepository
 
     private var orderId: String = ""
 
+    // listener GPS
+    private val gpsListener = object : LocationListener {
+
+        override fun onLocationChanged(location: Location) {
+
+            Log.d(
+                "WalkService",
+                "GPS: ${location.latitude}, ${location.longitude}, acc=${location.accuracy}"
+            )
+
+            // фильтр плохих координат
+            if (location.accuracy > 30f) return
+
+            rtdbRepo.updateLocation(
+                orderId,
+                location.latitude,
+                location.longitude
+            )
+        }
+
+        override fun onProviderEnabled(provider: String) {
+            Log.d("WalkService", "GPS enabled")
+        }
+
+        override fun onProviderDisabled(provider: String) {
+            Log.d("WalkService", "GPS disabled")
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
-        Log.d("WalkService", "onCreate start")
 
-        fusedLocationClient =
-            LocationServices.getFusedLocationProviderClient(this)
+        Log.d("WalkService", "onCreate")
 
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         rtdbRepo = RealtimeOrderRepository()
 
         startForeground(
             c.NOTIFICATION_ID,
             createNotification()
         )
-        Log.d("WalkService", "onCreate success")
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        orderId = intent?.getStringExtra("orderId") ?: return START_NOT_STICKY
-        Log.d("WalkService", "onStartCommand orderId=${intent?.getStringExtra("orderId")}")
-        startLocationUpdates()
-        return START_STICKY
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
+
+        when (intent?.action) {
+
+            WalkServiceActions.START -> {
+
+                orderId = intent.getStringExtra("orderId")
+                    ?: return START_NOT_STICKY
+
+                Log.d("WalkService", "START orderId=$orderId")
+
+                startLocationUpdates()
+            }
+
+            WalkServiceActions.STOP -> {
+
+                Log.d("WalkService", "STOP")
+
+                stopLocationUpdates()
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
+            }
+        }
+
+        return START_NOT_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+
+    // ================= GPS =================
+
     private fun startLocationUpdates() {
-        val request = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            5000 // каждые 5 секунд
-        ).build()
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED) {
-                fusedLocationClient.requestLocationUpdates(
-                request,
-                locationCallback,
-                Looper.getMainLooper()
-            )
+            ) != PackageManager.PERMISSION_GRANTED
+        ) return
+
+
+        // Проверяем что GPS включён
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+
+            Log.e("WalkService", "GPS is disabled")
+            return
         }
+
+
+        // Запуск GPS
+        locationManager.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            3000,   // каждые 3 сек
+            2f,     // 2 метра
+            gpsListener
+        )
+
+        Log.d("WalkService", "GPS tracking started")
     }
 
-    private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(result: LocationResult) {
-            val location = result.lastLocation ?: return
-            Log.d("WalkService", "Location result = $location")
-            rtdbRepo.updateLocation(
-                orderId = orderId,
-                lat = location.latitude,
-                lon = location.longitude
-            )
+
+    private fun stopLocationUpdates() {
+
+        try {
+            locationManager.removeUpdates(gpsListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+
+        Log.d("WalkService", "GPS tracking stopped")
     }
+
+
+    // ================= Notification =================
 
     private fun createNotification(): Notification {
+
         val channelId = "walk_channel"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
             val channel = NotificationChannel(
                 channelId,
                 "Активный выгул",
@@ -107,4 +170,11 @@ class WalkTrackingService: Service(){
             .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .build()
     }
+}
+
+
+object WalkServiceActions {
+
+    const val START = "ACTION_START_WALK"
+    const val STOP = "ACTION_STOP_WALK"
 }
