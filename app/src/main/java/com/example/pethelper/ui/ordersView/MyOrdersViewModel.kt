@@ -9,7 +9,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class AvailableOrdersViewModel(
+class MyOrdersViewModel(
     val fbRepository: FireStoreRepository,
     val userManager: UserSessionManager
 ): ViewModel() {
@@ -21,13 +21,14 @@ class AvailableOrdersViewModel(
     fun startObservingOrders() {
         if (listener != null) return
 
-        listener = fbRepository.observeOrders(
+        listener = fbRepository.observeMyOrders(
             onChange = { orders ->
                 _orders.value = orders
             },
             onError = { error ->
                 Log.e("OrdersViewModel", "Firestore error", error)
-            }
+            },
+            uid = userManager.currentUser.value!!.uid
         )
     }
 

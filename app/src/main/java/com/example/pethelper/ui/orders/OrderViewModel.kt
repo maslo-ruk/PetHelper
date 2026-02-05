@@ -28,7 +28,7 @@ class OrderDialogViewModel(
 
     fun submitOrder() {
         val state = _uiState.value
-        val order = state.details.toFOrder().copy(userId = userManager.currentUser.value!!.uid)
+        val order = state.details.toFOrder().copy(userId = userManager.currentUser.value!!.uid, user = userManager.currentUser.value!!.user)
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 

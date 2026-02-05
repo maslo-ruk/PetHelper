@@ -6,6 +6,7 @@ import com.google.firebase.Timestamp
 data class FOrder (
     val id:String="",
     val pet: FPet = FPet(),
+    val user: FUser = FUser(),
     val userId: String="",
     val helperId: String="",
     val address:String="",
