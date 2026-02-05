@@ -6,7 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.pethelper.data.entities.Message
+import com.example.pethelper.data.fireBaseEntities.Chat
+import com.example.pethelper.data.fireBaseEntities.Message
 import com.example.pethelper.data.firebaseRepositories.ChatRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ class ChatScreenViewModel(
     private val chatId: String,
     private val myUid: String
 ): ViewModel() {
+    val chat: StateFlow<Chat?> = repo.chatFlow(chatId).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val messages: StateFlow<List<Message>> = repo.messagesFlow(chatId).stateIn(viewModelScope,
         SharingStarted.WhileSubscribed(5_000), emptyList())
     var input by mutableStateOf("")

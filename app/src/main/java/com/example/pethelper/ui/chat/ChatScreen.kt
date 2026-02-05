@@ -21,7 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,13 +28,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.pethelper.data.entities.Message
+import com.example.pethelper.data.fireBaseEntities.Message
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatScreenViewModel,
                onBack: () -> Unit, myUid: String) {
+    val chat by viewModel.chat.collectAsState()
     val messages by viewModel.messages.collectAsState()
+    val isClosed = chat?.status == "CLOSED"
 
     Scaffold(
         topBar = {
@@ -43,7 +46,10 @@ fun ChatScreen(viewModel: ChatScreenViewModel,
     ) {padding ->
         Column(
             modifier = Modifier.padding(padding).fillMaxSize()
-        ) {
+        ) { if (isClosed) {
+            Text(text = "Заказ завершен. Чат закрыт", modifier = Modifier.padding(12.dp),
+                style = MaterialTheme.typography.bodyLarge)
+        }
             LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth(),
                 contentPadding = PaddingValues(12.dp)
             ) {
@@ -55,7 +61,8 @@ fun ChatScreen(viewModel: ChatScreenViewModel,
             }
             ChatInput(text = viewModel.input,
                 onTextChange = viewModel::onInput,
-                onSend = viewModel::send)
+                onSend = viewModel::send,
+                enabled = !isClosed)
 
         }
     }
@@ -68,7 +75,9 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
         Surface(tonalElevation = 2.dp, shape = MaterialTheme.shapes.medium) {
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(message.text, style = MaterialTheme.typography.bodyLarge)
-                val timetext = message.createdAt?.toDate()?.toString() ?: ""
+                val timetext = message.createdAt?.toDate()?.let { dt ->
+                    SimpleDateFormat("HH:mm", Locale.getDefault()).format(dt)
+                }.orEmpty()
                 if (timetext.isNotBlank()) {
                     Spacer(Modifier.height(4.dp))
                     Text(timetext, style = MaterialTheme.typography.labelSmall)
@@ -80,14 +89,15 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
 
 @Composable
 private fun ChatInput(text: String, onTextChange: (String) -> Unit,
-                      onSend: () -> Unit) {
+                      onSend: () -> Unit, enabled: Boolean) {
     Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             TextField(
+                enabled = enabled,
                 value = text,
                 onValueChange = onTextChange, modifier = Modifier.weight(1f), placeholder = { Text("Сообщение...")}
             )
         Spacer(Modifier.width(8.dp))
-        Button(onClick = onSend) {
+        Button(onClick = onSend, enabled = enabled) {
             Text("Отправить")
         }
     }

@@ -21,7 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.pethelper.data.entities.Chat
+import com.example.pethelper.data.fireBaseEntities.Chat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

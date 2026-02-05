@@ -1,4 +1,4 @@
-package com.example.pethelper.data.entities
+package com.example.pethelper.data.fireBaseEntities
 
 import com.google.firebase.Timestamp
 
