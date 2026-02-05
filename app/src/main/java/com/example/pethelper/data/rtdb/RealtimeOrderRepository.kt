@@ -47,7 +47,7 @@ class RealtimeOrderRepository {
 
     /** Отписка */
     fun removeListener(orderId: String, listener: ValueEventListener) {
-        rootRef.child(orderId).child("location")
+        rootRef.child(orderId)
             .removeEventListener(listener)
     }
 

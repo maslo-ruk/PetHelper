@@ -1,4 +1,7 @@
 package com.example.pethelper.ui.ordersView
 
-class AvsilableOrdersUiState {
-}
+import com.example.pethelper.data.fireBaseEntities.FOrder
+
+data class AvsilableOrdersUiState(
+    val orders: List<FOrder> = listOf()
+)
