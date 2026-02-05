@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.pethelper.data.entities.User
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.ui.AppViewModelProvider
@@ -110,32 +109,50 @@ fun OrderInputs(modifier:Modifier = Modifier,
 
     var expanded1 by remember { mutableStateOf(false) }
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+        AnimatedVisibility(
+            visible = showFields,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+
             ExposedDropdownMenuBox(
                 expanded = expanded1,
-                onExpandedChange = { expanded1 = it }
+                onExpandedChange = {
+                    expanded1 = !expanded1   // ← важно!
+                }
             ) {
+
                 OutlinedTextField(
                     value = uiState.details.pet.name,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Выберите нужного питомца") },
+
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = expanded1
-                        )
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1)
                     },
-                    modifier = Modifier.fillMaxWidth()
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor() // ← ОБЯЗАТЕЛЬНО
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded1,
-                    onDismissRequest = { onClick(uiState.details.copy(pet = FPet())) }
+                    onDismissRequest = {
+                        expanded1 = false
+                    }
                 ) {
+
                     pets.forEach { pet ->
+
                         DropdownMenuItem(
-                            text = { pet.name },
-                            onClick = {onClick(uiState.details.copy(pet = pet))}
+                            text = { Text(pet.name) },
+
+                            onClick = {
+                                onClick(uiState.details.copy(pet = pet))
+                                expanded1 = false   // ← закрываем меню
+                            }
                         )
                     }
                 }

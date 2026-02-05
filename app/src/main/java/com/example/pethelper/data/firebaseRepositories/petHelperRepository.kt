@@ -76,7 +76,7 @@ class FireStoreRepository(
             .set(pet, SetOptions.merge())
     }
 
-    suspend fun addOrder(order: FOrder) {
+    suspend fun addOrder(order: FOrder, userId: String) {
         db.collection("orders")
             .add(order)
             .await()

@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import com.example.pethelper.data.entities.User
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.ui.account.PetListItem
