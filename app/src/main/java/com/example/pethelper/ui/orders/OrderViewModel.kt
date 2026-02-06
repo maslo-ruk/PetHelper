@@ -28,13 +28,14 @@ class OrderDialogViewModel(
 
     fun submitOrder() {
         val state = _uiState.value
-        val order = state.details.toFOrder().copy(userId = userManager.currentUser.value!!.uid, user = userManager.currentUser.value!!.user)
+        var order = state.details.toFOrder().copy(userId = userManager.currentUser.value!!.uid, user = userManager.currentUser.value!!.user)
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
             try {
-                fbRepository.addOrder(order, userManager.currentUser.value!!.uid)
-
+                val ord = fbRepository.addOrder(order, userManager.currentUser.value!!.uid)
+                order = order.copy(id=ord.id)
+                fbRepository.updateOrder(ord.id, order)
                 _uiState.update {
                     it.copy(isLoading = false, success = true)
                 }

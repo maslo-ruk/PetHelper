@@ -28,6 +28,8 @@ class AvailableOrdersViewModel(
 
 
     private var listener: ListenerRegistration? = null
+    private var myListener: ListenerRegistration? = null
+
 
     fun startObservingOrders() {
         if (listener != null) return
@@ -40,11 +42,26 @@ class AvailableOrdersViewModel(
                 Log.e("OrdersViewModel", "Firestore error", error)
             }
         )
+
+        if (myListener != null) return
+
+        myListener = fbRepository.observeMyOrders(
+            onChange = { orders ->
+                _uiState.update { it.copy(ordersOfWorker = orders) }
+            },
+            onError = { error ->
+                Log.e("OrdersViewModel", "Firestore error", error)
+            },
+            uid = userManager.currentUser.value!!.uid
+        )
     }
+
 
     fun stopObservingOrders() {
         listener?.remove()
         listener = null
+        myListener?.remove()
+        myListener = null
     }
 
     override fun onCleared() {
@@ -56,6 +73,8 @@ class AvailableOrdersViewModel(
             _uiState.update { it.copy(isLoading = true)  }
             try {
                 chatRepository.createChat(order.id, order.userId, userManager.currentUser.value!!.uid)
+                fbRepository.addWorkerToOrder(userManager.currentUser.value!!.uid, order)
+                Log.d("AceptOrder", "SUCCESS")
                 _uiState.update { it.copy(success = true, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.message, isLoading = false) }
