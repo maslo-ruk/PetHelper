@@ -190,7 +190,7 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             }
         }
         if (uiState.order.status == "STARTED") {
-            Button(onClick = { checkPosition(uiState.order.id) }, enabled = enabled) {
+            Button(onClick = { checkPosition(uiState.orderId) }, enabled = enabled) {
                 Text("Посмотреть местоположение")
             }
         }
