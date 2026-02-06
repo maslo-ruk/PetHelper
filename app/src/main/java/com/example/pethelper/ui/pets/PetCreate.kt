@@ -88,7 +88,7 @@ fun PetCreate(onBack: () -> Unit,
     ) { innerPadding ->
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding)
+            .padding(start = 20.dp, end = 20.dp)
             .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally, ) {
             Spacer(modifier= Modifier.height(12.dp))

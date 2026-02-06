@@ -27,7 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.ui.AppViewModelProvider
-
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.Color
 @Composable
 fun LoginScreen(onBack: () -> Unit,
                 viewModel: LoginViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -56,7 +59,8 @@ fun LoginScreen(onBack: () -> Unit,
             value = uiState.details.email,
             onValueChange = { onUpdate(uiState.details.copy(email = it)) },
             label = { Text("Электронная почта")},
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
         )
 
         Spacer(Modifier.height(16.dp))
@@ -66,14 +70,18 @@ fun LoginScreen(onBack: () -> Unit,
             onValueChange = { onUpdate(uiState.details.copy(password = it)) },
             label = { Text("Пароль") },
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
         )
-
         Spacer(Modifier.height(32.dp))
 
         Button(
             onClick = { onSubmit() },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF93000A),
+                contentColor = Color.White  // цвет текста
+            )
         ) {
             Text("Войти")
         }

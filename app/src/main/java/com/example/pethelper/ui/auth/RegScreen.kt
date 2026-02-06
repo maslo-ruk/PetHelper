@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -196,7 +198,11 @@ fun RegistrationScreen(
             onClick = {
                 onSubmit()
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF93000A),
+                contentColor = Color.White  // цвет текста
+            )
         ) {
             Text("Регистрация")
         }
@@ -211,7 +217,8 @@ fun RegistrationScreen(
             Spacer(Modifier.width(8.dp))
             Text(
                 text = "Войти",
-                modifier = Modifier.clickable { onLoginClick() }
+                modifier = Modifier.clickable { onLoginClick() },
+                color = Color(0xFF93000A)
             )
         }
         if (uiState.success) {

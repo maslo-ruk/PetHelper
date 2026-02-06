@@ -119,7 +119,8 @@ fun AccountScreen(
                 .padding(padding)
                 .fillMaxSize()
                 .padding(16.dp)
-                .alpha(alphaAnim.value)
+                .alpha(alphaAnim.value),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 // Аватар
             Box(
@@ -139,12 +140,13 @@ fun AccountScreen(
             Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
+            Row(modifier = Modifier.fillMaxWidth()){
+                AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
+                Spacer(Modifier.height(12.dp))
 
-            AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
-            Spacer(Modifier.height(12.dp))
 
-
-            AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+                AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+            }
 
             Spacer(Modifier.height(12.dp))
 

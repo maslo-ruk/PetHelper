@@ -36,8 +36,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pethelper.data.fireBaseEntities.FUser
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.size
-
-
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.layout.R
+import androidx.compose.foundation.Image
 @Composable
 fun MainScreen(
     viewModel: StartViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -91,41 +96,34 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
 
             IconButton(onClick = { onAccount() }) {
                 Icon(Icons.Default.AccountCircle, contentDescription = "Аккаунт",
-                    modifier = Modifier.height(180.dp).width(180.dp)
+                    modifier = Modifier.size(400.dp)
                 )
             }
         }
 
+        Spacer(modifier = Modifier.height(50.dp))
 
         Button(
             onClick = onCreateOrder,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF93000A),
+                contentColor = Color.White  // цвет текста
+            )
         ) {
             Text("Создать заказ")
         }
-        
-        Button(
-            onClick = {
-                onLogout()
-                      },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Выйти")
-        }
-        Button(
-            onClick = {
-                onLoc()
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Чек геолокации")
-        }
+
         if (curUser.type == 0) {
             Button(
                 onClick = {
                     onShowOrders()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF93000A),
+                    contentColor = Color.White  // цвет текста
+                )
             ) {
                 Text("Доступные заказы")
             }
@@ -135,13 +133,50 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                 onClick = {
                     onShowOrdersUser()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF93000A),
+                    contentColor = Color.White  // цвет текста
+                )
             ) {
                 Text("Данные по заказам")
             }
         }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Button(
+            onClick = {
+                onLoc()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF93000A),
+                contentColor = Color.White  // цвет текста
+            )
+        ) {
+            Text("Геолокация")
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Button(
+            onClick = {
+                onLogout()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF93000A),
+                contentColor = Color.White  // цвет текста
+            )
+        ) {
+            Text("Выйти")
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
         Row(
-            modifier = Modifier.width(80.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ){
             Button(
@@ -149,9 +184,18 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                     onChat()
                 },
                 shape = CircleShape,
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.size(70.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF93000A),
+                    contentColor = Color.White  // цвет текста
+                )
             ) {
-                Text("Мои чаты")
+                // Иконка и текст в ряд
+                Icon(
+                    imageVector = Icons.Default.Chat, // Иконка чата из Material Icons
+                    contentDescription = "Чат",
+                    modifier = Modifier.size(30.dp)
+                )
             }
         }
     }
@@ -175,13 +219,21 @@ fun AuthFalse(onLogin: () -> Unit, onReg: () -> Unit) {
         Button(
             onClick = onLogin,
             modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF93000A),
+                contentColor = Color.White  // цвет текста
+            )
         ) {
             Text("Войти")
         }
 
         Button(
             onClick = onReg,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF93000A),
+                contentColor = Color.White  // цвет текста
+            )
         ) {
             Text("Регистрация")
         }
