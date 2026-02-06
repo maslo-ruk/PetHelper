@@ -130,7 +130,7 @@ fun AccountScreen(
                     .size(100.dp)
                     .clip(CircleShape).verticalScroll(rememberScrollState()) // потом поменяем
             ) {
-                GetPhoto(currentUser = curUser)
+//                GetPhoto(currentUser = curUser)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -246,10 +246,11 @@ fun AccountInfoScreen(onBack: () -> Unit = {},
 fun PetInfoScreen(viewModel: PetViewModel = viewModel(factory = AppViewModelProvider.Factory), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pet = uiState.pet
+    val name: String = uiState.pet.name
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(pet.name) },
+                title = { Text(name) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
@@ -259,6 +260,7 @@ fun PetInfoScreen(viewModel: PetViewModel = viewModel(factory = AppViewModelProv
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+//            GetPhotoPet(pet)
             Text("Тип: ${pet.type}")
             Text("Пол: ${pet.gender}")
             Text("Возраст: ${pet.age}")
@@ -270,11 +272,31 @@ fun PetInfoScreen(viewModel: PetViewModel = viewModel(factory = AppViewModelProv
     }
 }
 
-@Composable // функция загрузки изображения я хз, куда ее вставить так, чтобы из бд взять fileID
+@Composable
 fun GetPhoto(currentUser: FUser?,
              baseUrl: String = NetworkConfig.BASE_URL
 ) {
     val fileId: String? = currentUser?.photoId
+    if (fileId.isNullOrBlank()) {
+        Box(
+            Modifier.size(160.dp).clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
+        return
+    }
+    AsyncImage(
+        model = "$baseUrl/photo/$fileId",
+        contentDescription = "photo",
+        modifier = Modifier.size(160.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant,CircleShape),
+        contentScale = ContentScale.Crop,
+    )
+}
+
+@Composable
+fun GetPhotoPet(currentPet: FPet?,
+             baseUrl: String = NetworkConfig.BASE_URL
+) {
+    val fileId: String? = currentPet?.photoId
     if (fileId.isNullOrBlank()) {
         Box(
             Modifier.size(160.dp).clip(CircleShape)

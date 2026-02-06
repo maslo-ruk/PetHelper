@@ -117,7 +117,7 @@ fun PetHelperApp(
             composable(PetHelperScreens.AddPet.name) {
                 PetCreate(onBack = {navController.popBackStack()})
             }
-            composable(route = PetHelperScreens.PetInfo.name) {
+            composable(route = PetHelperScreens.PetInfo.name,) {
                 PetInfoScreen(onBack = {navController.popBackStack()})
             }
             composable(route = PetHelperScreens.Location.name) {

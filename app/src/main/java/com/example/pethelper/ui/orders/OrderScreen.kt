@@ -230,7 +230,10 @@ fun OrderInputs(modifier:Modifier = Modifier,
         AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
             OutlinedTextField(
                 value = uiState.details.price.toString(),
-                onValueChange = { onClick(uiState.details.copy(price=it.toInt())) },
+                onValueChange = {new ->
+                    val text = new
+                    val amount = text.toIntOrNull() ?: 0
+                    onClick(uiState.details.copy(price = amount))}, // фикс вылета
                 label = { Text("Цена") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)

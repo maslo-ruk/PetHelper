@@ -38,12 +38,20 @@ import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.AppViewModelProvider
 import android.content.Context
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
+import com.example.pethelper.data.enums.PetTypeConverter
+import com.example.pethelper.data.enums.PetTypes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,15 +72,7 @@ fun PetCreate(onBack: () -> Unit,
               onUpdate: (FPet) -> Unit = viewModel::updateStateFlow,
               onSubmit: () -> Unit = viewModel::submitPet
  ) {
-    /*я не разобаралась с классом животного, потом изменим*/
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-
-    var petName by remember { mutableStateOf("") }
-    var breed by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -107,6 +107,53 @@ fun PetCreate(onBack: () -> Unit,
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            var expanded by remember { mutableStateOf(false) }
+            var selected by remember { mutableStateOf("") }
+            val items = listOf<String>(PetTypes.DOG.name,
+                PetTypes.CHINCHILLA.name,
+                PetTypes.CAT.name,
+                PetTypes.FISH.name,
+                PetTypes.HAMSTER.name,
+                PetTypes.PARROT.name,
+                PetTypes.OTHER.name)
+
+            Box { // выбор типа животного
+                OutlinedTextField(
+                    value = selected,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Тип животного")},
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = true }
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(item) },
+                            onClick = {
+                                selected = item
+                                onUpdate(uiState.details.copy(type = PetTypes.valueOf(item)))
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             /*порода, сделала первую букву заглавной, чтобы в бд было легче искать всегда*/
             OutlinedTextField(
                 value = uiState.details.breed,
@@ -121,7 +168,10 @@ fun PetCreate(onBack: () -> Unit,
 
             OutlinedTextField(
                 value = uiState.details.age.toString(),
-                onValueChange = { onUpdate(uiState.details.copy(age = it.toInt())) },
+                onValueChange = { new ->
+                    val text = new
+                    val amount = text.toIntOrNull() ?: 0
+                    onUpdate(uiState.details.copy(age = amount)) }, // фикс вылета
                 label = { Text("Возраст") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -131,7 +181,10 @@ fun PetCreate(onBack: () -> Unit,
 
             OutlinedTextField(
                 value = uiState.details.weight.toString(),
-                onValueChange = { onUpdate(uiState.details.copy(weight = it.toInt())) },
+                onValueChange = {new ->
+                    val text = new
+                    val amount = text.toIntOrNull() ?: 0
+                    onUpdate(uiState.details.copy(weight = amount))}, // фикс вылета
                 label = { Text("Вес (кг)") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

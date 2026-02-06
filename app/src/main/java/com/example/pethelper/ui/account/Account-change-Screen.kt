@@ -141,6 +141,14 @@ fun AccountChange(onBack:()-> Unit = {},
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier= Modifier.height(12.dp))
+            OutlinedTextField(
+                value = uiState.user.login,
+                onValueChange = {onValChange(uiState.user.copy(login = it))},
+                label = { Text("Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier=Modifier.height(12.dp))
             var showDatePicker by remember { mutableStateOf(false) }
             val datePickerState = rememberDatePickerState()
 //            OutlinedTextField(
