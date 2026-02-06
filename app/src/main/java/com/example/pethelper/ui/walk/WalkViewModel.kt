@@ -11,9 +11,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class WalkViewModel(val rtdbRepository: RealtimeOrderRepository): ViewModel() {
+class WalkViewModel(
+    val rtdbRepository: RealtimeOrderRepository,
+    val orderId:String): ViewModel() {
     private val _location = MutableStateFlow<Pair<Double, Double>?>(null)
     val location: StateFlow<Pair<Double, Double>?> = _location.asStateFlow()
+
+    private val _locating = MutableStateFlow<Boolean>(false)
+    val locating: StateFlow<Boolean> = _locating.asStateFlow()
 
     private var listener: ValueEventListener? = null
 
@@ -27,32 +32,29 @@ class WalkViewModel(val rtdbRepository: RealtimeOrderRepository): ViewModel() {
         listener = rtdbRepository.observeLocation(orderId) { lat, lon ->
             _location.value = Pair(lat, lon)
         }
+        _locating.value = true
         Log.d("WalkViewModel", "Location updated: ${location.value?.first}, ${location.value?.second}")
     }
 
     fun stopObserving(orderId: String) {
+        Log.d("WalkViewModel", "Stopped observing")
         listener?.let {
             rtdbRepository.removeListener(orderId, it)
             listener = null
         }
+        _locating.value = false
     }
 
     fun onWalkStarted(
-        context: Context,
         orderId: String
     ) {
         startObserving(orderId)
-        Log.d("WalkViewModel", "onWalkStarted")
-        WalkServiceController.startWalkService(context, orderId)
-        Log.d("WalkViewModel", "onWalkStarted success")
     }
 
     fun onWalkFinished(
-        context: Context,
         orderId: String
     ) {
         stopObserving(orderId)
-        WalkServiceController.stopWalkService(context)
     }
 
     override fun onCleared() {

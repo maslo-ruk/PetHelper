@@ -94,4 +94,12 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
 
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    implementation("com.yandex.android:maps.mobile:4.30.0-lite")
+}
+
+android {
+    defaultConfig {
+        minSdk = 26
+    }
 }

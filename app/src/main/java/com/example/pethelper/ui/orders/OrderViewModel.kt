@@ -4,8 +4,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pethelper.data.fireBaseEntities.FOrder
+import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
 import com.example.pethelper.data.firebaseRepositories.UserSessionManager
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,13 +28,12 @@ class OrderDialogViewModel(
 
     fun submitOrder() {
         val state = _uiState.value
-        val order = state.details.toFOrder()
-
+        val order = state.details.toFOrder().copy(userId = userManager.currentUser.value!!.uid, user = userManager.currentUser.value!!.user)
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
             try {
-                fbRepository.addOrder(order)
+                fbRepository.addOrder(order, userManager.currentUser.value!!.uid)
 
                 _uiState.update {
                     it.copy(isLoading = false, success = true)

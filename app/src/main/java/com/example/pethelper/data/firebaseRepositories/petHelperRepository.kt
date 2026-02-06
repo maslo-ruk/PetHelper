@@ -1,11 +1,14 @@
 package com.example.pethelper.data.firebaseRepositories
 
+import android.util.Log
 import com.example.pethelper.data.fireBaseEntities.FOrder
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObjects
@@ -73,7 +76,7 @@ class FireStoreRepository(
             .set(pet, SetOptions.merge())
     }
 
-    suspend fun addOrder(order: FOrder) {
+    suspend fun addOrder(order: FOrder, userId: String) {
         db.collection("orders")
             .add(order)
             .await()
@@ -84,11 +87,76 @@ class FireStoreRepository(
             .await()
     }
 
+    suspend fun updateOrder(orderId: String, order: FOrder) {
+        Log.d("FS", "updateOrder")
+        db.collection("orders")
+            .document(orderId)
+            .set(order, SetOptions.merge())
+            .await()
+        val ord = db.collection("orders").document(orderId).get().await()
+        Log.d("FS", "updateOrder ${ord.get("STATUS")}")
+    }
+
     suspend fun addWorkerToOrder(orderId:String, worker:FUser) {
         db.collection("orders")
             .document(orderId)
             .collection("workers")
             .add(worker)
             .await()
+    }
+
+    fun observeOrders(
+        onChange: (List<FOrder>) -> Unit,
+        onError: (Throwable) -> Unit
+    ): ListenerRegistration {
+        val ordersRef = db.collection("orders")
+        Log.d("FS", "Orders ref = ${ordersRef.get()}")
+
+        return ordersRef
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot == null) return@addSnapshotListener
+
+                val orders = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(FOrder::class.java)?.copy(id = doc.id)
+                }
+
+                Log.d("FS", "Docs count = ${snapshot.size()}") // ← ВАЖНО
+
+                onChange(orders)
+            }
+    }
+
+    fun observeMyOrders(
+        onChange: (List<FOrder>) -> Unit,
+        onError: (Throwable) -> Unit,
+        uid: String,
+    ): ListenerRegistration {
+        val ordersRef = db.collection("users").document(uid).collection("orders")
+        Log.d("FS", "Orders ref = ${ordersRef.get()}")
+
+        return ordersRef
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot == null) return@addSnapshotListener
+
+                val orders = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(FOrder::class.java)?.copy(id = doc.id)
+                }
+
+                Log.d("FS", "Docs count = ${snapshot.size()}") // ← ВАЖНО
+
+                onChange(orders)
+            }
     }
 }

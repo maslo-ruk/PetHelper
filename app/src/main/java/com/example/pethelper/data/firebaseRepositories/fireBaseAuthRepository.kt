@@ -21,7 +21,7 @@ class AuthRepository(
             val result = auth
                 .createUserWithEmailAndPassword(email, password)
                 .await()
-
+            _isLogged.value = true
             Result.success(result.user!!.uid)
         } catch (e: Exception) {
             Result.failure(e)
@@ -33,13 +33,14 @@ class AuthRepository(
             val result = auth
                 .signInWithEmailAndPassword(email, password)
                 .await()
-
+            _isLogged.value = true
             Result.success(result.user!!.uid)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
     override fun logout() {
+        _isLogged.value = false
         auth.signOut()
     }
 

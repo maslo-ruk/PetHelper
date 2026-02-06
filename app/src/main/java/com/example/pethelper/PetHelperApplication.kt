@@ -10,6 +10,7 @@ import com.example.pethelper.data.session.AppSession
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,5 +25,7 @@ class PetHelperApplication : Application() {
         CoroutineScope(Dispatchers.IO).launch {
             AppSession.sessionManager.loadCurrentUser()
         }
+        MapKitFactory.setApiKey("f42b771e-795f-4f7f-b7d0-edb44919d52c")
+        MapKitFactory.initialize(this)
     }
 }

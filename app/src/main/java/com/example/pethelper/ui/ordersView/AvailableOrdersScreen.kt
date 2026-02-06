@@ -5,43 +5,73 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import com.example.pethelper.data.entities.User
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
+import com.example.pethelper.ui.AppViewModelProvider
 import com.example.pethelper.ui.account.PetListItem
+import com.example.pethelper.ui.orders.OrderDialogViewModel
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import com.example.pethelper.data.fireBaseEntities.FOrder
 
 
 @Composable
-fun AvailableOrders() {
-    val orders: MutableList<String> = mutableListOf("names")
+fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = AppViewModelProvider.Factory),
+                    onOrderClick:(order: FOrder)->Unit = viewModel::acceptOrder) {
+    val orders by viewModel.orders.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.startObservingOrders()
+    }
+
+
     LazyColumn {
         items(orders) { order ->
-            OrderCard() }
+            OrderCard(order, onOrderClick) }
         }
     }
 
 
 @Composable
-fun OrderCard() {
+fun OrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit) {
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Box() {
-            Text(text = "Имя Фамилия Пользователя")
-            Text("Заказ инфо")
-            Text(text = "Адрес")
-        }
-        Box() {
-            Text(text = "Дата")
-            Text(text = "Цена")
+        Column {
+            Box() {
+                Column {
+                    Text(text = "${order.user.name} ${order.user.surname}")
+                    Text(order.notes)
+                    Text(text = order.address)
+                }
+            }
+            Box() {
+                Column {
+                    Text(text = order.date)
+                    Text(text = order.price.toString())
+                }
+            }
+            Button(
+                onClick = {onOrderClick(order)}
+            ) {
+                Text("Отозваться")
+            }
         }
     }
 }

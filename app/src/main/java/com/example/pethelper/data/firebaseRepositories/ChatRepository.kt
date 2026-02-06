@@ -1,11 +1,14 @@
 package com.example.pethelper.data.firebaseRepositories
 
-import androidx.compose.animation.core.snap
+import android.util.Log
 import com.example.pethelper.data.enums.OrderStatus
 import com.example.pethelper.data.fireBaseEntities.Chat
+import com.example.pethelper.data.fireBaseEntities.FOrder
+import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.fireBaseEntities.Message
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -14,17 +17,37 @@ import kotlinx.coroutines.tasks.await
 class ChatRepository {
     private val db = FirebaseFirestore.getInstance()
 
-    fun chatsFlow(myUid: String) = callbackFlow<List<Chat>> {
+    fun chatsFlowListen(myUid: String) = callbackFlow<List<Chat>> {
         val listener = db.collection("chats").whereArrayContains("participants", myUid)
             .whereEqualTo("status", "ACTIVE").orderBy("lastMessageAt",
                 Query.Direction.DESCENDING).addSnapshotListener { snap, e ->
                     if (e != null) {trySend(emptyList())
                         return@addSnapshotListener}
-                val chats = snap?.documents?.mapNotNull {d ->
-                    d.toObject(Chat::class.java)!!.copy(id = d.id)
+                val chats = snap?.documents?.mapNotNull { d ->
+                    d.toObject(Chat::class.java)
+                        ?.copy(id = d.id)
                 } ?: emptyList()
-            trySend(chats)}
+
+                trySend(chats)}
         awaitClose { listener.remove() }
+    }
+
+    fun observeChats(myUid: String, onError: (Throwable) -> Unit,
+                     onChange: (List<Chat>) -> Unit): ListenerRegistration {
+        val chatsRef = db.collection("chats").whereArrayContains("participants", myUid)
+            .whereEqualTo("status", "ACTIVE")
+
+        return chatsRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                onError(error)
+                return@addSnapshotListener
+            }
+            if (snapshot == null) return@addSnapshotListener
+            val chats = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Chat::class.java)?.copy(id = doc.id)
+            }
+            onChange(chats)
+        }
     }
 
     fun chatFlow(chatId: String) = callbackFlow<Chat?> {
@@ -52,6 +75,25 @@ class ChatRepository {
             }
         awaitClose { listener.remove() }
     }
+
+    fun observeMessages(chatid: String, onError: (Throwable) -> Unit,
+                     onChange: (List<Message>) -> Unit): ListenerRegistration {
+        val messagesRef = db.collection("messages").whereEqualTo("chatId", chatid)
+            .orderBy("createdAt", Query.Direction.ASCENDING)
+
+        return messagesRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                onError(error)
+                return@addSnapshotListener
+            }
+            if (snapshot == null) return@addSnapshotListener
+            val messages = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Message::class.java)?.copy(id = doc.id)
+            }
+            Log.d("ChatRepository", "Received ${messages.size} messages")
+            onChange(messages)
+        }
+    }
     suspend fun sendMessage(chatId: String, senderId: String, text: String) {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return
@@ -69,10 +111,10 @@ class ChatRepository {
         chatRef.update(chatUpdates).await()
     }
 
-    suspend fun createChat(orderId: String, petyaId: String, vasyaId: String): String {
+    suspend fun createChat(orderId: String, clientId: String, workerId: String): String {
         val chatRef = db.collection("chats").document()
         val data = mapOf("orderId" to orderId,
-            "participants" to listOf(petyaId, vasyaId),
+            "participants" to listOf(clientId, workerId),
             "status" to "ACTIVE",
             "lastMessage" to "",
             "createdAt" to FieldValue.serverTimestamp(),
@@ -94,5 +136,35 @@ class ChatRepository {
         "closedAT" to FieldValue.serverTimestamp()))
         batch.commit().await()
     }
+
+    suspend fun getOrderByChatId(chatId: String): FOrder? {
+        val chatSnap = db.collection("chats").document(chatId).get().await()
+        val orderId = chatSnap.getString("orderId") ?: return null
+
+        val orderSnap = db.collection("orders")
+            .document(orderId)
+            .get()
+            .await()
+        Log.d("CHAT", "ORDER REPO ${orderSnap.data}")
+        Log.d("CHAT", "ORDER REPO ${orderSnap.get("status")}")
+        val order = orderSnap.toObject(FOrder::class.java)
+        Log.d("CHAT", "ORDER REPO 2 ${order!!.status}")
+        return order
+    }
+
+    suspend fun getOrderIdByChatId(chatId: String): String? {
+        val chatSnap = db.collection("chats").document(chatId).get().await()
+        val orderId = chatSnap.getString("orderId") ?: return null
+
+        return orderId
+    }
+
+    suspend fun getChatById(chatId: String): Chat? {
+        Log.d("CHAT", "getChatById")
+        val chatSnap = db.collection("chats").document(chatId).get().await()
+        Log.d("CHAT", "${chatSnap.data}")
+        return chatSnap.toObject(Chat::class.java)
+    }
+
 }
 
