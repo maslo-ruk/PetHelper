@@ -19,6 +19,7 @@ foundationLayoutVersion = "1.10.0"
 foundationVersion = "1.10.2"
 androidxFoundationLayout = "1.10.2"
 uiautomator = "2.3.0"
+animationCoreVersion = "1.10.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,6 +47,7 @@ androidx-foundation-layout = { group = "androidx.compose.foundation", name = "fo
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
 foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "androidxFoundationLayout" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
+androidx-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "animationCoreVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

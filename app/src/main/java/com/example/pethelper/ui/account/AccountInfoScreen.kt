@@ -57,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.pethelper.Constants
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.R
 import com.example.pethelper.network.NetworkConfig
@@ -105,69 +106,84 @@ fun AccountScreen(
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     val pets = viewModel.userManager.pets.collectAsState().value
     val petUiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Аккаунт", textAlign = TextAlign.Center) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(brush = Constants.GRADIENT_BRUSH)
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Аккаунт", textAlign = TextAlign.Center) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                painterResource(id = android.R.drawable.ic_media_previous),
+                                contentDescription = "Назад"
+                            )
+                        }
                     }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .padding(16.dp)
-                .alpha(alphaAnim.value),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-// Аватар
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .verticalScroll(rememberScrollState()) // потом поменяем
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.cot),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
                 )
             }
+        ) { padding ->
 
-            Spacer(Modifier.height(12.dp))
-            Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .alpha(alphaAnim.value),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+// Аватар
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .verticalScroll(rememberScrollState()) // потом поменяем
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.cot),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
+                Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
 
 
-            Row(modifier = Modifier.fillMaxWidth()){
-                AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
+                    Spacer(Modifier.height(12.dp))
+
+
+                    AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+                }
+
                 Spacer(Modifier.height(12.dp))
 
-
-                AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
+                AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
 
 
-            Spacer(Modifier.height(24.dp))
-            Text("Домашние животные", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(24.dp))
+                Text("Домашние животные", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(8.dp))
 
 
-            LazyColumn {
-                items(pets) { pet ->
-                    AnimatedVisibility(visible = true, enter = fadeIn() + expandVertically()) {
-                        PetListItem(pet = pet,
-                            onClick = onOpenPet)
+                LazyColumn {
+                    items(pets) { pet ->
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn() + expandVertically()
+                        ) {
+                            PetListItem(
+                                pet = pet,
+                                onClick = onOpenPet
+                            )
+                        }
                     }
                 }
             }

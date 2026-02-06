@@ -1,15 +1,21 @@
 package com.example.pethelper.ui.start
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
+import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -21,28 +27,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.ui.AppViewModelProvider
-import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pethelper.data.fireBaseEntities.FUser
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.res.painterResource
-import androidx.compose.foundation.layout.R
-import androidx.compose.foundation.Image
+import com.example.pethelper.Constants
+import com.example.pethelper.R
+
 @Composable
 fun MainScreen(
     viewModel: StartViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -78,46 +85,81 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
              onShowOrders:() -> Unit = {},
              onShowOrdersUser:() -> Unit = {},
              onChat:()->Unit) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(brush = Constants.GRADIENT_BRUSH)
     ) {
-
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(top = 60.dp, bottom = 0.dp, start = 40.dp, end = 50.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "PetHelper",
-            )
 
-            IconButton(onClick = { onAccount() }) {
-                Icon(Icons.Default.AccountCircle, contentDescription = "Аккаунт",
-                    modifier = Modifier.size(400.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 60.dp, bottom = 0.dp, start = 40.dp, end = 50.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "PetHelper",
                 )
+
+                IconButton(onClick = { onAccount() }) {
+                    Icon(
+                        Icons.Default.AccountCircle, contentDescription = "Аккаунт",
+                        modifier = Modifier.size(400.dp)
+                    )
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
-        Button(
-            onClick = onCreateOrder,
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF93000A),
-                contentColor = Color.White  // цвет текста
-            )
-        ) {
-            Text("Создать заказ")
-        }
+            Button(
+                onClick = onCreateOrder,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF93000A),
+                    contentColor = Color.White  // цвет текста
+                )
+            ) {
+                Text("Создать заказ")
+            }
 
-        if (curUser.type == 0) {
+            if (curUser.type == 0) {
+                Button(
+                    onClick = {
+                        onShowOrders()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF93000A),
+                        contentColor = Color.White  // цвет текста
+                    )
+                ) {
+                    Text("Доступные заказы")
+                }
+            } else {
+                Button(
+                    onClick = {
+                        onShowOrdersUser()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF93000A),
+                        contentColor = Color.White  // цвет текста
+                    )
+                ) {
+                    Text("Данные по заказам")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
+
             Button(
                 onClick = {
-                    onShowOrders()
+                    onLoc()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -125,13 +167,14 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                     contentColor = Color.White  // цвет текста
                 )
             ) {
-                Text("Доступные заказы")
+                Text("Геолокация")
             }
-        }
-        else {
+
+            Spacer(modifier = Modifier.height(30.dp))
+
             Button(
                 onClick = {
-                    onShowOrdersUser()
+                    onLogout()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -139,105 +182,339 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                     contentColor = Color.White  // цвет текста
                 )
             ) {
-                Text("Данные по заказам")
+                Text("Выйти")
             }
-        }
 
-        Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
-        Button(
-            onClick = {
-                onLoc()
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF93000A),
-                contentColor = Color.White  // цвет текста
-            )
-        ) {
-            Text("Геолокация")
-        }
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Button(
-            onClick = {
-                onLogout()
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF93000A),
-                contentColor = Color.White  // цвет текста
-            )
-        ) {
-            Text("Выйти")
-        }
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ){
-            Button(
-                onClick = {
-                    onChat()
-                },
-                shape = CircleShape,
-                modifier = Modifier.size(70.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF93000A),
-                    contentColor = Color.White  // цвет текста
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ) {
-                // Иконка и текст в ряд
-                Icon(
-                    imageVector = Icons.Default.Chat, // Иконка чата из Material Icons
-                    contentDescription = "Чат",
-                    modifier = Modifier.size(30.dp)
-                )
+                Button(
+                    onClick = {
+                        onChat()
+                    },
+                    shape = CircleShape,
+                    modifier = Modifier.size(70.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF93000A),
+                        contentColor = Color.White  // цвет текста
+                    )
+                ) {
+                    // Иконка и текст в ряд
+                    Icon(
+                        imageVector = Icons.Default.Chat, // Иконка чата из Material Icons
+                        contentDescription = "Чат",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
             }
         }
     }
-
 }
 
 @Composable
 fun AuthFalse(onLogin: () -> Unit, onReg: () -> Unit) {
-    Column(
+
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val scale: Float by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 800, easing = EaseInOutCubic),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "scale"
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 30.dp, start = 30.dp, end = 30.dp),
-        verticalArrangement = Arrangement.Bottom,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(brush = Constants.GRADIENT_BRUSH)
     ) {
-        //Spacer(Modifier.height(60.dp))
-
-//        Text(
-//            text = "Зарегистрируйтесь, или войдите в аккаунт"
-//        )
-        Button(
-            onClick = onLogin,
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF93000A),
-                contentColor = Color.White  // цвет текста
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp)
+                .padding(top = 80.dp, bottom = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Войти")
-        }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
 
-        Button(
-            onClick = onReg,
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF93000A),
-                contentColor = Color.White  // цвет текста
-            )
-        ) {
-            Text("Регистрация")
+                Box(
+                    modifier = Modifier
+                        .size(150.dp)
+                        .scale(scale)
+                        .clip(CircleShape)
+                        .background(Color(color = 0xFF690005)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.doglogo1),
+                        contentDescription = "Лапка",
+                        modifier = Modifier.size(150.dp)
+                            .clip(CircleShape),
+                        tint = Color.Unspecified
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                FeatureItem(emoji = "🐕", text = "Отслеживание прогулки в реальном времени")
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = onLogin,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(color = 0xFF690005),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Войти",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = onReg,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(color = 0xFF690005)
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(color = 0xFF690005),
+                                Color(color = 0xFF93000A)
+                            )
+                        )
+                    )
+                ) {
+                    Text(
+                        text = "Регистрация",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
         }
     }
 }
+/*
+@Composable
+fun AuthFalse2(onLogin: () -> Unit, onReg: () -> Unit) {
 
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val scale: Float by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 800, easing = EaseInOutCubic),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "scale"
+    )
 
+    var visible: Boolean by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = Unit) {
+        delay(300L)
+        visible = true
+    }
+
+    val alpha: Float by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(durationMillis = 1000),
+        label = "alpha"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(color = 0xFFFFF8F0),
+                        Color(color = 0xFFFFE0B2),
+                        Color(color = 0xFFFFF8F0)
+                    )
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp)
+                .padding(top = 80.dp, bottom = 48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Верхняя часть
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .scale(scale)
+                        .clip(CircleShape)
+                        .background(Color(color = 0xFF690005)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.doglogo1),
+                        //imageVector = ImageVector.Builder(painterResource(id = R.drawable.doglogo1), contentDescription = "Лапка"),// R.drawable.doglogo1,
+                        contentDescription = "Лапка",
+                        modifier = Modifier.size(120.dp)
+                            .clip(CircleShape),
+                        tint = Color.Unspecified
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "PetWalk",
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    //fontFamily = Montserrat,
+                    color = Color(color = 0xFF690005)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Прогулки с заботой\nо вашем питомце",
+                    fontSize = 16.sp,
+                    //fontFamily = Montserrat,
+                    fontWeight = FontWeight.Normal,
+                    color = Color(color = 0xFF93000A),
+                    textAlign = TextAlign.Center,
+                    lineHeight = 24.sp
+                )
+            }
+
+            // Средняя часть
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                FeatureItem(emoji = "🐕", text = "Надёжные выгульщики рядом с вами")
+                //FeatureItem(emoji = "📍", text = "Отслеживание прогулки в реальном времени")
+                //FeatureItem(emoji = "⭐", text = "Рейтинги и отзывы от владельцев")
+            }
+
+            // Нижняя часть
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    onClick = onReg,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(color = 0xFF690005),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Зарегистрироваться",
+                        fontSize = 16.sp,
+                        //fontFamily = Montserrat,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                //Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = onLogin,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(color = 0xFF690005)
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(color = 0xFF690005),
+                                Color(color = 0xFF93000A)
+                            )
+                        )
+                    )
+                ) {
+                    Text(
+                        text = "Войти",
+                        fontSize = 16.sp,
+                        //fontFamily = Montserrat,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+/*
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Продолжая, вы соглашаетесь с условиями использования",
+                    fontSize = 12.sp,
+                    //fontFamily = Montserrat,
+                    color = Color(color = 0xFFAAAAAA),
+                    textAlign = TextAlign.Center
+                )*/
+            }
+        }
+    }
+}*/
+
+@Composable
+fun FeatureItem(emoji: String, text: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White.copy(alpha = 0.7f))
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = emoji,
+            fontSize = 24.sp
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            //fontFamily = Montserrat,
+            fontWeight = FontWeight.Normal,
+            color = Color(color = 0xFF4A4A4A)
+        )
+    }
+}

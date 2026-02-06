@@ -1,5 +1,7 @@
 package com.example.pethelper.ui.auth
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +33,8 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.graphics.Color
+import com.example.pethelper.Constants
+
 @Composable
 fun LoginScreen(onBack: () -> Unit,
                 viewModel: LoginViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -39,57 +43,60 @@ fun LoginScreen(onBack: () -> Unit,
                 goToMain:() -> Unit = {}) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(scrollState)
+            .background(brush = Constants.GRADIENT_BRUSH)
     ) {
-
-        IconButton(onClick = onBack) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
-        }
-
-        Text(
-            text = "Вход",
-            modifier = Modifier.padding(vertical = 24.dp),
-        )
-
-        OutlinedTextField(
-            value = uiState.details.email,
-            onValueChange = { onUpdate(uiState.details.copy(email = it)) },
-            label = { Text("Электронная почта")},
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = uiState.details.password,
-            onValueChange = { onUpdate(uiState.details.copy(password = it)) },
-            label = { Text("Пароль") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-        )
-        Spacer(Modifier.height(32.dp))
-
-        Button(
-            onClick = { onSubmit() },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF93000A),
-                contentColor = Color.White  // цвет текста
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(scrollState)
         ) {
-            Text("Войти")
-        }
-        if (uiState.success) {
-            goToMain()
-        }
-        else {
-            Text(uiState.error)
+
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
+            }
+
+            Text(
+                text = "Вход",
+                modifier = Modifier.padding(vertical = 24.dp),
+            )
+
+            OutlinedTextField(
+                value = uiState.details.email,
+                onValueChange = { onUpdate(uiState.details.copy(email = it)) },
+                label = { Text("Электронная почта") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = uiState.details.password,
+                onValueChange = { onUpdate(uiState.details.copy(password = it)) },
+                label = { Text("Пароль") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation()
+            )
+            Spacer(Modifier.height(32.dp))
+
+            Button(
+                onClick = { onSubmit() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF93000A),
+                    contentColor = Color.White  // цвет текста
+                )
+            ) {
+                Text("Войти")
+            }
+            if (uiState.success) {
+                goToMain()
+            } else {
+                Text(uiState.error)
+            }
         }
     }
 }
