@@ -32,25 +32,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Update
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.AppViewModelProvider
 import android.content.Context
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
-import com.example.pethelper.data.enums.PetTypeConverter
 import com.example.pethelper.data.enums.PetTypes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -107,7 +101,7 @@ fun PetCreate(onBack: () -> Unit,
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            var expanded by remember { mutableStateOf(false) }
+            var expanded1 by remember { mutableStateOf(false) }
             var selected by remember { mutableStateOf("") }
             val items = listOf<String>(PetTypes.DOG.name,
                 PetTypes.CHINCHILLA.name,
@@ -117,40 +111,37 @@ fun PetCreate(onBack: () -> Unit,
                 PetTypes.PARROT.name,
                 PetTypes.OTHER.name)
 
-            Box { // выбор типа животного
+            ExposedDropdownMenuBox(
+                expanded = expanded1,
+                onExpandedChange = { expanded1 = !expanded1 }
+            ) {
                 OutlinedTextField(
                     value = selected,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Тип животного")},
                     trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null
-                        )
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1)
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { expanded = true }
+                        .fillMaxWidth().menuAnchor()
                 )
 
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.fillMaxWidth()
+                ExposedDropdownMenu(
+                    expanded = expanded1,
+                    onDismissRequest = { expanded1 = false },
+//                    modifier = Modifier.fillMaxWidth()
                 ) {
                     items.forEach { item ->
                         DropdownMenuItem(
                             text = { Text(item) },
                             onClick = {
-                                selected = item
                                 onUpdate(uiState.details.copy(type = PetTypes.valueOf(item)))
-                                expanded = false
+                                expanded1 = false
                             }
                         )
                     }
-                }
-            }
+                }}
 
             Spacer(modifier = Modifier.height(12.dp))
 

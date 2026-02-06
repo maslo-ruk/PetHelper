@@ -10,7 +10,9 @@ data class RegUiState(
     val details: RegDetails= RegDetails(),
     val error:String = "",
     val isLoading: Boolean = false,
-    val success: Boolean = false
+    val success: Boolean = false,
+//    val verificationEmailSent: Boolean = false,
+//    val waitingForEmailVerification: Boolean = false
 )
 
 data class RegDetails(

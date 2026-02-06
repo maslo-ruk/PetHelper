@@ -214,17 +214,13 @@ fun OrderInputs(modifier:Modifier = Modifier,
                 }
             )
         }
-        var expanded by remember { mutableStateOf(false) }
-        // Районы
         AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
             OutlinedTextField(
-                    value = uiState.details.address,
-                    onValueChange = {onClick(uiState.details.copy(address = it)) },
-                    readOnly = true,
-                    label = { Text("Адрес") }
+                value = uiState.details.address,
+                onValueChange = {onClick(uiState.details.copy(address = it))},
+                label = {Text("Адрес выполнения")}
             )
         }
-
 
         // Цена
         AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
@@ -248,7 +244,7 @@ fun OrderInputs(modifier:Modifier = Modifier,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
-                label = { Text("Примечания по заказу") },
+                label = { Text("Комментарии к заказу: что нужно?") },
                 maxLines = 10
             )
         }

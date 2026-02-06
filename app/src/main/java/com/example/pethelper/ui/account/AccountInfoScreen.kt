@@ -137,8 +137,6 @@ fun AccountScreen(
             Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
-
-            AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
             Spacer(Modifier.height(12.dp))
 
 

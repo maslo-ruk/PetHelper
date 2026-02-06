@@ -124,7 +124,7 @@ fun PetHelperApp(
                 WalkScreen()
             }
             composable(PetHelperScreens.OrdersAvailable.name) {
-                AvailableOrders()
+                AvailableOrders(onBack = {navController.popBackStack()})
             }
             composable(
                 route = PetHelperScreens.MyChats.name,
@@ -132,7 +132,8 @@ fun PetHelperApp(
                 ChatListScreen(onOpenChat = {chatId ->
 
                     navController.navigate("${PetHelperScreens.Chat.name}/$chatId")
-                })
+                },
+                    onBack = {navController.popBackStack()})
             }
             composable(
                 route = "${PetHelperScreens.Chat.name}/{chatId}",
@@ -141,6 +142,7 @@ fun PetHelperApp(
                 val chatId = backStackEntry.arguments?.getString("chatId")
                 ChatScreen(
                     chatId = chatId!!,
+                    onBack = {navController.popBackStack()},
                     checkposition = {ordId -> navController.navigate("${PetHelperScreens.Tracking.name}/$ordId")}
                 )
             }

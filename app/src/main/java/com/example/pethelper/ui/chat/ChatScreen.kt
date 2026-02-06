@@ -15,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -29,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,7 +45,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(chatId: String,
-               onBack: () -> Unit = {},
+               onBack: () -> Unit,
                checkposition:(ordId:String)->Unit = {}) {
     val viewModel: ChatScreenViewModel = viewModel(
         factory = ChatViewModelFactory(chatId)
@@ -59,7 +62,13 @@ fun ChatScreen(chatId: String,
 
     Scaffold(
         topBar = {
-            TopAppBar(title = {Text(text = "Чат")})}
+            TopAppBar(title = {Text(text = "Чат по заказу $chatId")},
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                    }
+                })
+        }
     ) {padding ->
         Column(
             modifier = Modifier
