@@ -157,6 +157,7 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
     val addOrderWorker = viewModel::addOrderWorker
     val startOrder = viewModel::startOrder
     val stopOrder = viewModel::stopOrder
+    val stopChat = viewModel::changeChatStatus
     val context = LocalContext.current
     var hasPermission = hasBackgroundLocation(context)
     Row(modifier = Modifier
@@ -202,12 +203,13 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             if (hasPermission) {
                 Button(onClick = {
                     changeStatus("STARTED")
-                    startOrder(context,uiState.order.id)
+                    Log.d("WALKSERV", "sarted order with id = ${uiState.orderId}")
+                    startOrder(context,uiState.orderId)
                 }, enabled = enabled) {
                     Text("Начать Заказ")
                 }
             } else {
-                Row {
+                Column {
                     Text("Перед началом заказа разрешите геолокацию в любом режиме")
                     Button(
                         onClick = {getPermissions()}
@@ -222,6 +224,7 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             Button(onClick = {
                 changeStatus("ENDED")
                 stopOrder(context)
+                stopChat()
                              }, enabled = enabled) {
                 Text("Закончить Заказ")
             }

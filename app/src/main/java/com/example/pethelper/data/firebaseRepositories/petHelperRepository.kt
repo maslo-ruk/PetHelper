@@ -135,7 +135,7 @@ class FireStoreRepository(
         onChange: (List<FOrder>) -> Unit,
         onError: (Throwable) -> Unit
     ): ListenerRegistration {
-        val ordersRef = db.collection("orders")
+        val ordersRef = db.collection("orders").whereEqualTo("status", "CREATED")
         Log.d("FS", "Orders ref = ${ordersRef.get()}")
 
         return ordersRef

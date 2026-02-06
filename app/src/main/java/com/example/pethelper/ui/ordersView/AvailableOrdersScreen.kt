@@ -60,13 +60,13 @@ fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = Ap
             IconButton(onClick = onBack) {
                 Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
             }
-        }) }) {
+        }) }) { innerPadding ->
         LaunchedEffect(Unit) {
             viewModel.startObservingOrders()
         }
 
 
-        LazyColumn {
+        LazyColumn(modifier = Modifier.padding(innerPadding)) {
             items(orders) { order ->
                 OrderCard(order, onOrderClick) }
         }

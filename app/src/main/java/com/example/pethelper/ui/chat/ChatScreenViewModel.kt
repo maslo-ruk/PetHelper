@@ -109,6 +109,15 @@ class ChatScreenViewModel(
         }
     }
 
+    fun changeChatStatus() {
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            repo.finishOrder(_uiState.value.orderId, userManager.currentUser.value!!.uid)
+            _uiState.update { it.copy(isLoading = false)
+            }
+        }
+    }
+
     fun startOrder(
         context: Context,
         orderId: String
