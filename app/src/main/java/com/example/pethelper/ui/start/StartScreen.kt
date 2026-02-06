@@ -8,12 +8,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.IconButton
@@ -26,8 +29,14 @@ import com.example.pethelper.ui.AppViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pethelper.data.fireBaseEntities.FUser
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.size
+
 
 @Composable
 fun MainScreen(
@@ -67,11 +76,13 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(top = 60.dp, bottom = 0.dp, start = 40.dp, end = 50.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -79,21 +90,20 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
             )
 
             IconButton(onClick = { onAccount() }) {
-                Icon(Icons.Default.AccountCircle, contentDescription = "Аккаунт")
+                Icon(Icons.Default.AccountCircle, contentDescription = "Аккаунт",
+                    modifier = Modifier.height(180.dp).width(180.dp)
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-        Text("")
-        Spacer(modifier = Modifier.height(32.dp))
+
         Button(
             onClick = onCreateOrder,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Создать заказ")
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
+        
         Button(
             onClick = {
                 onLogout()
@@ -130,13 +140,19 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                 Text("Данные по заказам")
             }
         }
-        Button(
-            onClick = {
-                onChat()
-            },
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text("Мои чаты")
+        Row(
+            modifier = Modifier.width(80.dp),
+            horizontalArrangement = Arrangement.End
+        ){
+            Button(
+                onClick = {
+                    onChat()
+                },
+                shape = CircleShape,
+                modifier = Modifier.size(80.dp),
+            ) {
+                Text("Мои чаты")
+            }
         }
     }
 
@@ -147,22 +163,27 @@ fun AuthFalse(onLogin: () -> Unit, onReg: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(bottom = 30.dp, start = 30.dp, end = 30.dp),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Зарегистрируйтесь, или войдите в аккаунт"
-        )
+        //Spacer(Modifier.height(60.dp))
+
+//        Text(
+//            text = "Зарегистрируйтесь, или войдите в аккаунт"
+//        )
         Button(
             onClick = onLogin,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Войти")
         }
+
         Button(
             onClick = onReg,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Зарегистрироваться")
+            Text("Регистрация")
         }
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -48,13 +49,13 @@ fun LoginScreen(onBack: () -> Unit,
 
         Text(
             text = "Вход",
-            modifier = Modifier.padding(vertical = 24.dp)
+            modifier = Modifier.padding(vertical = 24.dp),
         )
 
         OutlinedTextField(
             value = uiState.details.email,
             onValueChange = { onUpdate(uiState.details.copy(email = it)) },
-            label = { Text("Электронная почта") },
+            label = { Text("Электронная почта")},
             modifier = Modifier.fillMaxWidth()
         )
 
