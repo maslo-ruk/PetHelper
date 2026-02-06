@@ -32,33 +32,118 @@ class RegViewModel(
         val details = state.details
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, error = "") }
             authRepository.register(user.login, details.password)
-                .onSuccess { uid ->
-                    fbRepository.addUser(uid, user)
-                    userManager.loadCurrentUser()
+                .onSuccess { authRepository.sendEmailVerification().onSuccess {
                     _uiState.update {
-                        it.copy(isLoading = false, success = true)
+                        it.copy(
+                            isLoading = false,
+                            verificationEmailSent = true,
+                            waitingForEmailVerification = true,
+                            error = ""
+                        )
                     }
+                }
+                    .onFailure {e ->
+                        authRepository.logout()
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = e.message ?: "Не удалось отправить письмо подтверждения"
+                            )
+                        }
+                    }
+//                    uid ->
+//                    fbRepository.addUser(uid, user)
+//                    userManager.loadCurrentUser()
+//                    _uiState.update {
+//                        it.copy(isLoading = false, success = true)
+//                    }
                 }
                 .onFailure {
                     e -> _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = e.message ?: "Ошибка сохранения"
+                            error = e.message ?: "Ошибка регистрации"
+                        )
+                    }
+                }
+        }
+    }
+    fun checkEmailVerifiedAndFinish() {
+        val state = _uiState.value
+        val user = state.details.toFUser()
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = "") }
+
+            authRepository.reloadAndCheckEmailVerified()
+                .onSuccess { verified ->
+                    if (!verified) {
+                        _uiState.update { it.copy(isLoading = false, error ="Почта не подтверждена") }
+                        return@onSuccess
+                    }
+                    val uid = authRepository.getCurrentUserId()
+                    if (uid == null) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Не удалось получить пользователя. Попробуйте войти заново."
+                            )
+                        }
+                        return@onSuccess
+                    }
+                    runCatching {
+                        fbRepository.addUser(uid, user)
+                        userManager.loadCurrentUser()
+                    }.onSuccess {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                success = true,
+                                waitingForEmailVerification = false
+                            )
+                        }
+                    }.onFailure { e ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = e.message ?: "Ошибка сохранения профиля"
+                            )
+                        }
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.message ?: "Ошибка проверки подтверждения"
+                        )
+                    }
+                }
+
+        }
+}
+    fun resendVerificationEmail() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = "") }
+            authRepository.sendEmailVerification()
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            verificationEmailSent = true,
+                            error = ""
+                        )
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.message ?: "Не удалось отправить письмо повторно"
                         )
                     }
                 }
         }
     }
 }
-
-fun RegDetails.toFUser(): FUser = FUser(
-    type=role,
-    login=email,
-    name=firstName,
-    surname=lastName,
-    phoneNumber=phone,
-    address=address,
-    birthDate=birthDate
-)

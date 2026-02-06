@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.pethelper.data.fireBaseEntities.FUser
 
 
 data class RegUiState(
@@ -11,8 +12,8 @@ data class RegUiState(
     val error:String = "",
     val isLoading: Boolean = false,
     val success: Boolean = false,
-//    val verificationEmailSent: Boolean = false,
-//    val waitingForEmailVerification: Boolean = false
+    val verificationEmailSent: Boolean = false,
+    val waitingForEmailVerification: Boolean = false
 )
 
 data class RegDetails(
@@ -25,3 +26,14 @@ data class RegDetails(
     val address:String = "",
     val birthDate:String = ""
 )
+
+fun RegDetails.toFUser(): FUser = FUser(
+    type = role,
+    login = email,
+    name = firstName,
+    surname = lastName,
+    phoneNumber = phone,
+    address = address,
+    birthDate = birthDate
+)
+

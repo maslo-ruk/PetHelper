@@ -201,6 +201,27 @@ fun RegistrationScreen(
             Text("Регистрация")
         }
 
+        if (uiState.waitingForEmailVerification) {
+            Spacer(Modifier.height(16.dp))
+            Text("Мы отправили письмо на ${uiState.details.email}. Подтвердите почту по ссылке в письме.")
+
+            Spacer(Modifier.height(12.dp))
+
+            Button(
+                onClick = { viewModel.checkEmailVerifiedAndFinish() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Я подтвердил почту")
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = "Отправить письмо ещё раз",
+                modifier = Modifier.clickable { viewModel.resendVerificationEmail() }
+            )
+        }
+
         Spacer(Modifier.height(24.dp))
 
         Row(
@@ -218,7 +239,9 @@ fun RegistrationScreen(
             goToMain()
         }
         else {
-            Text(uiState.error)
+            if (uiState.error.isNotBlank()) {
+                Text(uiState.error)
+            }
         }
     }
 }
