@@ -91,6 +91,7 @@ class ChatScreenViewModel(
             var ord = _uiState.value.order
             ord = ord.copy(workerId = workerId, status = status)
             fbRepository.updateOrder(_uiState.value.orderId, ord)
+            repo.finishChatsById(_uiState.value.orderId, userManager.currentUser.value!!.uid)
             _uiState.update { it.copy(isLoading = false) }
         }
     }
@@ -106,6 +107,15 @@ class ChatScreenViewModel(
                         it.copy(order = order)
                     }
                 }
+        }
+    }
+
+    fun changeChatStatus() {
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            repo.finishOrder(_uiState.value.orderId, userManager.currentUser.value!!.uid)
+            _uiState.update { it.copy(isLoading = false)
+            }
         }
     }
 

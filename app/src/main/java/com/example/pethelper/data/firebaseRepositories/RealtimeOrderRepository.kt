@@ -1,5 +1,6 @@
 package com.example.pethelper.data.firebaseRepositories
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -19,7 +20,7 @@ class RealtimeOrderRepository {
             "lon" to lon,
             "lastPing" to System.currentTimeMillis()
         )
-
+        Log.d("RealtimeOrderRepository", "Updating location for order $orderId: lat=$lat, lon=$lon")
         rootRef.child(orderId).updateChildren(data)
     }
 

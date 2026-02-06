@@ -81,8 +81,8 @@ class FireStoreRepository(
             .set(pet, SetOptions.merge())
     }
 
-    suspend fun addOrder(order: FOrder, userId: String) {
-        db.collection("orders")
+    suspend fun addOrder(order: FOrder, userId: String): DocumentReference {
+        return db.collection("orders")
             .add(order)
             .await()
 
@@ -98,12 +98,23 @@ class FireStoreRepository(
         Log.d("FS", "updateOrder ${ord.get("STATUS")}")
     }
 
-    suspend fun addWorkerToOrder(orderId:String, worker:FUser) {
-        db.collection("orders")
-            .document(orderId)
-            .collection("workers")
-            .add(worker)
-            .await()
+    suspend fun addWorkerToOrder(userId: String, order: FOrder) {
+
+        try {
+
+            db.collection("users")
+                .document(userId)
+                .collection("orders")
+                .document(order.id)
+                .set(order)
+                .await()
+
+            Log.d("FS", "Order added: ${userId}")
+
+        } catch (e: Exception) {
+
+            Log.e("FS", "Failed to add order", e)
+        }
     }
 
     fun observeOrder(orderId: String): Flow<FOrder> = callbackFlow {
@@ -135,7 +146,7 @@ class FireStoreRepository(
         onChange: (List<FOrder>) -> Unit,
         onError: (Throwable) -> Unit
     ): ListenerRegistration {
-        val ordersRef = db.collection("orders")
+        val ordersRef = db.collection("orders").whereEqualTo("status", "CREATED")
         Log.d("FS", "Orders ref = ${ordersRef.get()}")
 
         return ordersRef
@@ -163,7 +174,7 @@ class FireStoreRepository(
         onError: (Throwable) -> Unit,
         uid: String,
     ): ListenerRegistration {
-        val ordersRef = db.collection("orders").whereEqualTo("userId", uid)
+        val ordersRef = db.collection("users").document(uid).collection("orders")
         Log.d("FS", "Orders ref = ${ordersRef.get()}")
 
         return ordersRef

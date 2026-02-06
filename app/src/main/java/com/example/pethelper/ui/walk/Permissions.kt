@@ -70,11 +70,11 @@ fun LocationPermissionScreen(
                 }) {
                     Text("Открыть настройки")
                 }
-//                Button(onClick = {
-//                    onBack()
-//                }) {
-//                    Text("Готово")
-//                }
+                Button(onClick = {
+                    navController!!.popBackStack()
+                }) {
+                    Text("Готово")
+                }
             }
         }
     }

@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
@@ -30,6 +31,12 @@ class ChatRepository {
 
                 trySend(chats)}
         awaitClose { listener.remove() }
+    }
+
+    suspend fun getMyChats(myUid: String):List<Chat> {
+        val listener = db.collection("chats").whereArrayContains("participants", myUid)
+            .whereEqualTo("status", "ACTIVE").get().await()
+        return listener.toObjects(Chat::class.java)
     }
 
     fun observeChats(myUid: String, onError: (Throwable) -> Unit,
@@ -164,6 +171,25 @@ class ChatRepository {
         val chatSnap = db.collection("chats").document(chatId).get().await()
         Log.d("CHAT", "${chatSnap.data}")
         return chatSnap.toObject(Chat::class.java)
+    }
+
+    suspend fun finishChatsById(orderId:String, workerId:String) {
+        Log.d("CHAT", "finishChatsById start")
+        val chatSnap = db.collection("chats").whereEqualTo("orderId", orderId)
+            .whereEqualTo("status", "ACTIVE").get().await()
+        val batch = db.batch()
+        chatSnap.documents.forEach { doc ->
+            val x = doc.toObject(Chat::class.java)?.participants
+            Log.d("CHAT", "finishChatsById ${x?.get(0)}")
+            Log.d("CHAT", "finishChatsById ${x?.get(1)}")
+            Log.d("CHAT", "finishChatsById $workerId")
+            if (x?.get(0) != workerId) {
+            batch.update(doc.reference, mapOf("status" to "CLOSED",
+                "lastMessage" to "Заказ приняли",
+                "lastMessageAt" to FieldValue.serverTimestamp()))
+            }
+        }
+        batch.commit().await()
     }
 
 }

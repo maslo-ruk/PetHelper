@@ -1,5 +1,6 @@
 package com.example.pethelper.ui.ordersView
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pethelper.data.fireBaseEntities.FOrder
+import com.google.firebase.firestore.auth.User
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,29 +56,34 @@ import com.example.pethelper.data.fireBaseEntities.FOrder
 fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = AppViewModelProvider.Factory),
                     onOrderClick:(order: FOrder)->Unit = viewModel::acceptOrder, onBack: () -> Unit) {
     val orders by viewModel.orders.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+
 
     Scaffold(topBar = { TopAppBar(title = {Text("Доступные заказы")},
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
             }
-        }) }) {
+        }) }) { innerPadding ->
         LaunchedEffect(Unit) {
             viewModel.startObservingOrders()
         }
-
-
-        LazyColumn {
+        LazyColumn(modifier = Modifier.padding(innerPadding)) {
             items(orders) { order ->
-                OrderCard(order, onOrderClick) }
+                Log.d("STUPIDO", order.id)
+                Log.d("STUPIDO", uiState.ordersOfWorker.size.toString())
+                for (i in uiState.ordersOfWorker) {
+                    Log.d("STUPIDO000", i.id)
+                    if (i.id == order.id) return@items
+                }
+                OrderCard(order, onOrderClick, uiState.ordersOfWorker) }
         }
     }
     }
 
 
 @Composable
-fun OrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit) {
-
+fun OrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit, myOrders:List<FOrder>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,32 +91,49 @@ fun OrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = RoundedCornerShape(12.dp),
     ) {
-        Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Column {
                 Box() {
                     Column {
-                        Text(text = "Заказчик: ${order.user.name} ${order.user.surname}", style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold, modifier = Modifier)
-                        Text(text = "Питомец: ${order.pet.breed} ${order.pet.name}", style = MaterialTheme.typography.bodyMedium)
-                        Text(order.notes, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,)
+                        Text(
+                            text = "Заказчик: ${order.user.name} ${order.user.surname}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                        )
+                        Text(
+                            text = "Питомец: ${order.pet.breed} ${order.pet.name}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            order.notes,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                         Text(text = "Адрес: ${order.address}", modifier = Modifier)
                     }
                 }
                 Box() {
                     Column {
-                        Text(text = "Дата: ${order.date}",
+                        Text(
+                            text = "Дата: ${order.date}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        Text(text = "Цена: ${order.price}",
+                        )
+                        Text(
+                            text = "Цена: ${order.price}",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
-                            )
+                        )
                     }
                 }
-                Button(modifier=Modifier.padding(12.dp),
-                    onClick = {onOrderClick(order)}
+                Button(
+                    modifier = Modifier.padding(12.dp),
+                    onClick = { onOrderClick(order) }
                 ) {
                     Text("Отозваться")
                 }
