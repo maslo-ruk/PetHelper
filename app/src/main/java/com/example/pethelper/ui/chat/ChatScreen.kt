@@ -1,5 +1,9 @@
 package com.example.pethelper.ui.chat
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -22,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.Chat
@@ -42,8 +51,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(chatId: String,
-               onBack: () -> Unit = {},
-               checkposition:(ordId:String)->Unit = {}) {
+               onBack: () -> Unit,
+               checkposition:(ordId:String)->Unit = {},
+               getPermissions:()->Unit = {}) {
     val viewModel: ChatScreenViewModel = viewModel(
         factory = ChatViewModelFactory(chatId)
     )
@@ -59,7 +69,13 @@ fun ChatScreen(chatId: String,
 
     Scaffold(
         topBar = {
-            TopAppBar(title = {Text(text = "Чат")})}
+            TopAppBar(title = {Text(text = "Чат по заказу $chatId")},
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                    }
+                })
+        }
     ) {padding ->
         Column(
             modifier = Modifier
@@ -76,7 +92,7 @@ fun ChatScreen(chatId: String,
             ) {
                 items(items = messages, key = {it.id}) {
                     msg ->
-                    MessageBubble(message = msg, isMine = (msg.senderId == myUid))
+                    MessageBubble(message = msg, isMine = (msg.senderId == myUid), uiState = uiState, curUser = curUser!!)
                     Spacer(Modifier.height(8.dp))
                 }
             }
@@ -91,7 +107,9 @@ fun ChatScreen(chatId: String,
                     checkPosition = checkposition,
                     viewModel = viewModel,
                     uiState = uiState,
-                    uid = myUid
+                    uid = myUid,
+                    chatId = chatId,
+                    getPermissions = getPermissions
                 )
             }
 
@@ -100,18 +118,25 @@ fun ChatScreen(chatId: String,
 }
 
 @Composable
-private fun MessageBubble(message: Message, isMine: Boolean) {
+private fun MessageBubble(message: Message, isMine: Boolean, uiState: ChatUiState, curUser:FUser) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (isMine) Arrangement.End else
-    Arrangement.Start) {
-        Surface(tonalElevation = 2.dp, shape = MaterialTheme.shapes.medium) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Text(message.text, style = MaterialTheme.typography.bodyLarge)
-                val timetext = message.createdAt?.toDate()?.let { dt ->
-                    SimpleDateFormat("HH:mm", Locale.getDefault()).format(dt)
-                }.orEmpty()
-                if (timetext.isNotBlank()) {
-                    Spacer(Modifier.height(4.dp))
-                    Text(timetext, style = MaterialTheme.typography.labelSmall)
+        Arrangement.Start) {
+        Column(horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+            if (isMine) {
+                Text("${curUser.name} ${curUser.surname}")
+            } else {
+                Text("${uiState.participant?.name} ${uiState.participant?.surname}")
+            }
+            Surface(tonalElevation = 2.dp, shape = MaterialTheme.shapes.medium) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(message.text, style = MaterialTheme.typography.bodyLarge)
+                    val timetext = message.createdAt?.toDate()?.let { dt ->
+                        SimpleDateFormat("HH:mm", Locale.getDefault()).format(dt)
+                    }.orEmpty()
+                    if (timetext.isNotBlank()) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(timetext, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
         }
@@ -124,13 +149,16 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
                       checkPosition:(ordId:String)->Unit,
                       uiState: ChatUiState,
                       uid:String = "",
-                      viewModel: ChatScreenViewModel
+                      viewModel: ChatScreenViewModel,
+                      chatId:String,
+                      getPermissions:()->Unit
 ) {
     val changeStatus = viewModel::updateOrderStatus
     val addOrderWorker = viewModel::addOrderWorker
     val startOrder = viewModel::startOrder
     val stopOrder = viewModel::stopOrder
     val context = LocalContext.current
+    var hasPermission = hasBackgroundLocation(context)
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -144,10 +172,9 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             Text("Отправить")
         }
     }
-    Log.d("CHAT","ORDER STATE = ${uiState.order.status}")
-    Log.d("CHAT","ORDER STATE = ${uid}")
-    Log.d("CHAT","ORDER STATE = ${uiState.chat.participants[1]}")
-    Log.d("CHAT","ORDER id = ${uiState.orderId}")
+    LaunchedEffect(chatId) {
+        viewModel.observeOrder(uiState.orderId)
+    }
     if (uid == uiState.chat.participants[0]) {
         if (uiState.order.status == "CREATED") {
             Button(onClick = {
@@ -172,11 +199,23 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             Text("Ожидание подтверждения")
         }
         if (uiState.order.status == "ACCEPTED") {
-            Button(onClick = {
-                changeStatus("STARTED")
-                startOrder(context,uiState.order.id)
-                             }, enabled = enabled) {
-                Text("Начать Заказ")
+            if (hasPermission) {
+                Button(onClick = {
+                    changeStatus("STARTED")
+                    startOrder(context,uiState.order.id)
+                }, enabled = enabled) {
+                    Text("Начать Заказ")
+                }
+            } else {
+                Row {
+                    Text("Перед началом заказа разрешите геолокацию в любом режиме")
+                    Button(
+                        onClick = {getPermissions()}
+                    ) {
+                        Text("Разрешить геолокацию")
+                    }
+                }
+
             }
         }
         if (uiState.order.status == "STARTED") {
@@ -188,4 +227,13 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             }
         }
     }
+}
+
+fun hasBackgroundLocation(context: Context): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    } else true
 }

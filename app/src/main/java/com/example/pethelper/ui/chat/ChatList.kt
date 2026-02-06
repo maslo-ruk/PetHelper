@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.Chat
@@ -30,7 +33,7 @@ import com.example.pethelper.ui.AppViewModelProvider
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListScreen(viewModel: ChatListViewModel = viewModel(factory = AppViewModelProvider.Factory),
-                   onOpenChat: (chatId: String) -> Unit) {
+                   onOpenChat: (chatId: String) -> Unit, onBack:()-> Unit = {}) {
     val chats by viewModel.chats.collectAsState()
 
     LaunchedEffect (Unit) {
@@ -44,7 +47,12 @@ fun ChatListScreen(viewModel: ChatListViewModel = viewModel(factory = AppViewMod
     }
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Чаты") }
+        TopAppBar(title = { Text("Чаты")},
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                }
+            }
         ) }
     ) { padding ->
         LazyColumn(

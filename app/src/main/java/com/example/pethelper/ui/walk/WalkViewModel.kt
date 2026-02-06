@@ -3,7 +3,7 @@ package com.example.pethelper.ui.walk
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.pethelper.data.rtdb.RealtimeOrderRepository
+import com.example.pethelper.data.firebaseRepositories.RealtimeOrderRepository
 import com.example.pethelper.service.WalkServiceController
 import com.example.pethelper.ui.auth.LoginScreen
 import com.google.firebase.database.ValueEventListener

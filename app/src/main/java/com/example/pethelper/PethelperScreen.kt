@@ -92,7 +92,7 @@ fun PetHelperApp(
                     onBack = {navController.popBackStack()},
                     onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)},
                     onAddPet = {navController.navigate(PetHelperScreens.AddPet.name)},
-                    onOpenPet = {navController.navigate(PetHelperScreens.PetInfo.name)}
+                    onOpenPet = {pet -> navController.navigate("${ PetHelperScreens.PetInfo.name}/${pet}")}
                 )
             }
             composable(PetHelperScreens.AccountInfo.name) {
@@ -117,14 +117,22 @@ fun PetHelperApp(
             composable(PetHelperScreens.AddPet.name) {
                 PetCreate(onBack = {navController.popBackStack()})
             }
-            composable(route = PetHelperScreens.PetInfo.name) {
-                PetInfoScreen(onBack = {navController.popBackStack()})
+            composable(
+                route = "${PetHelperScreens.PetInfo.name}/{petId}",
+                arguments = listOf(navArgument("petId") {type = NavType.StringType})
+                ) { backStackEntry ->
+                val petId = backStackEntry.arguments!!.getString("petId")
+                PetInfoScreen(petId = petId, onBack = {navController.popBackStack()})
             }
-            composable(route = PetHelperScreens.Location.name) {
-                WalkScreen()
+            composable(
+                route = "${PetHelperScreens.Location.name}/{orderId}",
+                arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val orderId = backStackEntry.arguments?.getString("orderId")
+                WalkScreen(orderId!!)
             }
             composable(PetHelperScreens.OrdersAvailable.name) {
-                AvailableOrders()
+                AvailableOrders(onBack = {navController.popBackStack()})
             }
             composable(
                 route = PetHelperScreens.MyChats.name,
@@ -132,7 +140,8 @@ fun PetHelperApp(
                 ChatListScreen(onOpenChat = {chatId ->
 
                     navController.navigate("${PetHelperScreens.Chat.name}/$chatId")
-                })
+                },
+                    onBack = {navController.popBackStack()})
             }
             composable(
                 route = "${PetHelperScreens.Chat.name}/{chatId}",
@@ -141,7 +150,9 @@ fun PetHelperApp(
                 val chatId = backStackEntry.arguments?.getString("chatId")
                 ChatScreen(
                     chatId = chatId!!,
-                    checkposition = {ordId -> navController.navigate("${PetHelperScreens.Tracking.name}/$ordId")}
+                    onBack = {navController.popBackStack()},
+                    checkposition = {ordId -> navController.navigate("${PetHelperScreens.Tracking.name}/$ordId")},
+                    getPermissions = {navController.navigate(PetHelperScreens.Permissions.name)}
                 )
             }
             composable (
@@ -150,6 +161,9 @@ fun PetHelperApp(
             ) {
                 val orderId = it.arguments?.getString("orderId")
                 WalkScreen(orderId = orderId!!)
+            }
+            composable(PetHelperScreens.Permissions.name) {
+                LocationPermissionScreen(navController)
             }
         }
     }

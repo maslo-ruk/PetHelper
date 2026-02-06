@@ -132,22 +132,20 @@ fun AccountScreen(
                     .clip(CircleShape)
                     .verticalScroll(rememberScrollState()) // потом поменяем
             ) {
-                Image(
-                    painter = painterResource(R.drawable.cot),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+//                GetPhoto(currentUser = curUser)
             }
 
             Spacer(Modifier.height(12.dp))
             Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
 
-
+<<<<<<< HEAD
             Row(modifier = Modifier.fillMaxWidth()){
                 AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
                 Spacer(Modifier.height(12.dp))
+=======
+            Spacer(Modifier.height(12.dp))
+>>>>>>> master
 
 
                 AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)

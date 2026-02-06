@@ -2,6 +2,7 @@ package com.example.pethelper.ui.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
 import com.example.pethelper.data.firebaseRepositories.UserSessionManager

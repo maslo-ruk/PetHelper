@@ -12,6 +12,9 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObjects
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class FireStoreRepository(
@@ -38,9 +41,8 @@ class FireStoreRepository(
     }
 
     suspend fun getPetsOfUser(userId:String): List<FPet> {
-        return db.collection("users")
-            .document(userId)
-            .collection("pets")
+        return db.collection("pets")
+            .whereEqualTo("ownerId", userId)
             .get()
             .await()
             .toObjects(FPet::class.java)
@@ -62,15 +64,18 @@ class FireStoreRepository(
         return photoId ?: ""
     }
 
-    suspend fun addPet(userId: String, pet: FPet): DocumentReference {
-        return db.collection("users")
-            .document(userId)
-            .collection("pets")
+    suspend fun addPet(pet: FPet): DocumentReference {
+        return db.collection("pets")
             .add(pet)
             .await()
     }
 
-    suspend fun updatePet(petId: String, pet: FPet) {
+    suspend fun getPet(petId: String): FPet? {
+        return db.collection("pets")
+            .document(petId)
+            .get().await().toObject(FPet::class.java)
+    }
+    suspend fun updatePet(petId: String, pet: FPet, userId:String) {
         db.collection("pets")
             .document(petId)
             .set(pet, SetOptions.merge())
@@ -80,11 +85,7 @@ class FireStoreRepository(
         db.collection("orders")
             .add(order)
             .await()
-        db.collection("users")
-            .document(order.userId)
-            .collection("orders")
-            .add(order)
-            .await()
+
     }
 
     suspend fun updateOrder(orderId: String, order: FOrder) {
@@ -103,6 +104,31 @@ class FireStoreRepository(
             .collection("workers")
             .add(worker)
             .await()
+    }
+
+    fun observeOrder(orderId: String): Flow<FOrder> = callbackFlow {
+
+        val listener = db
+            .collection("orders")
+            .document(orderId)
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val order = snapshot.toObject(FOrder::class.java)
+                    if (order != null) {
+                        trySend(order)
+                    }
+                }
+            }
+
+        awaitClose {
+            listener.remove()
+        }
     }
 
     fun observeOrders(
@@ -137,7 +163,7 @@ class FireStoreRepository(
         onError: (Throwable) -> Unit,
         uid: String,
     ): ListenerRegistration {
-        val ordersRef = db.collection("users").document(uid).collection("orders")
+        val ordersRef = db.collection("orders").whereEqualTo("userId", uid)
         Log.d("FS", "Orders ref = ${ordersRef.get()}")
 
         return ordersRef

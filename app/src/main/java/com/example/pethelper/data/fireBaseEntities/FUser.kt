@@ -9,5 +9,6 @@ data class FUser(
     val surname:String="",
     val phoneNumber:String="",
     val address:String="",
-    val birthDate: String=""
+    val birthDate: String="",
+    val photoId: String=""
 )

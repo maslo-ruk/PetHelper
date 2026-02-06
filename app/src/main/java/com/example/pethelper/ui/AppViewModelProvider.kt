@@ -56,9 +56,6 @@ object AppViewModelProvider {
             AccountChangeViewModel(AppSession.sessionManager, AppSession.userRepository)
         }
         initializer {
-            PetViewModel()
-        }
-        initializer {
             AvailableOrdersViewModel(AppSession.userRepository, AppSession.sessionManager, chatRepository = AppSession.chatRepository)
         }
         initializer {

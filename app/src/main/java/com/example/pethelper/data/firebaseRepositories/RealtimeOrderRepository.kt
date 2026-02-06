@@ -1,4 +1,4 @@
-package com.example.pethelper.data.rtdb
+package com.example.pethelper.data.firebaseRepositories
 
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

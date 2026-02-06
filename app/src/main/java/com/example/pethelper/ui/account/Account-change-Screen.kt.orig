@@ -108,8 +108,27 @@ fun AccountChange(onBack:()-> Unit = {},
             .fillMaxSize()
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
+<<<<<<< HEAD
+            .padding(innerPadding)) {
+            Box(modifier=Modifier, contentAlignment = Alignment.BottomEnd) {
+                Image(painter = painterResource(R.drawable.cot), contentDescription = "Аватар",
+                    Modifier
+                        .size(120.dp)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clip(CircleShape))
+                IconButton(onClick = {/*TODO*/},
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                        .size(36.dp)) {
+                            Icon(imageVector = Icons.Default.Edit,
+                                contentDescription = "Изменить аватар",
+                                tint = MaterialTheme.colorScheme.secondary)
+                }
+            }
+=======
             .padding(innerPadding), horizontalAlignment = Alignment.CenterHorizontally) {
             UploadPhotoButton()
+>>>>>>> master
             Spacer(modifier = Modifier.height(24.dp))
             OutlinedTextField(
                 value = uiState.user.name,
