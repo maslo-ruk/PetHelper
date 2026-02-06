@@ -1,5 +1,6 @@
 package com.example.pethelper.ui.account
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -94,12 +95,11 @@ import com.example.pethelper.network.NetworkConfig
 fun AccountScreen(
     onEditAccount: () -> Unit = {},
     onOpenAccountInfo: () -> Unit = {},
-    onOpenPet: () -> Unit = {},
+    onOpenPet: (petId: String) -> Unit = {},
     onAddPet: () -> Unit = {},
     onBack:() -> Unit = {},
     modifier: Modifier = Modifier,
-    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    petViewModel: PetViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
@@ -128,7 +128,8 @@ fun AccountScreen(
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(CircleShape).verticalScroll(rememberScrollState()) // потом поменяем
+                    .clip(CircleShape)
+                    .verticalScroll(rememberScrollState()) // потом поменяем
             ) {
 //                GetPhoto(currentUser = curUser)
             }
@@ -156,10 +157,7 @@ fun AccountScreen(
                 items(pets) { pet ->
                     AnimatedVisibility(visible = true, enter = fadeIn() + expandVertically()) {
                         PetListItem(pet = pet,
-                            onClick = {
-                                petViewModel.updateStateFlow(pet)
-                                onOpenPet()
-                            })
+                            onClick = onOpenPet)
                     }
                 }
             }
@@ -186,11 +184,12 @@ fun AnimatedButton(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun PetListItem(pet: FPet, onClick: () -> Unit) {
+fun PetListItem(pet: FPet, onClick: (id:String) -> Unit) {
+    Log.d("PetListItem", "petId = ${pet.id}")
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = { onClick(pet.id) }),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -241,32 +240,41 @@ fun AccountInfoScreen(onBack: () -> Unit = {},
 //питомец
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetInfoScreen(viewModel: PetViewModel = viewModel(factory = AppViewModelProvider.Factory), onBack: () -> Unit) {
+fun PetInfoScreen(onBack: () -> Unit, petId: String?) {
+    val viewModel: PetViewModel = viewModel(factory = PetViewModelFactory(petId!!))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val pet = uiState.pet
-    val name: String = uiState.pet.name
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(name) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+    if (uiState.isLoading) {
+        Text("Загрузка...")
+    } else if (uiState.success) {
+        val pet = uiState.pet
+        val name: String = uiState.pet.name
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(name) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                        }
                     }
-                }
-            )
+                )
+            }
+        ) { padding ->
+            Column(modifier = Modifier
+                .padding(padding)
+                .padding(16.dp)) {
+                GetPhotoPet(pet)
+                Text("Тип: ${pet.type}")
+                Text("Пол: ${pet.gender}")
+                Text("Возраст: ${pet.age}")
+                Text("Порода: ${pet.breed}")
+                Text("Особенности: ${pet.description}")
+                Spacer(Modifier.height(20.dp))
+                AnimatedButton(text = "Изменить", onClick = {})
+            }
         }
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
-//            GetPhotoPet(pet)
-            Text("Тип: ${pet.type}")
-            Text("Пол: ${pet.gender}")
-            Text("Возраст: ${pet.age}")
-            Text("Порода: ${pet.breed}")
-            Text("Особенности: ${pet.description}")
-            Spacer(Modifier.height(20.dp))
-            AnimatedButton(text = "Изменить", onClick = {})
-        }
+    } else {
+        Text(uiState.error)
     }
 }
 
@@ -277,7 +285,9 @@ fun GetPhoto(currentUser: FUser?,
     val fileId: String? = currentUser?.photoId
     if (fileId.isNullOrBlank()) {
         Box(
-            Modifier.size(160.dp).clip(CircleShape)
+            Modifier
+                .size(160.dp)
+                .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
         return
@@ -285,7 +295,10 @@ fun GetPhoto(currentUser: FUser?,
     AsyncImage(
         model = "$baseUrl/photo/$fileId",
         contentDescription = "photo",
-        modifier = Modifier.size(160.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant,CircleShape),
+        modifier = Modifier
+            .size(160.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
         contentScale = ContentScale.Crop,
     )
 }
@@ -297,7 +310,9 @@ fun GetPhotoPet(currentPet: FPet?,
     val fileId: String? = currentPet?.photoId
     if (fileId.isNullOrBlank()) {
         Box(
-            Modifier.size(160.dp).clip(CircleShape)
+            Modifier
+                .size(160.dp)
+                .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
         return
@@ -305,7 +320,10 @@ fun GetPhotoPet(currentPet: FPet?,
     AsyncImage(
         model = "$baseUrl/photo/$fileId",
         contentDescription = "photo",
-        modifier = Modifier.size(160.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant,CircleShape),
+        modifier = Modifier
+            .size(160.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
         contentScale = ContentScale.Crop,
     )
 }

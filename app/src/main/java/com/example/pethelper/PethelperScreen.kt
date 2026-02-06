@@ -92,7 +92,7 @@ fun PetHelperApp(
                     onBack = {navController.popBackStack()},
                     onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)},
                     onAddPet = {navController.navigate(PetHelperScreens.AddPet.name)},
-                    onOpenPet = {navController.navigate(PetHelperScreens.PetInfo.name)}
+                    onOpenPet = {pet -> navController.navigate("${ PetHelperScreens.PetInfo.name}/${pet}")}
                 )
             }
             composable(PetHelperScreens.AccountInfo.name) {
@@ -117,8 +117,12 @@ fun PetHelperApp(
             composable(PetHelperScreens.AddPet.name) {
                 PetCreate(onBack = {navController.popBackStack()})
             }
-            composable(route = PetHelperScreens.PetInfo.name,) {
-                PetInfoScreen(onBack = {navController.popBackStack()})
+            composable(
+                route = "${PetHelperScreens.PetInfo.name}/{petId}",
+                arguments = listOf(navArgument("petId") {type = NavType.StringType})
+                ) { backStackEntry ->
+                val petId = backStackEntry.arguments!!.getString("petId")
+                PetInfoScreen(petId = petId, onBack = {navController.popBackStack()})
             }
             composable(route = PetHelperScreens.Location.name) {
                 WalkScreen()

@@ -26,9 +26,9 @@ class PetCreateViewModel(val userManager: UserSessionManager, val fbRepository: 
             _uiState.update {it.copy(isLoading = true)}
 
             try {
-                val ref = fbRepository.addPet(userManager.currentUser.value!!.uid, pet)
+                val ref = fbRepository.addPet(pet)
                 pet = pet.copy(id=ref.id)
-                fbRepository.updatePet(ref.id, pet)
+                fbRepository.updatePet(ref.id, pet, userManager.currentUser.value!!.uid)
                 userManager.loadCurrentUser()
                 _uiState.update {
                     it.copy(isLoading = false, isSuccess = true)
