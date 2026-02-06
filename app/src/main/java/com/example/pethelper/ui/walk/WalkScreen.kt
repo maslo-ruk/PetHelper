@@ -36,7 +36,7 @@ import com.yandex.mapkit.mapview.MapView
 
 @Composable
 fun WalkScreen(
-    orderId:String = "ORDERBORDER1",
+    orderId:String,
     modifier: Modifier = Modifier
 ) {
     val viewModel: WalkViewModel = viewModel(factory = WalkViewModelFactory(orderId))
@@ -46,7 +46,7 @@ fun WalkScreen(
 
     val context = LocalContext.current
 
-    var hasPermission = hasBackgroundLocation(context)
+    var hasPermission = true
 
     if (hasPermission) {
         val is_pressed by viewModel.locating.collectAsStateWithLifecycle()
@@ -63,7 +63,7 @@ fun WalkScreen(
 
             Button(
                 onClick = {
-                    onClick2( orderId)
+                    onClick2(orderId)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -80,7 +80,10 @@ fun WalkScreen(
                         com.yandex.mapkit.mapview.MapView(context).apply {
                             map.move(
                                 com.yandex.mapkit.map.CameraPosition(
-                                    com.yandex.mapkit.geometry.Point(location!!.first, location!!.second),
+                                    com.yandex.mapkit.geometry.Point(
+                                        location!!.first,
+                                        location!!.second
+                                    ),
                                     16f,  // zoom
                                     0f,   // azimuth
                                     0f    // tilt
@@ -90,21 +93,23 @@ fun WalkScreen(
                     }
 
                     //маркер
-                    val placemarkRef = remember {mutableStateOf<PlacemarkMapObject?>(null)}
+                    val placemarkRef = remember { mutableStateOf<PlacemarkMapObject?>(null) }
 
                     // прокидываем lifecycle в mapkit
                     val lifecycle = LocalLifecycleOwner.current.lifecycle
                     DisposableEffect(lifecycle) {
                         val observer = LifecycleEventObserver { _, event ->
-                            when(event) {
+                            when (event) {
                                 Lifecycle.Event.ON_START -> {
                                     MapKitFactory.getInstance().onStart()
                                     mapView.onStart()
                                 }
+
                                 Lifecycle.Event.ON_STOP -> {
                                     mapView.onStop()
                                     MapKitFactory.getInstance().onStop()
                                 }
+
                                 else -> Unit
                             }
                         }
@@ -142,13 +147,4 @@ fun WalkScreen(
             }
         )
     }
-}
-
-fun hasBackgroundLocation(context: Context): Boolean {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    } else true
 }

@@ -12,7 +12,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import com.example.pethelper.data.rtdb.RealtimeOrderRepository
+import com.example.pethelper.data.firebaseRepositories.RealtimeOrderRepository
 import com.example.pethelper.R
 
 object c {

@@ -1,5 +1,9 @@
 package com.example.pethelper.ui.chat
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.Chat
@@ -47,7 +52,8 @@ import java.util.Locale
 @Composable
 fun ChatScreen(chatId: String,
                onBack: () -> Unit,
-               checkposition:(ordId:String)->Unit = {}) {
+               checkposition:(ordId:String)->Unit = {},
+               getPermissions:()->Unit = {}) {
     val viewModel: ChatScreenViewModel = viewModel(
         factory = ChatViewModelFactory(chatId)
     )
@@ -102,7 +108,8 @@ fun ChatScreen(chatId: String,
                     viewModel = viewModel,
                     uiState = uiState,
                     uid = myUid,
-                    chatId = chatId
+                    chatId = chatId,
+                    getPermissions = getPermissions
                 )
             }
 
@@ -143,13 +150,15 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
                       uiState: ChatUiState,
                       uid:String = "",
                       viewModel: ChatScreenViewModel,
-                      chatId:String
+                      chatId:String,
+                      getPermissions:()->Unit
 ) {
     val changeStatus = viewModel::updateOrderStatus
     val addOrderWorker = viewModel::addOrderWorker
     val startOrder = viewModel::startOrder
     val stopOrder = viewModel::stopOrder
     val context = LocalContext.current
+    var hasPermission = hasBackgroundLocation(context)
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -190,11 +199,23 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             Text("Ожидание подтверждения")
         }
         if (uiState.order.status == "ACCEPTED") {
-            Button(onClick = {
-                changeStatus("STARTED")
-                startOrder(context,uiState.order.id)
-                             }, enabled = enabled) {
-                Text("Начать Заказ")
+            if (hasPermission) {
+                Button(onClick = {
+                    changeStatus("STARTED")
+                    startOrder(context,uiState.order.id)
+                }, enabled = enabled) {
+                    Text("Начать Заказ")
+                }
+            } else {
+                Row {
+                    Text("Перед началом заказа разрешите геолокацию в любом режиме")
+                    Button(
+                        onClick = {getPermissions()}
+                    ) {
+                        Text("Разрешить геолокацию")
+                    }
+                }
+
             }
         }
         if (uiState.order.status == "STARTED") {
@@ -206,4 +227,13 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             }
         }
     }
+}
+
+fun hasBackgroundLocation(context: Context): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    } else true
 }

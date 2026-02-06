@@ -21,10 +21,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 
 @Composable
 fun LocationPermissionScreen(
-    onGranted: () -> Unit
+    navController: NavHostController? = null,
+    onGranted: () -> Unit = {navController?.popBackStack()}
 ) {
     val context = LocalContext.current
     val activity = context as Activity
@@ -68,6 +70,11 @@ fun LocationPermissionScreen(
                 }) {
                     Text("Открыть настройки")
                 }
+//                Button(onClick = {
+//                    onBack()
+//                }) {
+//                    Text("Готово")
+//                }
             }
         }
     }

@@ -4,7 +4,7 @@ import com.example.pethelper.data.firebaseRepositories.AuthRepository
 import com.example.pethelper.data.firebaseRepositories.ChatRepository
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
 import com.example.pethelper.data.firebaseRepositories.UserSessionManager
-import com.example.pethelper.data.rtdb.RealtimeOrderRepository
+import com.example.pethelper.data.firebaseRepositories.RealtimeOrderRepository
 import com.google.firebase.firestore.FirebaseFirestore
 
 object AppSession {
