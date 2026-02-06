@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.Chat
 import com.example.pethelper.data.fireBaseEntities.FOrder
+import com.example.pethelper.data.fireBaseEntities.FUser
 import com.example.pethelper.data.fireBaseEntities.Message
 import com.example.pethelper.data.firebaseRepositories.ChatRepository
 import com.example.pethelper.data.firebaseRepositories.FireStoreRepository
@@ -60,7 +61,12 @@ class ChatScreenViewModel(
             Log.d("CHAT", "ORDER VIEWMODEL ${ord!!.status}")
             val ordId = repo.getOrderIdByChatId(chatId)
             val ch = repo.getChatById(chatId)
-            _uiState.update { it.copy(order = ord!!, chat = ch!!, orderId = ordId!!) }
+            var partId = ch!!.participants[0]
+            if (partId == userManager.currentUser.value?.uid) {
+                partId = ch.participants[1]
+            }
+            val part = fbRepository.getUser(partId)
+            _uiState.update { it.copy(chat = ch, orderId = ordId!!, participant = part) }
             _uiState.update { it.copy(isLoading = false) }
             Log.d("CHAT", "viewmodel ${ch!!.orderId}")
         }
@@ -75,7 +81,6 @@ class ChatScreenViewModel(
             Log.d("CHAT", "ORDER STATE ${ord.status}")
             fbRepository.updateOrder(_uiState.value.orderId, ord)
             Log.d("CHAT", "ORDER STATE after ${ord.status}")
-            _uiState.update { it.copy(order = ord) }
             _uiState.update { it.copy(isLoading = false) }
         }
     }
@@ -86,8 +91,21 @@ class ChatScreenViewModel(
             var ord = _uiState.value.order
             ord = ord.copy(workerId = workerId, status = status)
             fbRepository.updateOrder(_uiState.value.orderId, ord)
-            _uiState.update { it.copy(order = ord) }
             _uiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+    fun observeOrder(orderId: String) {
+
+        viewModelScope.launch {
+
+            fbRepository.observeOrder(orderId)
+                .collect { order ->
+
+                    _uiState.update {
+                        it.copy(order = order)
+                    }
+                }
         }
     }
 
@@ -108,6 +126,7 @@ data class ChatUiState(
     val chat:Chat = Chat(),
     val order:FOrder = FOrder(),
     val orderId:String = "",
+    val participant:FUser? = FUser(),
     val error:String = "",
     val success: Boolean = false,
     val isLoading: Boolean = true

@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,7 +86,7 @@ fun ChatScreen(chatId: String,
             ) {
                 items(items = messages, key = {it.id}) {
                     msg ->
-                    MessageBubble(message = msg, isMine = (msg.senderId == myUid))
+                    MessageBubble(message = msg, isMine = (msg.senderId == myUid), uiState = uiState, curUser = curUser!!)
                     Spacer(Modifier.height(8.dp))
                 }
             }
@@ -100,7 +101,8 @@ fun ChatScreen(chatId: String,
                     checkPosition = checkposition,
                     viewModel = viewModel,
                     uiState = uiState,
-                    uid = myUid
+                    uid = myUid,
+                    chatId = chatId
                 )
             }
 
@@ -109,18 +111,25 @@ fun ChatScreen(chatId: String,
 }
 
 @Composable
-private fun MessageBubble(message: Message, isMine: Boolean) {
+private fun MessageBubble(message: Message, isMine: Boolean, uiState: ChatUiState, curUser:FUser) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (isMine) Arrangement.End else
-    Arrangement.Start) {
-        Surface(tonalElevation = 2.dp, shape = MaterialTheme.shapes.medium) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Text(message.text, style = MaterialTheme.typography.bodyLarge)
-                val timetext = message.createdAt?.toDate()?.let { dt ->
-                    SimpleDateFormat("HH:mm", Locale.getDefault()).format(dt)
-                }.orEmpty()
-                if (timetext.isNotBlank()) {
-                    Spacer(Modifier.height(4.dp))
-                    Text(timetext, style = MaterialTheme.typography.labelSmall)
+        Arrangement.Start) {
+        Column(horizontalAlignment = if (isMine) Alignment.End else Alignment.Start) {
+            if (isMine) {
+                Text("${curUser.name} ${curUser.surname}")
+            } else {
+                Text("${uiState.participant?.name} ${uiState.participant?.surname}")
+            }
+            Surface(tonalElevation = 2.dp, shape = MaterialTheme.shapes.medium) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(message.text, style = MaterialTheme.typography.bodyLarge)
+                    val timetext = message.createdAt?.toDate()?.let { dt ->
+                        SimpleDateFormat("HH:mm", Locale.getDefault()).format(dt)
+                    }.orEmpty()
+                    if (timetext.isNotBlank()) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(timetext, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
         }
@@ -133,7 +142,8 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
                       checkPosition:(ordId:String)->Unit,
                       uiState: ChatUiState,
                       uid:String = "",
-                      viewModel: ChatScreenViewModel
+                      viewModel: ChatScreenViewModel,
+                      chatId:String
 ) {
     val changeStatus = viewModel::updateOrderStatus
     val addOrderWorker = viewModel::addOrderWorker
@@ -153,10 +163,9 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             Text("Отправить")
         }
     }
-    Log.d("CHAT","ORDER STATE = ${uiState.order.status}")
-    Log.d("CHAT","ORDER STATE = ${uid}")
-    Log.d("CHAT","ORDER STATE = ${uiState.chat.participants[1]}")
-    Log.d("CHAT","ORDER id = ${uiState.orderId}")
+    LaunchedEffect(chatId) {
+        viewModel.observeOrder(uiState.orderId)
+    }
     if (uid == uiState.chat.participants[0]) {
         if (uiState.order.status == "CREATED") {
             Button(onClick = {

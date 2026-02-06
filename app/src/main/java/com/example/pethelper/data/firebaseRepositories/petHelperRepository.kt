@@ -12,6 +12,9 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObjects
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class FireStoreRepository(
@@ -101,6 +104,31 @@ class FireStoreRepository(
             .collection("workers")
             .add(worker)
             .await()
+    }
+
+    fun observeOrder(orderId: String): Flow<FOrder> = callbackFlow {
+
+        val listener = db
+            .collection("orders")
+            .document(orderId)
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val order = snapshot.toObject(FOrder::class.java)
+                    if (order != null) {
+                        trySend(order)
+                    }
+                }
+            }
+
+        awaitClose {
+            listener.remove()
+        }
     }
 
     fun observeOrders(
