@@ -39,3 +39,11 @@ class ChatListViewModel(private val repo: ChatRepository,
         listener = null
     }
 }
+
+data class ChatListUiState(
+    val error: String = "",
+    val isLoading:Boolean = false,
+    val success:Boolean = true,
+    val myName:String = "",
+    val otherName:String = ""
+)
