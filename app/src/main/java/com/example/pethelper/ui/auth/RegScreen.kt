@@ -447,7 +447,8 @@ fun RegistrationScreen(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Уже есть аккаунт?")
+                Text("Уже есть аккаунт?",
+                    color = Color(0xFF000000))
                 Spacer(Modifier.width(8.dp))
                 Text(
                     text = "Войти",

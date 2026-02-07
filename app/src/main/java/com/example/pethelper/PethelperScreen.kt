@@ -89,6 +89,7 @@ fun PetHelperApp(
             }
             composable(PetHelperScreens.Account.name) {
                 AccountScreen(
+                    onLogout = {navController.navigate(PetHelperScreens.Auth.name)},
                     onBack = {navController.popBackStack()},
                     onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)},
                     onAddPet = {navController.navigate(PetHelperScreens.AddPet.name)},
@@ -104,7 +105,7 @@ fun PetHelperApp(
             composable(PetHelperScreens.Reg.name) {
                 RegistrationScreen(
                     onBack = { navController.popBackStack() },
-                    onLoginClick = {navController.navigate(PetHelperScreens.Auth)},
+                    onLoginClick = {navController.navigate(PetHelperScreens.Auth.name)},
                     goToMain = {navController.navigate(PetHelperScreens.Start.name)}
                 )
             }

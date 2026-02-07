@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.IconButton
@@ -50,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.pethelper.Constants
 import com.example.pethelper.R
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
 
 @Composable
 fun MainScreen(
@@ -185,29 +185,7 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Button(
-                onClick = {
-                    onLoc()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(45.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(color = 0xFF690005),
-                    contentColor = Color.White
-                )
-            ) {
-                Text("Геолокация",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold)
-            }
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(60.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -232,6 +210,17 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                     )
                 }
             }
+        }
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.dog22_mirror),
+                contentDescription = "Собакен1",
+                tint = Color.Unspecified,
+            )
         }
     }
 }
