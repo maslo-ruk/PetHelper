@@ -49,6 +49,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.res.painterResource
 import com.example.pethelper.Constants
 import com.example.pethelper.R
+import androidx.compose.material3.TextButton
 
 @Composable
 fun MainScreen(
@@ -99,12 +100,24 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
 
             Row(
                 modifier = Modifier.fillMaxWidth()
-                    .padding(top = 60.dp, bottom = 0.dp, start = 40.dp, end = 50.dp),
+                    .padding(top = 60.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "PetHelper",
-                )
+                TextButton(
+                    onClick = {
+                        onLogout()
+                    },
+                    modifier = Modifier,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFF93000A)
+                    )
+                ) {
+                    Text(
+                        text = "Выйти",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
 
                 IconButton(onClick = { onAccount() }) {
                     Icon(
@@ -118,40 +131,57 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
 
             Button(
                 onClick = onCreateOrder,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF93000A),
-                    contentColor = Color.White  // цвет текста
+                    containerColor = Color(color = 0xFF690005),
+                    contentColor = Color.White
                 )
             ) {
-                Text("Создать заказ")
+                Text("Создать заказ",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold)
             }
+
+            Spacer(modifier = Modifier.height(30.dp))
 
             if (curUser.type == 0) {
                 Button(
                     onClick = {
                         onShowOrders()
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF93000A),
-                        contentColor = Color.White  // цвет текста
+                        containerColor = Color(color = 0xFF690005),
+                        contentColor = Color.White
                     )
                 ) {
-                    Text("Доступные заказы")
+                    Text("Доступные заказы",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold)
                 }
             } else {
                 Button(
                     onClick = {
                         onShowOrdersUser()
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF93000A),
-                        contentColor = Color.White  // цвет текста
+                        containerColor = Color(color = 0xFF690005),
+                        contentColor = Color.White
                     )
                 ) {
-                    Text("Данные по заказам")
+                    Text("Данные по заказам",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold)
                 }
             }
 
@@ -161,29 +191,21 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                 onClick = {
                     onLoc()
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF93000A),
-                    contentColor = Color.White  // цвет текста
+                    containerColor = Color(color = 0xFF690005),
+                    contentColor = Color.White
                 )
             ) {
-                Text("Геолокация")
+                Text("Геолокация",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
-
-            Button(
-                onClick = {
-                    onLogout()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF93000A),
-                    contentColor = Color.White  // цвет текста
-                )
-            ) {
-                Text("Выйти")
-            }
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -198,8 +220,8 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                     shape = CircleShape,
                     modifier = Modifier.size(70.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF93000A),
-                        contentColor = Color.White  // цвет текста
+                        containerColor = Color(color = 0xFF690005),
+                        contentColor = Color.White
                     )
                 ) {
                     // Иконка и текст в ряд

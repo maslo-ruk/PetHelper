@@ -9,9 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +36,10 @@ import com.example.pethelper.ui.AppViewModelProvider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.pethelper.Constants
 
 @Composable
@@ -56,19 +63,49 @@ fun LoginScreen(onBack: () -> Unit,
         ) {
 
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
+                Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Назад", tint = Color(0xFF690005))
             }
 
             Text(
-                text = "Вход",
-                modifier = Modifier.padding(vertical = 24.dp),
+                text = "Войти с паролем",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF690005),
+                textAlign = TextAlign.Center
             )
 
             OutlinedTextField(
                 value = uiState.details.email,
                 onValueChange = { onUpdate(uiState.details.copy(email = it)) },
                 label = { Text("Электронная почта") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -78,19 +115,48 @@ fun LoginScreen(onBack: () -> Unit,
                 onValueChange = { onUpdate(uiState.details.copy(password = it)) },
                 label = { Text("Пароль") },
                 modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Password,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                ),
                 visualTransformation = PasswordVisualTransformation()
             )
             Spacer(Modifier.height(32.dp))
 
             Button(
                 onClick = { onSubmit() },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF93000A),
-                    contentColor = Color.White  // цвет текста
+                    containerColor = Color(color = 0xFF690005),
+                    contentColor = Color.White
                 )
             ) {
-                Text("Войти")
+                Text("Войти",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold)
             }
             if (uiState.success) {
                 goToMain()

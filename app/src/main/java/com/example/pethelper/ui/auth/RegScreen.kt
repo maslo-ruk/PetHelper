@@ -15,11 +15,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.PermIdentity
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.SupervisorAccount
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -37,9 +48,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.Constants
@@ -49,7 +62,9 @@ import com.example.pethelper.ui.auth.RegViewModel
 import com.example.pethelper.ui.orders.OrderDetails
 import com.example.pethelper.ui.orders.OrderDialogViewModel
 import java.util.Calendar
-
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material.icons.filled.Person
 @Composable
 fun RegistrationScreen(
     onBack:() -> Unit,
@@ -74,18 +89,48 @@ fun RegistrationScreen(
 
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
+                Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Назад", tint = Color(0xFF690005))
             }
             Text(
                 text = "Регистрация",
-                modifier = Modifier.padding(bottom = 32.dp) // добавить шрифт
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF690005),
+                textAlign = TextAlign.Center// добавить шрифт
             )
 
             OutlinedTextField(
                 value = uiState.details.firstName,
                 onValueChange = { onClick(uiState.details.copy(firstName = it)) },
                 label = { Text("Имя") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -94,7 +139,31 @@ fun RegistrationScreen(
                 value = uiState.details.lastName,
                 onValueChange = { onClick(uiState.details.copy(lastName = it)) },
                 label = { Text("Фамилия") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.PermIdentity,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -103,7 +172,31 @@ fun RegistrationScreen(
                 value = uiState.details.email,
                 onValueChange = { onClick(uiState.details.copy(email = it)) },
                 label = { Text("Электронная почта") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -112,8 +205,32 @@ fun RegistrationScreen(
                 value = uiState.details.password,
                 onValueChange = { onClick(uiState.details.copy(password = it)) },
                 label = { Text("Пароль") },
+                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Password,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -122,9 +239,33 @@ fun RegistrationScreen(
                 value = uiState.details.phone,
                 onValueChange = { onClick(uiState.details.copy(phone = it)) },
                 label = { Text("Номер телефона") },
-                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Phone
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
                 )
             )
 
@@ -134,7 +275,31 @@ fun RegistrationScreen(
                 value = uiState.details.address,
                 onValueChange = { onClick(uiState.details.copy(address = it)) },
                 label = { Text("Адрес") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -147,6 +312,14 @@ fun RegistrationScreen(
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Дата рождения") },
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -167,7 +340,23 @@ fun RegistrationScreen(
                             calendar.get(Calendar.MONTH),
                             calendar.get(Calendar.DAY_OF_MONTH)
                         ).show()
-                    }
+                    },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
 
             Spacer(Modifier.height(16.dp))
@@ -180,13 +369,37 @@ fun RegistrationScreen(
                     value = roles[uiState.details.role],
                     onValueChange = {},
                     readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
                     label = { Text("Выберите роль") },
                     trailingIcon = {
                         Icon(
                             Icons.Default.ArrowDropDown, contentDescription = null,
                             Modifier.clickable { expanded = true })
-                    }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.SupervisorAccount,
+                            contentDescription = null,
+                            tint = Color(0xFF690005)
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        // Цвет рамки
+                        focusedBorderColor = Color(0xFF690005),
+                        unfocusedBorderColor = Color(0xFF690005),
+
+                        // Цвет текста
+                        focusedTextColor = Color(0xFF690005),
+                        unfocusedTextColor = Color(0xFF690005),
+
+                        // Цвет label
+                        focusedLabelColor = Color(0xFF690005),
+                        unfocusedLabelColor = Color(0xFF690005),
+
+                        // Цвет курсора
+                        cursorColor = Color(0xFF690005)
+                    )
                 )
 
                 DropdownMenu(
@@ -214,13 +427,18 @@ fun RegistrationScreen(
                 onClick = {
                     onSubmit()
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF93000A),
-                    contentColor = Color.White  // цвет текста
+                    containerColor = Color(color = 0xFF690005),
+                    contentColor = Color.White
                 )
             ) {
-                Text("Регистрация")
+                Text("Регистрация",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold)
             }
 
             Spacer(Modifier.height(24.dp))
@@ -234,7 +452,7 @@ fun RegistrationScreen(
                 Text(
                     text = "Войти",
                     modifier = Modifier.clickable { onLoginClick() },
-                    color = Color(0xFF93000A)
+                    color = Color(0xFF690005)
                 )
             }
             if (uiState.success) {
