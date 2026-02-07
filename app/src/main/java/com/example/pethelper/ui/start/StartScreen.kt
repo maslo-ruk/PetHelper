@@ -102,14 +102,6 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
         ) {
             Text("Выйти")
         }
-        Button(
-            onClick = {
-                onLoc()
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Чек геолокации")
-        }
         if (curUser.type == 0) {
             Button(
                 onClick = {
