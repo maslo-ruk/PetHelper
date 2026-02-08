@@ -57,62 +57,67 @@ fun ChatScreen(chatId: String,
     val viewModel: ChatScreenViewModel = viewModel(
         factory = ChatViewModelFactory(chatId)
     )
-//    fun onOrderAccepted(status:String) = viewModel::updateOrderStatus
-//    fun onOrderStarted() : Unit = {}
-//    fun checkPosition():Unit = {}
-//    fun onOrderEnded():Unit = {}
     val messages by viewModel.messages.collectAsState()
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     val myUid = viewModel.userManager.currentUser.collectAsState().value?.uid ?: ""
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isClosed = uiState.chat.status == "CLOSED"
-
-    Scaffold(
-        topBar = {
-            TopAppBar(title = {Text(text = "Чат по заказу $chatId")},
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+    lateinit var x:String
+    if (uiState.state == "Loading") {
+        Text("Загрузка чата...")
+    } else {
+        if (uiState.chat.participants[0] == myUid) {
+            x = "${uiState.chat.worker.name} ${uiState.chat.worker.surname}"
+        } else {
+            x = "${uiState.chat.client.name} ${uiState.chat.client.surname}"
+        }
+        Scaffold(
+            topBar = {
+                TopAppBar(title = {Text(text = "Чат с ${x}")},
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                        }
+                    })
+            }
+        ) {padding ->
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+            ) { if (isClosed) {
+                Text(text = "Заказ завершен. Чат закрыт", modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodyLarge)
+            }
+                LazyColumn(modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                    contentPadding = PaddingValues(12.dp)
+                ) {
+                    items(items = messages, key = {it.id}) {
+                            msg ->
+                        MessageBubble(message = msg, isMine = (msg.senderId == myUid), uiState = uiState, curUser = curUser!!)
+                        Spacer(Modifier.height(8.dp))
                     }
-                })
-        }
-    ) {padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-        ) { if (isClosed) {
-            Text(text = "Заказ завершен. Чат закрыт", modifier = Modifier.padding(12.dp),
-                style = MaterialTheme.typography.bodyLarge)
-        }
-            LazyColumn(modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-                contentPadding = PaddingValues(12.dp)
-            ) {
-                items(items = messages, key = {it.id}) {
-                    msg ->
-                    MessageBubble(message = msg, isMine = (msg.senderId == myUid), uiState = uiState, curUser = curUser!!)
-                    Spacer(Modifier.height(8.dp))
                 }
-            }
-            if (uiState.isLoading) {
-                Text("Загрузка...")
-            }
-            else {
-                ChatInput(text = viewModel.input,
-                    onTextChange = viewModel::onInput,
-                    onSend = viewModel::send,
-                    enabled = !isClosed,
-                    checkPosition = checkposition,
-                    viewModel = viewModel,
-                    uiState = uiState,
-                    uid = myUid,
-                    chatId = chatId,
-                    getPermissions = getPermissions
-                )
-            }
+                if (uiState.isLoading) {
+                    Text("Загрузка...")
+                }
+                else {
+                    ChatInput(text = viewModel.input,
+                        onTextChange = viewModel::onInput,
+                        onSend = viewModel::send,
+                        enabled = !isClosed,
+                        checkPosition = checkposition,
+                        viewModel = viewModel,
+                        uiState = uiState,
+                        uid = myUid,
+                        chatId = chatId,
+                        getPermissions = getPermissions
+                    )
+                }
 
+            }
         }
     }
 }
@@ -196,7 +201,7 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
         }
     }
     else if (uid == uiState.chat.participants[1]) {
-        if (uiState.order.status == "PUBLISHED") {
+        if (uiState.order.status == "CREATED") {
             Text("Ожидание подтверждения")
         }
         if (uiState.order.status == "ACCEPTED") {

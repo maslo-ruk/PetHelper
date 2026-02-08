@@ -35,6 +35,7 @@ import com.example.pethelper.ui.AppViewModelProvider
 fun ChatListScreen(viewModel: ChatListViewModel = viewModel(factory = AppViewModelProvider.Factory),
                    onOpenChat: (chatId: String) -> Unit, onBack:()-> Unit = {}) {
     val chats by viewModel.chats.collectAsState()
+    val curUserId = viewModel.myUid.currentUser.collectAsState().value!!.uid
 
     LaunchedEffect (Unit) {
         viewModel.startObservingChats()
@@ -60,7 +61,7 @@ fun ChatListScreen(viewModel: ChatListViewModel = viewModel(factory = AppViewMod
         ) {
             items(items = chats, key = { it.id }) {
                 chat ->
-                ChatRow(chat = chat, onClick = {onOpenChat(chat.id)})
+                ChatRow(chat = chat, onClick = {onOpenChat(chat.id)}, curUserId = curUserId)
                 Divider()
             }
         }
@@ -69,8 +70,14 @@ fun ChatListScreen(viewModel: ChatListViewModel = viewModel(factory = AppViewMod
 }
 
 @Composable
-private fun ChatRow(chat: Chat, onClick: () -> Unit) {
-    val title = "Заказ ${chat.orderId}"
+private fun ChatRow(chat: Chat, onClick: () -> Unit, curUserId:String) {
+    lateinit var x:String
+    if (chat.participants[0] == curUserId) {
+        x = "${chat.worker.name} ${chat.worker.surname}"
+    } else {
+        x = "${chat.client.name} ${chat.client.surname}"
+    }
+    val title = "Чат с ${x}"
     val subtitle = chat.lastMessage.ifBlank { "Нет сообщений" }
     Column(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp)) {
         Text(title, style = MaterialTheme.typography.titleMedium)

@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class ChatListViewModel(private val repo: ChatRepository,
-    private val myUid: UserSessionManager) : ViewModel() {
+    val myUid: UserSessionManager) : ViewModel() {
 
     val _chatsFlow = MutableStateFlow(emptyList<Chat>())
     val chats: StateFlow<List<Chat>> = _chatsFlow
@@ -43,7 +43,5 @@ class ChatListViewModel(private val repo: ChatRepository,
 data class ChatListUiState(
     val error: String = "",
     val isLoading:Boolean = false,
-    val success:Boolean = true,
-    val myName:String = "",
-    val otherName:String = ""
+    val success:Boolean = true
 )

@@ -88,6 +88,10 @@ class FireStoreRepository(
 
     }
 
+    suspend fun deleteOrder(order: FOrder) {
+        db.collection("orders").document(order.id).delete().await()
+    }
+
     suspend fun updateOrder(orderId: String, order: FOrder) {
         Log.d("FS", "updateOrder")
         db.collection("orders")
@@ -174,7 +178,7 @@ class FireStoreRepository(
         onError: (Throwable) -> Unit,
         uid: String,
     ): ListenerRegistration {
-        val ordersRef = db.collection("users").document(uid).collection("orders")
+        val ordersRef = db.collection("orders").whereEqualTo("userId", uid)
         Log.d("FS", "Orders ref = ${ordersRef.get()}")
 
         return ordersRef

@@ -28,6 +28,9 @@ class OrderDialogViewModel(
 
     fun submitOrder() {
         val state = _uiState.value
+        if (!CheckOrder(state.details)) {
+            _uiState.update { it.copy(error = "Заполните все поля!") }
+        }
         var order = state.details.toFOrder().copy(userId = userManager.currentUser.value!!.uid, user = userManager.currentUser.value!!.user)
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
@@ -61,3 +64,12 @@ fun OrderDetails.toFOrder(): FOrder = FOrder(
     price = price,
     notes = notes,
 )
+
+fun CheckOrder(details: OrderDetails):Boolean{
+    if (details.pet == FPet()) return false
+    else if (details.date == "") return false
+    else if (details.time == "") return false
+    else if (details.address == "") return false
+    else if (details.notes == "") return false
+    else return true
+}

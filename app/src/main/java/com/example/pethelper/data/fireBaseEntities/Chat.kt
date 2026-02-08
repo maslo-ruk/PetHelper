@@ -9,5 +9,7 @@ data class Chat(
     val status: String = "ACTIVE", // ACTIVE or CLOSED
     val lastMessage: String = "",
     val lastMessageAt: Timestamp? = null,
-    val createdAt: Timestamp? = null
+    val createdAt: Timestamp? = null,
+    val client: FUser = FUser(),
+    val worker: FUser = FUser()
 )

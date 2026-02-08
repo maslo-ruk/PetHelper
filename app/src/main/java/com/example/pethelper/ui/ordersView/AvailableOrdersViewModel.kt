@@ -72,7 +72,14 @@ class AvailableOrdersViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true)  }
             try {
-                chatRepository.createChat(order.id, order.userId, userManager.currentUser.value!!.uid)
+                val otherName = fbRepository.getUser(order.userId)
+                chatRepository.createChat(
+                    order.id,
+                    order.userId,
+                    userManager.currentUser.value!!.uid,
+                    otherName!!,
+                    userManager.currentUser.value!!.user
+                )
                 fbRepository.addWorkerToOrder(userManager.currentUser.value!!.uid, order)
                 Log.d("AceptOrder", "SUCCESS")
                 _uiState.update { it.copy(success = true, isLoading = false) }

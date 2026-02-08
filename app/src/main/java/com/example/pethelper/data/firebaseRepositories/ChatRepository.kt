@@ -118,14 +118,23 @@ class ChatRepository {
         chatRef.update(chatUpdates).await()
     }
 
-    suspend fun createChat(orderId: String, clientId: String, workerId: String): String {
+    suspend fun createChat(
+        orderId: String,
+        clientId: String,
+        workerId: String,
+        client: FUser,
+        worker: FUser
+    ): String {
         val chatRef = db.collection("chats").document()
         val data = mapOf("orderId" to orderId,
             "participants" to listOf(clientId, workerId),
             "status" to "ACTIVE",
             "lastMessage" to "",
             "createdAt" to FieldValue.serverTimestamp(),
-            "lastMessageAt" to FieldValue.serverTimestamp())
+            "lastMessageAt" to FieldValue.serverTimestamp(),
+            "client" to client,
+            "worker" to worker
+        )
         chatRef.set(data).await()
         return chatRef.id
     }
@@ -137,6 +146,7 @@ class ChatRepository {
             batch.update(doc.reference, mapOf("status" to "CLOSED",
                 "lastMessage" to "Заказ Завершен",
                 "lastMessageAt" to FieldValue.serverTimestamp()))
+            batch.delete(doc.reference)
         }
         val orderRef = db.collection("orders").document(orderId)
         batch.update(orderRef, mapOf("STATUS" to OrderStatus.CLOSED.toString(),
@@ -173,7 +183,7 @@ class ChatRepository {
         return chatSnap.toObject(Chat::class.java)
     }
 
-    suspend fun finishChatsById(orderId:String, workerId:String) {
+    suspend fun finishChatsById(orderId:String, workerId:String = "NOT_A_WORKER") {
         Log.d("CHAT", "finishChatsById start")
         val chatSnap = db.collection("chats").whereEqualTo("orderId", orderId)
             .whereEqualTo("status", "ACTIVE").get().await()
@@ -188,6 +198,7 @@ class ChatRepository {
                 "lastMessage" to "Заказ приняли",
                 "lastMessageAt" to FieldValue.serverTimestamp()))
             }
+            batch.delete(doc.reference)
         }
         batch.commit().await()
     }

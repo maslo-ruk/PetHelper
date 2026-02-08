@@ -1,5 +1,6 @@
 package com.example.pethelper.ui.orders
 
+import ads_mobile_sdk.ui
 import androidx.compose.runtime.Composable
 
 
@@ -249,21 +250,27 @@ fun OrderInputs(modifier:Modifier = Modifier,
             )
         }
 
-        // Кнопка "Создать заказ"
-        AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
-            Button(
-                onClick = { onSave() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Создать заказ")
+        if (!uiState.isLoading) {
+            // Кнопка "Создать заказ"
+            AnimatedVisibility(visible = showFields, enter = fadeIn(), exit = fadeOut()) {
+                Button(
+                    onClick = { onSave() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Создать заказ")
+                }
             }
         }
+        if (uiState.isLoading) {
+            Text("Загрузка...")
+        }
+        if (uiState.error != "") {
+            Text(uiState.error)
+        }
+        if (uiState.success) {
+            onBack()
+        }
+
     }
 
-    if (uiState.isLoading) {
-        Text("Загрузка...")
-    }
-    if (uiState.success) {
-       onBack()
-    }
 }

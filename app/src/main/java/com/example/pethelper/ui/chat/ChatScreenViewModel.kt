@@ -55,7 +55,7 @@ class ChatScreenViewModel(
 
     init {
         Log.d("CHAT", "load start")
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, state = "Loading") }
         viewModelScope.launch {
             val ord = repo.getOrderByChatId(chatId)
             Log.d("CHAT", "ORDER VIEWMODEL ${ord!!.status}")
@@ -67,7 +67,7 @@ class ChatScreenViewModel(
             }
             val part = fbRepository.getUser(partId)
             _uiState.update { it.copy(chat = ch, orderId = ordId!!, participant = part) }
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update { it.copy(isLoading = false, state="Loaded") }
             Log.d("CHAT", "viewmodel ${ch!!.orderId}")
         }
     }
@@ -139,5 +139,6 @@ data class ChatUiState(
     val participant:FUser? = FUser(),
     val error:String = "",
     val success: Boolean = false,
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val state:String = "Loading"
 )
