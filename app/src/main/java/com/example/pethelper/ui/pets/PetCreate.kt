@@ -61,6 +61,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
+import androidx.compose.foundation.layout.Row
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,8 +73,83 @@ fun PetCreate(onBack: () -> Unit,
               onSubmit: () -> Unit = viewModel::submitPet
  ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    Row(){
+        IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBackIos,
+                contentDescription = "Назад",
+                tint = Color(0xFF690005))
+        }
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .background(brush = Constants.GRADIENT_BRUSH)
+            .padding(start = 20.dp, end = 20.dp)
+            .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally, ) {
+            Spacer(modifier= Modifier.height(20.dp))
 
-    IconButton(onClick = onBack) {
+
+
+            Text("Добавить питомца")
+
+            Spacer(modifier= Modifier.height(10.dp))
+
+            UploadPhotoButton()
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = uiState.details.name,
+                onValueChange = { onUpdate(uiState.details.copy(name = it)) },
+                label = { Text("Имя питомца") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            var expanded1 by remember { mutableStateOf(false) }
+            var selected by remember { mutableStateOf("") }
+            val items = listOf<String>(PetTypes.DOG.name,
+                PetTypes.CHINCHILLA.name,
+                PetTypes.CAT.name,
+                PetTypes.FISH.name,
+                PetTypes.HAMSTER.name,
+                PetTypes.PARROT.name,
+                PetTypes.OTHER.name)
+
+            ExposedDropdownMenuBox(
+                expanded = expanded1,
+                onExpandedChange = { expanded1 = !expanded1 }
+            ) {
+                OutlinedTextField(
+                    value = selected,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Тип животного")},
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth().menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded1,
+                    onDismissRequest = { expanded1 = false },
+//                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(item) },
+                            onClick = {
+                                onUpdate(uiState.details.copy(type = PetTypes.valueOf(item)))
+                                expanded1 = false
+                            }
+                        )
+                    }
+                }}
+    }
+    /*IconButton(onClick = onBack) {
         Icon(Icons.AutoMirrored.Filled.ArrowBackIos,
             contentDescription = "Назад",
             tint = Color(0xFF690005))
@@ -145,7 +221,7 @@ fun PetCreate(onBack: () -> Unit,
                             }
                         )
                     }
-                }}
+                }}*/
 
             Spacer(modifier = Modifier.height(12.dp))
 
