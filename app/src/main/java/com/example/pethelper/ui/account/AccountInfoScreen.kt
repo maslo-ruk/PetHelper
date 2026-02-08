@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -79,15 +81,104 @@ fun AccountScreen(
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     val pets = viewModel.userManager.pets.collectAsState().value
-    val petUiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
+    //val petUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    //val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(brush = Constants.GRADIENT_BRUSH)
     ) {
-        Scaffold(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Назад", tint = Color(0xFF690005))
+            }
+
+            Text(
+                text = "Настройки пользователя",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF690005),
+                textAlign = TextAlign.Center
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .verticalScroll(scrollState) // потом поменяем
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.cot),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+            Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(8.dp))
+
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
+                Spacer(Modifier.height(12.dp))
+
+
+                AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            TextButton(
+                onClick = {
+                    onLogout()
+                },
+                modifier = Modifier,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color(0xFF93000A)
+                )
+            ) {
+                Text(
+                    text = if (uiState.isLoading) "Выходим.." else "Выйти",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
+
+
+            Spacer(Modifier.height(24.dp))
+            Text("Домашние животные", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+
+            /*LazyColumn {
+                items(pets) { pet ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn() + expandVertically()
+                    ) {
+                        PetListItem(
+                            pet = pet,
+                            onClick = onOpenPet
+                        )
+                    }
+                }
+            }*/
+        }
+        /*Scaffold(
             topBar = {
                 TopAppBar(
                     title = { Text("Аккаунт", textAlign = TextAlign.Center) },
@@ -178,7 +269,7 @@ fun AccountScreen(
                     }
                 }
             }
-        }
+        }*/
     }
 
     if (uiState.success) {

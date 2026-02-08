@@ -45,6 +45,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.ui.res.painterResource
 import com.example.pethelper.Constants
 import com.example.pethelper.R
@@ -103,21 +104,6 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                     .padding(top = 60.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                /*TextButton(
-                    onClick = {
-                        onLogout()
-                    },
-                    modifier = Modifier,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = Color(0xFF93000A)
-                    )
-                ) {
-                    Text(
-                        text = "Выйти",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }*/
                 Icon(
                     painter = painterResource(id = R.drawable.logo_pet_helper4),
                     modifier = Modifier.size(120.dp),
@@ -128,7 +114,8 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                 IconButton(onClick = { onAccount() }) {
                     Icon(
                         Icons.Default.AccountCircle, contentDescription = "Аккаунт",
-                        modifier = Modifier.size(400.dp)
+                        modifier = Modifier.size(120.dp),
+                        tint = Color(0xFF690005)
                     )
                 }
             }
@@ -210,7 +197,7 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                 ) {
                     // Иконка и текст в ряд
                     Icon(
-                        imageVector = Icons.Default.Chat, // Иконка чата из Material Icons
+                        imageVector = Icons.AutoMirrored.Filled.Chat, // Иконка чата из Material Icons
                         contentDescription = "Чат",
                         modifier = Modifier.size(30.dp)
                     )
@@ -339,175 +326,6 @@ fun AuthFalse(onLogin: () -> Unit, onReg: () -> Unit) {
         }
     }
 }
-/*
-@Composable
-fun AuthFalse2(onLogin: () -> Unit, onReg: () -> Unit) {
-
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val scale: Float by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.15f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 800, easing = EaseInOutCubic),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "scale"
-    )
-
-    var visible: Boolean by remember { mutableStateOf(false) }
-    LaunchedEffect(key1 = Unit) {
-        delay(300L)
-        visible = true
-    }
-
-    val alpha: Float by animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = tween(durationMillis = 1000),
-        label = "alpha"
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(color = 0xFFFFF8F0),
-                        Color(color = 0xFFFFE0B2),
-                        Color(color = 0xFFFFF8F0)
-                    )
-                )
-            )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp)
-                .padding(top = 80.dp, bottom = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Верхняя часть
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .scale(scale)
-                        .clip(CircleShape)
-                        .background(Color(color = 0xFF690005)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.doglogo1),
-                        //imageVector = ImageVector.Builder(painterResource(id = R.drawable.doglogo1), contentDescription = "Лапка"),// R.drawable.doglogo1,
-                        contentDescription = "Лапка",
-                        modifier = Modifier.size(120.dp)
-                            .clip(CircleShape),
-                        tint = Color.Unspecified
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "PetWalk",
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Bold,
-                    //fontFamily = Montserrat,
-                    color = Color(color = 0xFF690005)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Прогулки с заботой\nо вашем питомце",
-                    fontSize = 16.sp,
-                    //fontFamily = Montserrat,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(color = 0xFF93000A),
-                    textAlign = TextAlign.Center,
-                    lineHeight = 24.sp
-                )
-            }
-
-            // Средняя часть
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                FeatureItem(emoji = "🐕", text = "Надёжные выгульщики рядом с вами")
-                //FeatureItem(emoji = "📍", text = "Отслеживание прогулки в реальном времени")
-                //FeatureItem(emoji = "⭐", text = "Рейтинги и отзывы от владельцев")
-            }
-
-            // Нижняя часть
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = onReg,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(color = 0xFF690005),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text(
-                        text = "Зарегистрироваться",
-                        fontSize = 16.sp,
-                        //fontFamily = Montserrat,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-
-                //Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedButton(
-                    onClick = onLogin,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(color = 0xFF690005)
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color(color = 0xFF690005),
-                                Color(color = 0xFF93000A)
-                            )
-                        )
-                    )
-                ) {
-                    Text(
-                        text = "Войти",
-                        fontSize = 16.sp,
-                        //fontFamily = Montserrat,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-/*
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Продолжая, вы соглашаетесь с условиями использования",
-                    fontSize = 12.sp,
-                    //fontFamily = Montserrat,
-                    color = Color(color = 0xFFAAAAAA),
-                    textAlign = TextAlign.Center
-                )*/
-            }
-        }
-    }
-}*/
 
 @Composable
 fun FeatureItem(emoji: String, text: String) {
