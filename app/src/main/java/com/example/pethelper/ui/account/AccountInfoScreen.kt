@@ -38,7 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -84,27 +87,16 @@ fun AccountScreen(
             .fillMaxSize()
             .background(brush = Constants.GRADIENT_BRUSH)
     ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Аккаунт", textAlign = TextAlign.Center) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                painterResource(id = android.R.drawable.ic_media_previous),
-                                contentDescription = "Назад"
-                            )
-                        }
-                    }
-                )
-            }
-        ) { padding ->
+        IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBackIos,
+                contentDescription = "Назад",
+                tint = Color(0xFF690005))
+        }
 
             Column(
                 modifier = Modifier
-                    .padding(padding)
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(top = 50.dp)
                     .alpha(alphaAnim.value),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -125,18 +117,6 @@ fun AccountScreen(
 
                 Spacer(Modifier.height(12.dp))
                 Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(8.dp))
-
-
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
-                    Spacer(Modifier.height(12.dp))
-
-
-                    AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
-                }
-
-                Spacer(Modifier.height(12.dp))
 
                 TextButton(
                     onClick = {
@@ -154,7 +134,34 @@ fun AccountScreen(
                     )
                 }
 
-                AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    AnimatedButton(text = "Изменить аватар или имя",
+                        onClick = onEditAccount,
+                        )
+                    Spacer(Modifier.height(12.dp))
+
+
+                    AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+
+                Button(onClick = {onAddPet()},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .padding(start = 20.dp, end = 20.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(color = 0xFF690005),
+                        contentColor = Color.White
+                    )
+                ) {
+                Text("Добавить питомца",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold)
+            }
 
 
                 Spacer(Modifier.height(24.dp))
@@ -178,7 +185,6 @@ fun AccountScreen(
             }
         }
     }
-}
 
 
 // Кнопка с анимацией

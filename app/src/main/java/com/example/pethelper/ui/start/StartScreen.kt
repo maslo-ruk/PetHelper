@@ -103,7 +103,7 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                     .padding(top = 60.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                TextButton(
+                /*TextButton(
                     onClick = {
                         onLogout()
                     },
@@ -117,7 +117,13 @@ fun AuthTrue(onCreateOrder: () -> Unit, onLogout:() -> Unit, onAccount:() -> Uni
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
-                }
+                }*/
+                Icon(
+                    painter = painterResource(id = R.drawable.logo_pet_helper4),
+                    modifier = Modifier.size(120.dp),
+                    contentDescription = "Собакен1",
+                    tint = Color.Unspecified,
+                )
 
                 IconButton(onClick = { onAccount() }) {
                     Icon(

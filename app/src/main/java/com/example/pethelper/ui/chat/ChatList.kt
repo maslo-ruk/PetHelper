@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,7 +29,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.Chat
+import androidx.compose.foundation.background
 import com.example.pethelper.ui.AppViewModelProvider
+import com.example.pethelper.Constants
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,27 +56,36 @@ fun ChatListScreen(viewModel: ChatListViewModel = viewModel(factory = AppViewMod
         }
     }
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text("Чаты")},
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
-                }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(brush = Constants.GRADIENT_BRUSH)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBackIos,
+                    contentDescription = "Назад",
+                    tint = Color(0xFF690005)
+                )
             }
-        ) }
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier.padding(padding).fillMaxSize()
-        ) {
-            items(items = chats, key = { it.id }) {
-                chat ->
-                ChatRow(chat = chat, onClick = {onOpenChat(chat.id)})
-                Divider()
+            Text(
+                "Чаты",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF690005),
+                textAlign = TextAlign.Center
+            )
+        }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(items = chats, key = { it.id }) { chat ->
+                    ChatRow(chat = chat, onClick = { onOpenChat(chat.id) })
+                    Divider()
+                }
             }
         }
     }
-
-}
 
 @Composable
 private fun ChatRow(chat: Chat, onClick: () -> Unit) {
