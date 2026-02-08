@@ -26,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -36,15 +35,21 @@ import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.AppViewModelProvider
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
+import com.example.pethelper.Constants
 import com.example.pethelper.data.enums.PetTypes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -68,24 +73,23 @@ fun PetCreate(onBack: () -> Unit,
  ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Добавление питомца") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
+    IconButton(onClick = onBack) {
+        Icon(Icons.AutoMirrored.Filled.ArrowBackIos,
+            contentDescription = "Назад",
+            tint = Color(0xFF690005))
+    }
         Column(modifier = Modifier
             .fillMaxSize()
+            .background(brush = Constants.GRADIENT_BRUSH)
             .padding(start = 20.dp, end = 20.dp)
             .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally, ) {
-            Spacer(modifier= Modifier.height(12.dp))
+            Spacer(modifier= Modifier.height(20.dp))
+
+
+            Text("Добавить питомца")
+
+            Spacer(modifier= Modifier.height(10.dp))
 
             UploadPhotoButton()
 
@@ -207,7 +211,6 @@ fun PetCreate(onBack: () -> Unit,
         }
     }
 
-}
 
 suspend fun uploadPhotoToServer(
     context: Context,
