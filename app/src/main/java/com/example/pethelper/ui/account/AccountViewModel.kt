@@ -1,5 +1,6 @@
 package com.example.pethelper.ui.account
 
+import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,11 +22,17 @@ class AccountViewModel(
 ): ViewModel() {
     var _uiState = MutableStateFlow(AccountUiState())
     var uiState: StateFlow<AccountUiState> = _uiState.asStateFlow()
+    val isLogged: StateFlow<Boolean> = authRepository.isLogged
 
     fun logout() {
+        Log.d("AUTH", "LOGOGUT IN VIEWMODEL START")
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             authRepository.logout()
             userManager.loadCurrentUser()
+            _uiState.update { it.copy(isLoading = false, success = true) }
+            Log.d("AUTH", "LOGOGUT IN VIEWMODEL FINISH")
+
         }
     }
 }

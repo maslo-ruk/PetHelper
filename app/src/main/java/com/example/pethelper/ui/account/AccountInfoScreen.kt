@@ -67,18 +67,21 @@ import com.example.pethelper.ui.start.StartViewModel
 @ExperimentalMaterial3Api
 @Composable
 fun AccountScreen(
-    viewModel: StartViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onLogout:() -> Unit = viewModel::logout,
+    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onEditAccount: () -> Unit = {},
     onOpenAccountInfo: () -> Unit = {},
     onOpenPet: (petId: String) -> Unit = {},
     onAddPet: () -> Unit = {},
-    onBack:() -> Unit = {}
+    onBack:() -> Unit = {},
+    goToStart:() ->Unit = {},
+    onLogout:() -> Unit = viewModel::logout
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     val pets = viewModel.userManager.pets.collectAsState().value
     val petUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -148,7 +151,7 @@ fun AccountScreen(
                     )
                 ) {
                     Text(
-                        text = "Выйти",
+                        text = if (uiState.isLoading) "Выходим.." else "Выйти",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -160,7 +163,6 @@ fun AccountScreen(
                 Spacer(Modifier.height(24.dp))
                 Text("Домашние животные", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
-
 
                 LazyColumn {
                     items(pets) { pet ->
@@ -177,6 +179,10 @@ fun AccountScreen(
                 }
             }
         }
+    }
+
+    if (uiState.success) {
+        goToStart()
     }
 }
 

@@ -48,7 +48,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.pethelper.Constants
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.Alignment
 import com.example.pethelper.R
 

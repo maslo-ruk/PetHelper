@@ -1,5 +1,6 @@
 package com.example.pethelper.data.firebaseRepositories
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -88,8 +89,10 @@ class AuthRepository(
         }
     }
     override fun logout() {
+        Log.d("AUTH", "LOGOUT START")
         _isLogged.value = false
         auth.signOut()
+        Log.d("AUTH", "LOGOUT FINISH")
     }
 
     override fun getCurrentUserId(): String? {

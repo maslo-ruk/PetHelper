@@ -92,11 +92,15 @@ fun PetHelperApp(
             }
             composable(PetHelperScreens.Account.name) {
                 AccountScreen(
-                    onLogout = {navController.navigate(PetHelperScreens.Auth.name)},
                     onBack = {navController.popBackStack()},
                     onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)},
                     onAddPet = {navController.navigate(PetHelperScreens.AddPet.name)},
-                    onOpenPet = {pet -> navController.navigate("${ PetHelperScreens.PetInfo.name}/${pet}")}
+                    onOpenPet = {pet -> navController.navigate("${ PetHelperScreens.PetInfo.name}/${pet}")},
+                    goToStart = {navController.navigate(PetHelperScreens.Start.name) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }}
                 )
             }
             composable(PetHelperScreens.AccountInfo.name) {
