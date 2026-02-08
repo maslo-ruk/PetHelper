@@ -1,19 +1,20 @@
 package com.example.pethelper.ui.account
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +22,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,7 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -38,14 +43,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.draw.scale
@@ -55,6 +63,7 @@ import com.example.pethelper.ui.AppViewModelProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -94,120 +103,32 @@ fun AccountScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(scrollState)
         ) {
+
             IconButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Назад", tint = Color(0xFF690005))
             }
-
-            Text(
-                text = "Настройки пользователя",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF690005),
-                textAlign = TextAlign.Center
-            )
-
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .verticalScroll(scrollState) // потом поменяем
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.cot),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
-            Spacer(Modifier.height(12.dp))
-            Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-                AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
-                Spacer(Modifier.height(12.dp))
-
-
-                AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            TextButton(
-                onClick = {
-                    onLogout()
-                },
-                modifier = Modifier,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = Color(0xFF93000A)
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = if (uiState.isLoading) "Выходим.." else "Выйти",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = "НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF690005),
+                    textAlign = TextAlign.Center
                 )
-            }
 
-            AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
-
-
-            Spacer(Modifier.height(24.dp))
-            Text("Домашние животные", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-
-            /*LazyColumn {
-                items(pets) { pet ->
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn() + expandVertically()
-                    ) {
-                        PetListItem(
-                            pet = pet,
-                            onClick = onOpenPet
-                        )
-                    }
-                }
-            }*/
-        }
-        /*Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Аккаунт", textAlign = TextAlign.Center) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                painterResource(id = android.R.drawable.ic_media_previous),
-                                contentDescription = "Назад"
-                            )
-                        }
-                    }
-                )
-            }
-        ) { padding ->
-
-            Column(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .alpha(alphaAnim.value),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-// Аватар
                 Box(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .verticalScroll(rememberScrollState()) // потом поменяем
+                        .verticalScroll(scrollState) // потом поменяем
                 ) {
                     Image(
                         painter = painterResource(R.drawable.cot),
@@ -216,60 +137,150 @@ fun AccountScreen(
                         modifier = Modifier.fillMaxSize()
                     )
                 }
-
                 Spacer(Modifier.height(12.dp))
-                Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
+                Text("${curUser!!.name} ${curUser.surname}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color(0xFF690005),
+                    )
                 Spacer(Modifier.height(8.dp))
 
-
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
-                    Spacer(Modifier.height(12.dp))
-
-
-                    AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextButton(
+                        onClick = {
+                            onLogout()
+                        },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color(0xFF690005)
+                        )
+                    ) {
+                        Text(
+                            text = "Выйти",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
+            }
 
-                Spacer(Modifier.height(12.dp))
-
-                TextButton(
-                    onClick = {
-                        onLogout()
-                    },
-                    modifier = Modifier,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = Color(0xFF93000A)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = onEditAccount,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(color = 0xFF690005)
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(color = 0xFF690005),
+                                Color(color = 0xFF93000A)
+                            )
+                        )
                     )
                 ) {
                     Text(
-                        text = if (uiState.isLoading) "Выходим.." else "Выйти",
+                        text = "Изменить",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
 
-                AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
+                Spacer(Modifier.width(12.dp))
 
-
-                Spacer(Modifier.height(24.dp))
-                Text("Домашние животные", style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(8.dp))
-
-                LazyColumn {
-                    items(pets) { pet ->
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn() + expandVertically()
-                        ) {
-                            PetListItem(
-                                pet = pet,
-                                onClick = onOpenPet
+                OutlinedButton(
+                    onClick = onOpenAccountInfo,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(color = 0xFF690005)
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(color = 0xFF690005),
+                                Color(color = 0xFF93000A)
                             )
-                        }
+                        )
+                    )
+                ) {
+                    Text(
+                        text = "О пользователе",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = onAddPet,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(color = 0xFF690005)
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(color = 0xFF690005),
+                                Color(color = 0xFF93000A)
+                            )
+                        )
+                    )
+                ) {
+                    Text(
+                        text = "Добавить питомца",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+            Text("Домашние животные:", style = MaterialTheme.typography.titleMedium, color = Color(0xFF690005))
+            Spacer(Modifier.height(8.dp))
+
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            )
+            {
+                pets.forEach { pet ->
+                    AnimatedVisibility(
+                        visible = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp),
+                        enter = fadeIn() + expandVertically()
+                    ) {
+                        PetListItem(
+                            pet = pet,
+                            onClick = onOpenPet
+                        )
                     }
                 }
             }
-        }*/
+        }
     }
 
     if (uiState.success) {
@@ -302,17 +313,65 @@ fun PetListItem(pet: FPet, onClick: (id:String) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = { onClick(pet.id) }),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = Color(color = 0xFFFFE0B2)
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            brush = Brush.horizontalGradient(
+                colors = listOf(
+                    Color(color = 0xFF690005),
+                    Color(color = 0xFF93000A)
+                )
+            )
+        )
     ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(pet.name, fontWeight = FontWeight.Bold)
-                Text(pet.type.name)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+        )
+        {
+            Row (
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(1f)
+            )
+            {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(pet.name, fontWeight = FontWeight.Bold, color = Color(color = 0xFF690005))
+                    Text(pet.type.name, color = Color(color = 0xFF690005))
+                }
+                Text("→", color = Color(color = 0xFF690005))
             }
-            Text("→", color = MaterialTheme.colorScheme.primary)
         }
     }
+
+
+
+    /*Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White.copy(alpha = 0.7f))
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = emoji,
+            fontSize = 24.sp
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            //fontFamily = Montserrat,
+            fontWeight = FontWeight.Normal,
+            color = Color(color = 0xFF4A4A4A)
+        )
+    }*/
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
