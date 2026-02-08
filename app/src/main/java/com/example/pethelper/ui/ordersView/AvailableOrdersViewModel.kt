@@ -45,7 +45,7 @@ class AvailableOrdersViewModel(
 
         if (myListener != null) return
 
-        myListener = fbRepository.observeMyOrders(
+        myListener = fbRepository.observeAnsweredOrders(
             onChange = { orders ->
                 _uiState.update { it.copy(ordersOfWorker = orders) }
             },
