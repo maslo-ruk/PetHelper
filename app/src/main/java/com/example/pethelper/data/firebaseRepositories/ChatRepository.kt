@@ -139,6 +139,7 @@ class ChatRepository {
         return chatRef.id
     }
     suspend fun finishOrder(orderId: String, petyaId: String) {
+        Log.d("CHAT", "FINISH ORDER START")
         val chatSnap = db.collection("chats").whereEqualTo("orderId", orderId)
             .whereEqualTo("status", "ACTIVE").get().await()
         val batch = db.batch()
@@ -152,6 +153,8 @@ class ChatRepository {
         batch.update(orderRef, mapOf("STATUS" to OrderStatus.CLOSED.toString(),
         "closedAT" to FieldValue.serverTimestamp()))
         batch.commit().await()
+        Log.d("CHAT", "FINISH ORDER END")
+
     }
 
     suspend fun getOrderByChatId(chatId: String): FOrder? {
@@ -197,8 +200,9 @@ class ChatRepository {
             batch.update(doc.reference, mapOf("status" to "CLOSED",
                 "lastMessage" to "Заказ приняли",
                 "lastMessageAt" to FieldValue.serverTimestamp()))
+                Log.d("CHAT", "CHAT FINISHED")
+                batch.delete(doc.reference)
             }
-            batch.delete(doc.reference)
         }
         batch.commit().await()
     }
