@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.foundation.layout)
     implementation(libs.androidx.uiautomator)
+    implementation(libs.androidx.animation.core)
     val room_version = "2.7.2"
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")

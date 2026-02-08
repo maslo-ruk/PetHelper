@@ -12,6 +12,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -65,6 +66,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pethelper.Constants
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.pets.PetCreateViewModel
@@ -91,66 +93,80 @@ fun AccountChange(onBack:()-> Unit = {},
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pets = viewModel.userManager.pets.collectAsState().value
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Информация об аккаунте") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        Column(modifier = Modifier
+    Box(
+        modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(innerPadding), horizontalAlignment = Alignment.CenterHorizontally) {
-            UploadPhotoButton()
-            Spacer(modifier = Modifier.height(24.dp))
-            OutlinedTextField(
-                value = uiState.user.name,
-                onValueChange = {onValChange(uiState.user.copy(name = it))},
-                label = { Text("Имя") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            .background(brush = Constants.GRADIENT_BRUSH)
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Информация об аккаунте") },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                painterResource(id = android.R.drawable.ic_media_previous),
+                                contentDescription = "Назад"
+                            )
+                        }
+                    }
+                )
+            }
+        ) { innerPadding ->
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(innerPadding), horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                UploadPhotoButton()
+                Spacer(modifier = Modifier.height(24.dp))
+                OutlinedTextField(
+                    value = uiState.user.name,
+                    onValueChange = { onValChange(uiState.user.copy(name = it)) },
+                    label = { Text("Имя") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            OutlinedTextField(value = uiState.user.surname,
-                onValueChange = {onValChange(uiState.user.copy(surname = it))},
-                label = { Text("Фамилия") },
-                modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = uiState.user.surname,
+                    onValueChange = { onValChange(uiState.user.copy(surname = it)) },
+                    label = { Text("Фамилия") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            OutlinedTextField(
-                value = uiState.user.address,
-                onValueChange = {onValChange(uiState.user.copy(address = it))},
-                label = { Text("Адрес") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = uiState.user.phoneNumber,
-                onValueChange = {onValChange(uiState.user.copy(phoneNumber = it))},
-                label = { Text("Телефон") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier= Modifier.height(12.dp))
-            OutlinedTextField(
-                value = uiState.user.login,
-                onValueChange = {onValChange(uiState.user.copy(login = it))},
-                label = { Text("Email") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier=Modifier.height(12.dp))
-            var showDatePicker by remember { mutableStateOf(false) }
-            val datePickerState = rememberDatePickerState()
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = uiState.user.address,
+                    onValueChange = { onValChange(uiState.user.copy(address = it)) },
+                    label = { Text("Адрес") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = uiState.user.phoneNumber,
+                    onValueChange = { onValChange(uiState.user.copy(phoneNumber = it)) },
+                    label = { Text("Телефон") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = uiState.user.login,
+                    onValueChange = { onValChange(uiState.user.copy(login = it)) },
+                    label = { Text("Email") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                var showDatePicker by remember { mutableStateOf(false) }
+                val datePickerState = rememberDatePickerState()
 //            OutlinedTextField(
 //                value = uiState.user.birthDate.let {
 //                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -183,22 +199,23 @@ fun AccountChange(onBack:()-> Unit = {},
 //                }
 //            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedButton(
-                onClick = { onSubmit() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Готово")
-            }
-            if (uiState.isLoading) {
-                Text("Загрузка...")
-            }
-            if (uiState.success) {
-                onBack()
+                OutlinedButton(
+                    onClick = { onSubmit() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Готово")
+                }
+                if (uiState.isLoading) {
+                    Text("Загрузка...")
+                }
+                if (uiState.success) {
+                    onBack()
+                }
             }
         }
-        }
+    }
 }
 
 
