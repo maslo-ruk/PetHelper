@@ -38,10 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,33 +67,47 @@ import com.example.pethelper.ui.start.StartViewModel
 @ExperimentalMaterial3Api
 @Composable
 fun AccountScreen(
-    viewModel: StartViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onLogout:() -> Unit = viewModel::logout,
+    viewModel: AccountViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onEditAccount: () -> Unit = {},
     onOpenAccountInfo: () -> Unit = {},
     onOpenPet: (petId: String) -> Unit = {},
     onAddPet: () -> Unit = {},
-    onBack:() -> Unit = {}
+    onBack:() -> Unit = {},
+    goToStart:() ->Unit = {},
+    onLogout:() -> Unit = viewModel::logout
 ) {
     val alphaAnim = animateFloatAsState(1f, tween(800, easing = LinearOutSlowInEasing))
     val curUser:FUser? = viewModel.userManager.currentUser.collectAsState().value?.user
     val pets = viewModel.userManager.pets.collectAsState().value
     val petUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLogged by viewModel.isLogged.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(brush = Constants.GRADIENT_BRUSH)
     ) {
-        IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBackIos,
-                contentDescription = "Назад",
-                tint = Color(0xFF690005))
-        }
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Аккаунт", textAlign = TextAlign.Center) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                painterResource(id = android.R.drawable.ic_media_previous),
+                                contentDescription = "Назад"
+                            )
+                        }
+                    }
+                )
+            }
+        ) { padding ->
 
             Column(
                 modifier = Modifier
+                    .padding(padding)
                     .fillMaxSize()
-                    .padding(top = 50.dp)
+                    .padding(16.dp)
                     .alpha(alphaAnim.value),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -117,6 +128,18 @@ fun AccountScreen(
 
                 Spacer(Modifier.height(12.dp))
                 Text("${curUser!!.name} ${curUser.surname}", fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    AnimatedButton(text = "Изменить аватар или имя", onClick = onEditAccount)
+                    Spacer(Modifier.height(12.dp))
+
+
+                    AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
+                }
+
+                Spacer(Modifier.height(12.dp))
 
                 TextButton(
                     onClick = {
@@ -128,46 +151,18 @@ fun AccountScreen(
                     )
                 ) {
                     Text(
-                        text = "Выйти",
+                        text = if (uiState.isLoading) "Выходим.." else "Выйти",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
 
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    AnimatedButton(text = "Изменить аватар или имя",
-                        onClick = onEditAccount,
-                        )
-                    Spacer(Modifier.height(12.dp))
-
-
-                    AnimatedButton(text = "Информация об аккаунте", onClick = onOpenAccountInfo)
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-
-                Button(onClick = {onAddPet()},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .padding(start = 20.dp, end = 20.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(color = 0xFF690005),
-                        contentColor = Color.White
-                    )
-                ) {
-                Text("Добавить питомца",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold)
-            }
+                AnimatedButton(text = "Добавить питомца", onClick = onAddPet)
 
 
                 Spacer(Modifier.height(24.dp))
                 Text("Домашние животные", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
-
 
                 LazyColumn {
                     items(pets) { pet ->
@@ -185,6 +180,11 @@ fun AccountScreen(
             }
         }
     }
+
+    if (uiState.success) {
+        goToStart()
+    }
+}
 
 
 // Кнопка с анимацией

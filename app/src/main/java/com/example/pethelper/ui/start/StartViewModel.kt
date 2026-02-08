@@ -1,5 +1,6 @@
 package com.example.pethelper.ui.start
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pethelper.data.firebaseRepositories.AuthRepository
@@ -27,9 +28,12 @@ class StartViewModel(
     }
 
     fun logout() {
+        Log.d("AUTH", "LOGOGUT IN VIEWMODEL START")
         viewModelScope.launch {
             authRepository.logout()
             userManager.loadCurrentUser()
+            Log.d("AUTH", "LOGOGUT IN VIEWMODEL FINISH")
+
         }
     }
 

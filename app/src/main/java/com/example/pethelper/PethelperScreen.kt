@@ -28,6 +28,7 @@ import com.example.pethelper.ui.chat.ChatScreenViewModel
 
 import com.example.pethelper.ui.orders.OrderDialog
 import com.example.pethelper.ui.ordersView.AvailableOrders
+import com.example.pethelper.ui.ordersView.MyOrders
 import com.example.pethelper.ui.pets.PetCreate
 import com.example.pethelper.ui.walk.LocationPermissionScreen
 import com.example.pethelper.ui.walk.WalkScreen
@@ -53,6 +54,7 @@ enum class PetHelperScreens {
     Location,
     Permissions,
     OrdersAvailable,
+    MyOrders,
     MyChats,
     Chat,
     Tracking
@@ -81,6 +83,7 @@ fun PetHelperApp(
                     onAccount =  {navController.navigate(PetHelperScreens.Account.name)},
                     onLoc = { navController.navigate(PetHelperScreens.Location.name) },
                     onShowOrders = { navController.navigate(PetHelperScreens.OrdersAvailable.name) },
+                    onShowOrdersUser = {navController.navigate(PetHelperScreens.MyOrders.name)},
                     onChat = {navController.navigate(PetHelperScreens.MyChats.name)}
                 )
             }
@@ -89,11 +92,15 @@ fun PetHelperApp(
             }
             composable(PetHelperScreens.Account.name) {
                 AccountScreen(
-                    onLogout = {navController.navigate(PetHelperScreens.Auth.name)},
                     onBack = {navController.popBackStack()},
                     onOpenAccountInfo = {navController.navigate(PetHelperScreens.AccountInfo.name)},
                     onAddPet = {navController.navigate(PetHelperScreens.AddPet.name)},
-                    onOpenPet = {pet -> navController.navigate("${ PetHelperScreens.PetInfo.name}/${pet}")}
+                    onOpenPet = {pet -> navController.navigate("${ PetHelperScreens.PetInfo.name}/${pet}")},
+                    goToStart = {navController.navigate(PetHelperScreens.Start.name) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }}
                 )
             }
             composable(PetHelperScreens.AccountInfo.name) {
@@ -165,6 +172,9 @@ fun PetHelperApp(
             }
             composable(PetHelperScreens.Permissions.name) {
                 LocationPermissionScreen(navController)
+            }
+            composable(PetHelperScreens.MyOrders.name) {
+                MyOrders(onBack = {navController.popBackStack()})
             }
         }
     }

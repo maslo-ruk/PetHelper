@@ -88,6 +88,10 @@ class FireStoreRepository(
 
     }
 
+    suspend fun deleteOrder(order: FOrder) {
+        db.collection("orders").document(order.id).delete().await()
+    }
+
     suspend fun updateOrder(orderId: String, order: FOrder) {
         Log.d("FS", "updateOrder")
         db.collection("orders")
@@ -169,12 +173,39 @@ class FireStoreRepository(
             }
     }
 
+    fun observeAnsweredOrders(onChange: (List<FOrder>) -> Unit,
+                              onError: (Throwable) -> Unit,
+                              uid: String,
+    ): ListenerRegistration {
+        val ordersRef = db.collection("users").document(uid).collection("orders")
+        Log.d("FS", "Orders ref = ${ordersRef.get()}")
+
+        return ordersRef
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot == null) return@addSnapshotListener
+
+                val orders = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(FOrder::class.java)?.copy(id = doc.id)
+                }
+
+                Log.d("FS", "Docs count = ${snapshot.size()}") // ← ВАЖНО
+
+                onChange(orders)
+            }
+    }
+
     fun observeMyOrders(
         onChange: (List<FOrder>) -> Unit,
         onError: (Throwable) -> Unit,
         uid: String,
     ): ListenerRegistration {
-        val ordersRef = db.collection("users").document(uid).collection("orders")
+        val ordersRef = db.collection("orders").whereEqualTo("userId", uid)
         Log.d("FS", "Orders ref = ${ordersRef.get()}")
 
         return ordersRef

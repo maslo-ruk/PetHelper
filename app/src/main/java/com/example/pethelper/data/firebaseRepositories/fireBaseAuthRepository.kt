@@ -1,5 +1,6 @@
 package com.example.pethelper.data.firebaseRepositories
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,6 +10,12 @@ import kotlinx.coroutines.tasks.await
 interface IAuthRepository {
     suspend fun register(email: String, password: String): Result<String>
     suspend fun login(email: String, password: String): Result<String>
+
+    suspend fun sendEmailVerification(): Result<Unit>
+
+    suspend fun reloadAndCheckEmailVerified(): Result<Boolean>
+
+    suspend fun loginWithoutEmailCheck(email: String, password: String): Result<Unit>
     fun logout()
     fun getCurrentUserId(): String?
 }
@@ -21,7 +28,7 @@ class AuthRepository(
             val result = auth
                 .createUserWithEmailAndPassword(email, password)
                 .await()
-            _isLogged.value = true
+            _isLogged.value = false
             Result.success(result.user!!.uid)
         } catch (e: Exception) {
             Result.failure(e)
@@ -33,15 +40,59 @@ class AuthRepository(
             val result = auth
                 .signInWithEmailAndPassword(email, password)
                 .await()
+            val user = result.user ?: return Result.failure(
+                IllegalStateException("User is null")
+            )
+            if (!user.isEmailVerified) {
+                auth.signOut()
+                _isLogged.value = false
+                return Result.failure(
+                    IllegalStateException("Email not verified")
+                )
+            }
             _isLogged.value = true
             Result.success(result.user!!.uid)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+    override suspend fun sendEmailVerification(): Result<Unit> {
+        return try {
+            val user = auth.currentUser
+                ?: return Result.failure(IllegalStateException("No current user"))
+
+            user.sendEmailVerification().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    override suspend fun reloadAndCheckEmailVerified(): Result<Boolean> {
+        return try {
+            val user = auth.currentUser
+                ?: return Result.failure(IllegalStateException("No current user"))
+
+            user.reload().await()
+            Result.success(user.isEmailVerified)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun loginWithoutEmailCheck(email: String, password: String): Result<Unit> {
+        return try {
+            auth.signInWithEmailAndPassword(email, password).await()
+            _isLogged.value = false // не пускаем в приложение
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
     override fun logout() {
+        Log.d("AUTH", "LOGOUT START")
         _isLogged.value = false
         auth.signOut()
+        Log.d("AUTH", "LOGOUT FINISH")
     }
 
     override fun getCurrentUserId(): String? {

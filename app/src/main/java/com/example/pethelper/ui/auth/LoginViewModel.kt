@@ -18,34 +18,79 @@ class LoginViewModel(
     val authRepository: IAuthRepository,
     val userManager: UserSessionManager
 ): ViewModel() {
-    var _uiState = MutableStateFlow(LoginUiState())
+    private var _uiState = MutableStateFlow(LoginUiState())
     var uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     fun updateUiState(details: LoginDetails) {
-        _uiState.update { it.copy(details = details) }
+        _uiState.update {
+            it.copy(
+                details = details,
+                error = "",
+                needsEmailVerification = false
+            )
+        }
     }
 
     fun submitRegistration() {
-        val state = _uiState.value
-
-        val details = state.details
+        val details = _uiState.value.details
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, error = "") }
+
             authRepository.login(details.email, details.password)
-                .onSuccess { uid ->
+                .onSuccess {
                     userManager.loadCurrentUser()
-                    _uiState.update {
-                        it.copy(isLoading = false, success = true)
+                    _uiState.update { it.copy(isLoading = false, success = true) }
+                }
+                .onFailure { e ->
+                    val msg = e.message ?: "Ошибка входа"
+
+                    if (msg == "Email not verified") {
+                        // Важно: пользователь уже разлогинен внутри authRepository.login()
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                needsEmailVerification = true,
+                                error = "Почта не подтверждена. Проверьте письмо и перейдите по ссылке."
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = msg
+                            )
+                        }
                     }
                 }
-                .onFailure {
-                        e -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = e.message ?: "Ошибка сохранения"
-                    )
+        }
+    }
+    fun resendVerificationEmail() {
+        val details = _uiState.value.details
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = "") }
+
+            authRepository.loginWithoutEmailCheck(details.email, details.password)
+                .onSuccess {
+                    authRepository.sendEmailVerification()
+                        .onSuccess {
+                            authRepository.logout()
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = "Письмо отправлено повторно. Проверьте почту."
+                                )
+                            }
+                        }
+                        .onFailure { e ->
+                            authRepository.logout()
+                            _uiState.update {
+                                it.copy(isLoading = false, error = e.message ?: "Не удалось отправить письмо")
+                            }
+                        }
                 }
+                .onFailure { e ->
+                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "Ошибка входа") }
                 }
         }
     }

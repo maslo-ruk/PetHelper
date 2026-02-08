@@ -16,6 +16,7 @@ import com.example.pethelper.ui.chat.ChatListViewModel
 import com.example.pethelper.ui.orders.OrderDialogViewModel
 import com.example.pethelper.ui.ordersView.AvailableOrders
 import com.example.pethelper.ui.ordersView.AvailableOrdersViewModel
+import com.example.pethelper.ui.ordersView.MyOrdersViewModel
 import com.example.pethelper.ui.pets.PetCreateViewModel
 import com.example.pethelper.ui.start.StartViewModel
 import com.example.pethelper.ui.walk.WalkViewModel
@@ -41,7 +42,7 @@ object AppViewModelProvider {
         }
         initializer {
             val app = petApplication()
-            AccountViewModel(AppSession.sessionManager, AppSession.userRepository)
+            AccountViewModel(AppSession.sessionManager, AppSession.userRepository, AppSession.authRepository)
         }
         initializer {
             val app = petApplication()
@@ -60,6 +61,9 @@ object AppViewModelProvider {
         }
         initializer {
             ChatListViewModel(AppSession.chatRepository, AppSession.sessionManager)
+        }
+        initializer {
+            MyOrdersViewModel(AppSession.userRepository, AppSession.sessionManager, AppSession.chatRepository)
         }
     }
 

@@ -118,18 +118,28 @@ class ChatRepository {
         chatRef.update(chatUpdates).await()
     }
 
-    suspend fun createChat(orderId: String, clientId: String, workerId: String): String {
+    suspend fun createChat(
+        orderId: String,
+        clientId: String,
+        workerId: String,
+        client: FUser,
+        worker: FUser
+    ): String {
         val chatRef = db.collection("chats").document()
         val data = mapOf("orderId" to orderId,
             "participants" to listOf(clientId, workerId),
             "status" to "ACTIVE",
             "lastMessage" to "",
             "createdAt" to FieldValue.serverTimestamp(),
-            "lastMessageAt" to FieldValue.serverTimestamp())
+            "lastMessageAt" to FieldValue.serverTimestamp(),
+            "client" to client,
+            "worker" to worker
+        )
         chatRef.set(data).await()
         return chatRef.id
     }
     suspend fun finishOrder(orderId: String, petyaId: String) {
+        Log.d("CHAT", "FINISH ORDER START")
         val chatSnap = db.collection("chats").whereEqualTo("orderId", orderId)
             .whereEqualTo("status", "ACTIVE").get().await()
         val batch = db.batch()
@@ -137,11 +147,14 @@ class ChatRepository {
             batch.update(doc.reference, mapOf("status" to "CLOSED",
                 "lastMessage" to "Заказ Завершен",
                 "lastMessageAt" to FieldValue.serverTimestamp()))
+            batch.delete(doc.reference)
         }
         val orderRef = db.collection("orders").document(orderId)
         batch.update(orderRef, mapOf("STATUS" to OrderStatus.CLOSED.toString(),
         "closedAT" to FieldValue.serverTimestamp()))
         batch.commit().await()
+        Log.d("CHAT", "FINISH ORDER END")
+
     }
 
     suspend fun getOrderByChatId(chatId: String): FOrder? {
@@ -173,7 +186,7 @@ class ChatRepository {
         return chatSnap.toObject(Chat::class.java)
     }
 
-    suspend fun finishChatsById(orderId:String, workerId:String) {
+    suspend fun finishChatsById(orderId:String, workerId:String = "NOT_A_WORKER") {
         Log.d("CHAT", "finishChatsById start")
         val chatSnap = db.collection("chats").whereEqualTo("orderId", orderId)
             .whereEqualTo("status", "ACTIVE").get().await()
@@ -187,6 +200,8 @@ class ChatRepository {
             batch.update(doc.reference, mapOf("status" to "CLOSED",
                 "lastMessage" to "Заказ приняли",
                 "lastMessageAt" to FieldValue.serverTimestamp()))
+                Log.d("CHAT", "CHAT FINISHED")
+                batch.delete(doc.reference)
             }
         }
         batch.commit().await()

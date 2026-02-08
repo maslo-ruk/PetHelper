@@ -79,7 +79,7 @@ fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = Ap
                 OrderCard(order, onOrderClick, uiState.ordersOfWorker) }
         }
     }
-    }
+}
 
 
 @Composable

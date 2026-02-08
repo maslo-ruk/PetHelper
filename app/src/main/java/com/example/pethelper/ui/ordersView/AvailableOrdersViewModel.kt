@@ -45,7 +45,7 @@ class AvailableOrdersViewModel(
 
         if (myListener != null) return
 
-        myListener = fbRepository.observeMyOrders(
+        myListener = fbRepository.observeAnsweredOrders(
             onChange = { orders ->
                 _uiState.update { it.copy(ordersOfWorker = orders) }
             },
@@ -72,11 +72,21 @@ class AvailableOrdersViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true)  }
             try {
-                chatRepository.createChat(order.id, order.userId, userManager.currentUser.value!!.uid)
+                val otherName = fbRepository.getUser(order.userId)
+                Log.d("AceptOrder", "START")
+                chatRepository.createChat(
+                    order.id,
+                    order.userId,
+                    userManager.currentUser.value!!.uid,
+                    otherName!!,
+                    userManager.currentUser.value!!.user
+                )
+                Log.d("AceptOrder", "PROGRESS")
                 fbRepository.addWorkerToOrder(userManager.currentUser.value!!.uid, order)
                 Log.d("AceptOrder", "SUCCESS")
                 _uiState.update { it.copy(success = true, isLoading = false) }
             } catch (e: Exception) {
+                Log.d("AceptOrder", "ERROR")
                 _uiState.update { it.copy(error = e.message, isLoading = false) }
             }
         }

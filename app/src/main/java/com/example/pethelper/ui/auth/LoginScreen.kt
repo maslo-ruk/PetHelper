@@ -1,13 +1,17 @@
 package com.example.pethelper.ui.auth
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -44,7 +48,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.pethelper.Constants
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.Alignment
 import com.example.pethelper.R
 
@@ -160,13 +163,43 @@ fun LoginScreen(onBack: () -> Unit,
                     contentColor = Color.White
                 )
             ) {
-                Text("Войти",
+                Text(if (uiState.isLoading) "Входим.." else "Войти",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold)
             }
-            if (uiState.success) {
-                goToMain()
-            } else {
+            if (uiState.needsEmailVerification) {
+                Spacer(Modifier.height(16.dp))
+                Text("Почта не подтверждена. Откройте письмо и перейдите по ссылке.")
+
+                Spacer(Modifier.height(8.dp))
+
+                // Работает только если вы реализуете вариант A (loginWithoutEmailCheck)
+                Text(
+                    text = "Отправить письмо ещё раз",
+                    modifier = Modifier.clickable { viewModel.resendVerificationEmail() }
+                )
+            }
+
+            if (uiState.error.isNotBlank()) {
+                Spacer(Modifier.height(12.dp))
+                Text(uiState.error)
+            }
+            Spacer(Modifier.height(24.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Нет аккаунта?")
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "Регистрация",
+                    modifier = Modifier.clickable { onBack() }
+                )
+            }
+
+            if (uiState.success) goToMain()
+            else {
                 Text(uiState.error)
             }
         }
