@@ -199,6 +199,18 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
                 Text("Посмотреть местоположение")
             }
         }
+        if (uiState.order.status == "ENDED BY WORKER") {
+            Row {
+                Button(onClick = { checkPosition(uiState.orderId) }, enabled = enabled) {
+                    Text("Посмотреть местоположение")
+                }
+                Button(onClick = {
+                    changeStatus("ENDED BY BOTH")
+                }, enabled = enabled) {
+                    Text("Подтвердить окончание")
+                }
+            }
+        }
     }
     else if (uid == uiState.chat.participants[1]) {
         if (uiState.order.status == "CREATED") {
@@ -227,11 +239,23 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
         }
         if (uiState.order.status == "STARTED") {
             Button(onClick = {
+                changeStatus("ENDED BY WORKER")
+            }, enabled = enabled) {
+                Text("Прогулка завершена")
+            }
+        }
+        if (uiState.order.status == "ENDED BY WORKER") {
+            Row {
+                Text("Ожидайте подтверждения от клиента и завершите заказ")
+            }
+        }
+        if (uiState.order.status == "ENDED BY BOTH") {
+            Button(onClick = {
                 changeStatus("ENDED")
                 stopOrder(context)
                 stopChat()
                              }, enabled = enabled) {
-                Text("Закончить Заказ")
+                Text("Завершить заказ")
             }
         }
     }
