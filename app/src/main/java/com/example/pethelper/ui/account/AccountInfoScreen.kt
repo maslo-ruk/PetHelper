@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,6 +57,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.draw.scale
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.data.fireBaseEntities.FUser
@@ -384,25 +386,59 @@ fun AccountInfoScreen(onBack: () -> Unit = {},
     val pets = viewModel.userManager.pets.collectAsState().value
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Информация об аккаунте") },
+            CenterAlignedTopAppBar(
+                title = { Text("Информация об аккаунте",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBackIos,
+                            contentDescription = "Назад",
+                            tint = Color.White
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF690005),
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .background(brush = Constants.GRADIENT_BRUSH)
+            .fillMaxWidth()
+            .padding(top = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Телефон: ${curUser!!.phoneNumber}")
-            Text("Email: ${curUser.login}")
-            Spacer(Modifier.height(12.dp))
-            Text("Адрес: ${curUser.address}")
-            Spacer(Modifier.height(12.dp))
-            Text("Дата рождения ${curUser.birthDate}")
+            Spacer(Modifier.height(7.dp))
+            Text("Email: ${curUser.login}",
+                color = Color(0xFF000000))
+            Spacer(Modifier.height(7.dp))
+            Text("Адрес: ${curUser.address}",
+                color = Color(0xFF000000))
+            Spacer(Modifier.height(7.dp))
+            Text("Дата рождения ${curUser.birthDate}",
+                color = Color(0xFF000000))
             Spacer(Modifier.height(20.dp))
-            AnimatedButton(text = "Изменить информацию", onClick = {onEditAccount()})
+            Button(
+                onClick = { onEditAccount() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp)
+                    .padding(start = 20.dp, end = 20.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF690005),
+                    contentColor = Color.White
+                )
+            ) {
+                Text("Изменить информацию")
+            }
         }
     }
 }
