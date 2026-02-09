@@ -314,33 +314,23 @@ fun RegistrationScreen(
                 label = { Text("Дата рождения") },
                 shape = RoundedCornerShape(16.dp),
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = null,
-                        tint = Color(0xFF690005)
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
+                    IconButton(onClick = {
+                        val calendar = Calendar.getInstance()
                         DatePickerDialog(
                             context,
-                            { _, year, month, day ->
-                                onClick(
-                                    uiState.details.copy(
-                                        birthDate = "%02d.%02d.%d".format(
-                                            day,
-                                            month + 1,
-                                            year
-                                        )
-                                    )
-                                )
+                            { _, year, month, dayOfMonth ->
+                                onClick(uiState.details.copy(birthDate = "$dayOfMonth/${month + 1}/$year"))
                             },
                             calendar.get(Calendar.YEAR),
                             calendar.get(Calendar.MONTH),
                             calendar.get(Calendar.DAY_OF_MONTH)
                         ).show()
-                    },
+                    }) {
+                        Icon(Icons.Default.DateRange, contentDescription = "Выбрать дату", tint = Color(0xFF690005))
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     // Цвет рамки
                     focusedBorderColor = Color(0xFF690005),
