@@ -171,34 +171,6 @@ fun AccountScreen(
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
-                    onClick = onEditAccount,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(color = 0xFF690005)
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color(color = 0xFF690005),
-                                Color(color = 0xFF93000A)
-                            )
-                        )
-                    )
-                ) {
-                    Text(
-                        text = "Изменить",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-
-                Spacer(Modifier.width(12.dp))
-
-                OutlinedButton(
                     onClick = onOpenAccountInfo,
                     modifier = Modifier
                         .weight(1f)

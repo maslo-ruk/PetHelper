@@ -127,8 +127,8 @@ private fun ChatRow(chat: Chat, onClick: () -> Unit, curUserId:String) {
     val title = "Чат с ${x}"
     val subtitle = chat.lastMessage.ifBlank { "Нет сообщений" }
     Column(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp)) {
-        Text(title, style = MaterialTheme.typography.titleMedium)
+        Text(title, style = MaterialTheme.typography.titleMedium, color = Color(0xFF690005))
         Spacer(modifier = Modifier.height(4.dp))
-        Text(subtitle,  style = MaterialTheme.typography.bodyMedium)
+        Text(subtitle,  style = MaterialTheme.typography.bodyMedium, color = Color(0xFF690005))
     }
 }
