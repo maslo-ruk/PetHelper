@@ -106,6 +106,7 @@ fun AccountScreen(
                 .fillMaxSize()
                 .padding(24.dp)
                 .verticalScroll(scrollState)
+                .background(brush = Constants.GRADIENT_BRUSH)
         ) {
 
             IconButton(onClick = onBack) {
@@ -383,20 +384,33 @@ fun AccountInfoScreen(onBack: () -> Unit = {},
         Column(modifier = Modifier
             .padding(innerPadding)
             .background(brush = Constants.GRADIENT_BRUSH)
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(top = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Телефон: ${curUser!!.phoneNumber}")
+            Text("Телефон: ${curUser!!.phoneNumber}",
+                color = Color(0xFF690005),
+                fontWeight = FontWeight.SemiBold
+            )
             Spacer(Modifier.height(7.dp))
+
             Text("Email: ${curUser.login}",
-                color = Color(0xFF000000))
+                color = Color(0xFF690005),
+                fontWeight = FontWeight.SemiBold
+            )
             Spacer(Modifier.height(7.dp))
+
             Text("Адрес: ${curUser.address}",
-                color = Color(0xFF000000))
+                color = Color(0xFF690005),
+                fontWeight = FontWeight.SemiBold
+            )
             Spacer(Modifier.height(7.dp))
+
             Text("Дата рождения ${curUser.birthDate}",
-                color = Color(0xFF000000))
+                color = Color(0xFF690005),
+                fontWeight = FontWeight.SemiBold
+            )
             Spacer(Modifier.height(20.dp))
+
             Button(
                 onClick = { onEditAccount() },
                 modifier = Modifier
@@ -433,7 +447,7 @@ fun PetInfoScreen(onBack: () -> Unit, petId: String?) {
                     title = { Text(name) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                            Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                             Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
                         }
                     }
                 )
