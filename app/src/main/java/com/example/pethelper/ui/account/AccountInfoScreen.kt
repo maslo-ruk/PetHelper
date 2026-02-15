@@ -443,27 +443,102 @@ fun PetInfoScreen(onBack: () -> Unit, petId: String?) {
         val name: String = uiState.pet.name
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text(name) },
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(name,
+                            fontSize = 25.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                            },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                             Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBackIos,
+                                contentDescription = "Назад",
+                                tint = Color.White
+                            )
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color(0xFF690005),
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White
+                    )
                 )
             }
         ) { padding ->
             Column(modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)) {
+                .padding(top = 20.dp)
+                .fillMaxSize()
+                .background(brush = Constants.GRADIENT_BRUSH),
+                horizontalAlignment = Alignment.CenterHorizontally) {
                 GetPhotoPet(pet)
-                Text("Тип: ${pet.type}")
-                Text("Пол: ${pet.gender}")
-                Text("Возраст: ${pet.age}")
-                Text("Порода: ${pet.breed}")
-                Text("Особенности: ${pet.description}")
-                Spacer(Modifier.height(20.dp))
-                AnimatedButton(text = "Изменить", onClick = {})
+
+                Spacer(Modifier.height(12.dp))
+
+                Column(
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        "Тип: ${pet.type}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF690005)
+                    )
+                    Spacer(Modifier.height(7.dp))
+
+                    Text(
+                        "Пол: ${pet.gender}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF690005)
+                    )
+                    Spacer(Modifier.height(7.dp))
+
+                    Text(
+                        "Возраст: ${pet.age}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF690005)
+                    )
+                    Spacer(Modifier.height(7.dp))
+
+                    Text(
+                        "Порода: ${pet.breed}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF690005)
+                    )
+                    Spacer(Modifier.height(7.dp))
+
+                    Text(
+                        "Особенности: ${pet.description}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF690005)
+                    )
+                    Spacer(Modifier.height(20.dp))
+                }
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .padding(start = 40.dp, end = 40.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF690005),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        "Изменить",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     } else {
