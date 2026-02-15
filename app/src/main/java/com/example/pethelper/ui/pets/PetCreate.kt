@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.zIndex
+import com.example.pethelper.ui.account.UploadPhotoButton
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -45,7 +48,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
@@ -62,6 +64,19 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Balance
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,8 +88,7 @@ fun PetCreate(onBack: () -> Unit,
               onSubmit: () -> Unit = viewModel::submitPet
  ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    Row(){
-        IconButton(onClick = onBack) {
+    /*IconButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Filled.ArrowBackIos,
                 contentDescription = "Назад",
                 tint = Color(0xFF690005))
@@ -148,48 +162,89 @@ fun PetCreate(onBack: () -> Unit,
                         )
                     }
                 }}
-    }
-    /*IconButton(onClick = onBack) {
-        Icon(Icons.AutoMirrored.Filled.ArrowBackIos,
-            contentDescription = "Назад",
-            tint = Color(0xFF690005))
-    }
-        Column(modifier = Modifier
+    }*/
+
+    Box(
+        modifier = Modifier
             .fillMaxSize()
             .background(brush = Constants.GRADIENT_BRUSH)
-            .padding(start = 20.dp, end = 20.dp)
-            .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally, ) {
-            Spacer(modifier= Modifier.height(20.dp))
+    ) {
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 40.dp, start = 4.dp)
+                .zIndex(1f)
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBackIos,
+                contentDescription = "Назад",
+                tint = Color(0xFF690005)
+            )
+        }
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 20.dp, end = 20.dp, top = 30.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Text("Добавить питомца")
+            Text("Добавить питомца",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF690005)
+            )
 
-            Spacer(modifier= Modifier.height(10.dp))
-
-            UploadPhotoButton()
-
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(22.dp))
 
             OutlinedTextField(
                 value = uiState.details.name,
                 onValueChange = { onUpdate(uiState.details.copy(name = it)) },
                 label = { Text("Имя питомца") },
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Badge,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             var expanded1 by remember { mutableStateOf(false) }
             var selected by remember { mutableStateOf("") }
-            val items = listOf<String>(PetTypes.DOG.name,
+            val items = listOf<String>(
+                PetTypes.DOG.name,
                 PetTypes.CHINCHILLA.name,
                 PetTypes.CAT.name,
                 PetTypes.FISH.name,
                 PetTypes.HAMSTER.name,
                 PetTypes.PARROT.name,
-                PetTypes.OTHER.name)
+                PetTypes.OTHER.name
+            )
 
             ExposedDropdownMenuBox(
                 expanded = expanded1,
@@ -199,18 +254,41 @@ fun PetCreate(onBack: () -> Unit,
                     value = selected,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Тип животного")},
+                    label = { Text("Тип животного") },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1)
                     },
                     modifier = Modifier
-                        .fillMaxWidth().menuAnchor()
+                        .fillMaxWidth().menuAnchor(),
+                    shape = RoundedCornerShape(16.dp),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Pets,
+                            contentDescription = null,
+                            tint = Color(0xFF690005)
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        // Цвет рамки
+                        focusedBorderColor = Color(0xFF690005),
+                        unfocusedBorderColor = Color(0xFF690005),
+
+                        // Цвет текста
+                        focusedTextColor = Color(0xFF690005),
+                        unfocusedTextColor = Color(0xFF690005),
+
+                        // Цвет label
+                        focusedLabelColor = Color(0xFF690005),
+                        unfocusedLabelColor = Color(0xFF690005),
+
+                        // Цвет курсора
+                        cursorColor = Color(0xFF690005)
+                    )
                 )
 
                 ExposedDropdownMenu(
                     expanded = expanded1,
                     onDismissRequest = { expanded1 = false },
-//                    modifier = Modifier.fillMaxWidth()
                 ) {
                     items.forEach { item ->
                         DropdownMenuItem(
@@ -221,19 +299,45 @@ fun PetCreate(onBack: () -> Unit,
                             }
                         )
                     }
-                }}*/
+                }
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            /*порода, сделала первую букву заглавной, чтобы в бд было легче искать всегда*/
             OutlinedTextField(
                 value = uiState.details.breed,
-                onValueChange = { input -> onUpdate(uiState.details.copy(breed = input.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase() else it.toString()}))
+                onValueChange = { input ->
+                    onUpdate(uiState.details.copy(breed = input.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase() else it.toString()
+                    }))
                 },
                 label = { Text("Порода") },
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.List,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -242,41 +346,129 @@ fun PetCreate(onBack: () -> Unit,
                 onValueChange = { new ->
                     val text = new
                     val amount = text.toIntOrNull() ?: 0
-                    onUpdate(uiState.details.copy(age = amount)) }, // фикс вылета
+                    onUpdate(uiState.details.copy(age = amount))
+                },
                 label = { Text("Возраст") },
-                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Numbers,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = uiState.details.weight.toString(),
-                onValueChange = {new ->
+                onValueChange = { new ->
                     val text = new
                     val amount = text.toIntOrNull() ?: 0
-                    onUpdate(uiState.details.copy(weight = amount))}, // фикс вылета
+                    onUpdate(uiState.details.copy(weight = amount))
+                },
                 label = { Text("Вес (кг)") },
-                modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Balance,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
                 value = uiState.details.description,
                 onValueChange = { onUpdate(uiState.details.copy(description = it)) },
-                label = { Text("Примечания по характеру, особенности") },
+                label = { Text("Особенности") },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                maxLines = 5
+                    .fillMaxWidth(),
+                maxLines = 5,
+                shape = RoundedCornerShape(16.dp),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = Color(0xFF690005)
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    // Цвет рамки
+                    focusedBorderColor = Color(0xFF690005),
+                    unfocusedBorderColor = Color(0xFF690005),
+
+                    // Цвет текста
+                    focusedTextColor = Color(0xFF690005),
+                    unfocusedTextColor = Color(0xFF690005),
+
+                    // Цвет label
+                    focusedLabelColor = Color(0xFF690005),
+                    unfocusedLabelColor = Color(0xFF690005),
+
+                    // Цвет курсора
+                    cursorColor = Color(0xFF690005)
+                )
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            UploadPhotoButton()
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedButton(onClick = { onSubmit() }, modifier = Modifier
-                .fillMaxWidth()) {
-                Text("Сохранить")
+            Button(
+                onClick = { onSubmit() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(color = 0xFF690005),
+                    contentColor = Color.White)
+            ) {
+                Text("Сохранить",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
             if (uiState.isLoading) {
                 Text("Загрузка...")
@@ -288,75 +480,96 @@ fun PetCreate(onBack: () -> Unit,
     }
 
 
-suspend fun uploadPhotoToServer(
-    context: Context,
-    uri: Uri,
-    baseUrl: String = NetworkConfig.BASE_URL,
-    client: OkHttpClient = OkHttpClient()): String {
-    val bytes = withContext(Dispatchers.IO) {
-        context.contentResolver.openInputStream(uri)?.use {it.readBytes()} ?: error("Не могу прочитать")
+    suspend fun uploadPhotoToServer(
+        context: Context,
+        uri: Uri,
+        baseUrl: String = NetworkConfig.BASE_URL,
+        client: OkHttpClient = OkHttpClient()
+    ): String {
+        val bytes = withContext(Dispatchers.IO) {
+            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                ?: error("Не могу прочитать")
+        }
+        val body = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart(
+                name = "photo",
+                filename = "image.png",
+                body = bytes.toRequestBody("image/jpeg".toMediaType())
+            ).build()
+        val request = Request.Builder().url("$baseUrl/upload").post(body).build()
+        val resp = withContext(Dispatchers.IO) {
+            client.newCall(request).execute()
+        }
+        if (!resp.isSuccessful) {
+            error("Upload failed")
+        }
+        val json = resp.body?.string() ?: error("Empty response")
+        return JSONObject(json).getString("fileId")
     }
-    val body = MultipartBody.Builder().setType(MultipartBody.FORM)
-        .addFormDataPart(name = "photo",
-            filename = "image.png",
-            body = bytes.toRequestBody("image/jpeg".toMediaType())).build()
-    val request = Request.Builder().url("$baseUrl/upload").post(body).build()
-    val resp = withContext(Dispatchers.IO) {
-        client.newCall(request).execute()
-    }
-    if (!resp.isSuccessful) {
-        error("Upload failed")
-    }
-    val json = resp.body?.string() ?: error("Empty response")
-    return JSONObject(json).getString("fileId")
-}
 
 
-@Composable
-fun UploadPhotoButton(viewModel: PetCreateViewModel = viewModel(factory = AppViewModelProvider.Factory),
-                      onUpdate: (FPet) -> Unit = viewModel::updateStateFlow) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var uploading by remember { mutableStateOf(false) }
-    var lastFileId by remember { mutableStateOf<String?>(null) }
-    var error by remember { mutableStateOf<String?>(null) }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val httpClient = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .callTimeout(90, TimeUnit.SECONDS).build()
-    val pickImageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
-        uri: Uri? -> if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch {
-            try {
-                error = null
-                uploading = true
-                val fileId = uploadPhotoToServer(context, uri, client = httpClient)
-                lastFileId = fileId} catch (e: Exception) {
-                    error = e.message } finally {
+    @Composable
+    fun UploadPhotoButton(
+        viewModel: PetCreateViewModel = viewModel(factory = AppViewModelProvider.Factory),
+        onUpdate: (FPet) -> Unit = viewModel::updateStateFlow
+    ) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        var uploading by remember { mutableStateOf(false) }
+        var lastFileId by remember { mutableStateOf<String?>(null) }
+        var error by remember { mutableStateOf<String?>(null) }
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val httpClient = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .callTimeout(90, TimeUnit.SECONDS).build()
+        val pickImageLauncher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+                if (uri == null) return@rememberLauncherForActivityResult
+                scope.launch {
+                    try {
+                        error = null
+                        uploading = true
+                        val fileId = uploadPhotoToServer(context, uri, client = httpClient)
+                        lastFileId = fileId
+                    } catch (e: Exception) {
+                        error = e.message
+                    } finally {
                         uploading = false
                     }
+                }
+                onUpdate(uiState.details.copy(photoId = lastFileId.toString())) // сохранение в бд
             }
-        onUpdate(uiState.details.copy(photoId = lastFileId.toString())) // сохранение в бд
+        Button(
+            onClick = { pickImageLauncher.launch(arrayOf("image/*")) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(45.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(color = 0xFF690005),
+                contentColor = Color.White),
+            enabled = !uploading
+        ) {
+            Text(if (uploading) "загружаю" else "Выбрать фото",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold)
+            lastFileId?.let { Text("fileId: $it") }
+            error?.let { Text("Ошибка: $it") }
         }
-    Button(
-        onClick = { pickImageLauncher.launch(arrayOf("image/*")) },
-        enabled = !uploading) {
-        Text(if (uploading) "загружаю" else "Выбрать фото")
-        lastFileId?.let { Text("fileId: $it") }
-        error?.let { Text("Ошибка: $it")}
     }
-}
 
-@Composable // функция загрузки изображения я хз, куда ее вставить так, чтобы из бд взять fileID
-fun GetPhoto(fileId: String,
-    baseUrl: String = NetworkConfig.BASE_URL
-) {
-    AsyncImage(
-        model = "$baseUrl/photo/$fileId",
-        contentDescription = "photo",
-        modifier = Modifier.size(160.dp)
-    )
+    @Composable // функция загрузки изображения я хз, куда ее вставить так, чтобы из бд взять fileID
+    fun GetPhoto(
+        fileId: String,
+        baseUrl: String = NetworkConfig.BASE_URL
+    ) {
+        AsyncImage(
+            model = "$baseUrl/photo/$fileId",
+            contentDescription = "photo",
+            modifier = Modifier.size(160.dp)
+        )
+    }
 }
 

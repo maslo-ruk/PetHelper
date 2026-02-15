@@ -70,7 +70,6 @@ import com.example.pethelper.Constants
 import com.example.pethelper.data.fireBaseEntities.FPet
 import com.example.pethelper.network.NetworkConfig
 import com.example.pethelper.ui.pets.PetCreateViewModel
-import com.example.pethelper.ui.pets.uploadPhotoToServer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

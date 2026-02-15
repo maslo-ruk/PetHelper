@@ -104,11 +104,6 @@ fun MyOrders(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(
-                            width = 2.dp,
-                            color = Color(0xFF690005),
-                            shape = RoundedCornerShape(8.dp)
-                        )
                 ) {
                     MyOrderCard(order, onOrderClick)
                 }
@@ -125,6 +120,10 @@ fun MyOrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit) {
             .padding(horizontal = 16.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF690005)
+        ),
+        border = null
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -137,56 +136,58 @@ fun MyOrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit) {
                             text = "Статус: ${remakeStatus(order.status)}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier,
-                            color = Color(0xFF000000),
+                            color = Color.White,
                         )
                         Text(
                             text = "Питомец: ${order.pet.breed} ${order.pet.name}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFF000000),
+                            //style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White,
                         )
                         Text(
                             order.notes,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFF000000),
+                            //style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White,
                         )
-                        Text(text = "Адрес: ${order.address}",
-                            modifier = Modifier,
-                            color = Color(0xFF000000),)
+                        Text(
+                            text = "Адрес: ${order.address}",
+                            color = Color.White,
+                        )
                     }
                 }
                 Box() {
                     Column {
                         Text(
                             text = "Дата: ${order.date}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF000000),
+                            //style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
                         )
                         Text(
                             text = "Время: ${order.time}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF000000),
+                            //style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
                         )
                         Text(
                             text = "Цена: ${order.price}",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF690005),
+                            color = Color.White,
                         )
                     }
                 }
                 Spacer(modifier = Modifier.height(5.dp))
                 Button(
-                    onClick = { onOrderClick(order)},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(38.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(color = 0xFF690005),
-                            contentColor = Color.White)
+                    onClick = { onOrderClick(order) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(38.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF690005)
+                    )
                 ) {
-                    Text("Удалить заказ")
+                    Text("Удалить заказ",
+                        fontWeight = FontWeight.Bold)
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
