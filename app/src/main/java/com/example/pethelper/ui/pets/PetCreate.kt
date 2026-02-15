@@ -453,7 +453,7 @@ fun PetCreate(onBack: () -> Unit,
 
             UploadPhotoButton()
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Button(
                 onClick = { onSubmit() },

@@ -24,11 +24,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
@@ -281,7 +283,15 @@ fun UploadPhotoButton(viewModel: AccountChangeViewModel = viewModel(factory = Ap
 
     Button(
         onClick = { pickImageLauncher.launch(arrayOf("image/*")) },
-        enabled = !uploading) {
+        enabled = !uploading,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(45.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(color = 0xFF690005),
+            contentColor = Color.White)
+    ) {
         Text(if (uploading) "загружаю" else "Выбрать фото")
         lastFileId?.let { Text("fileId: $it") }
         error?.let { Text("Ошибка: $it")}
