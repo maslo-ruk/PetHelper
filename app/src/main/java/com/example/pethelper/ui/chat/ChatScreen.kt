@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -269,10 +270,30 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
     }
     if (uid == uiState.chat.participants[0]) {
         if (uiState.order.status == "CREATED") {
-            Button(onClick = {
-                addOrderWorker(uiState.chat.participants[1],"ACCEPTED")
-                             }, enabled = enabled) {
-                Text("Принять заявку")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(onClick = {
+                    addOrderWorker(uiState.chat.participants[1],
+                        "ACCEPTED",
+                        )
+                },
+                    enabled = enabled,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .padding(start = 40.dp, end = 40.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF690005),
+                        contentColor = Color.White)
+                ) {
+                    Text("Принять заявку",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
         if (uiState.order.status == "ACCEPTED") {
@@ -287,26 +308,74 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
             }
         }
         if (uiState.order.status == "STARTED") {
-            Button(onClick = { checkPosition(uiState.orderId) }, enabled = enabled) {
-                Text("Посмотреть местоположение")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(onClick = { checkPosition(uiState.orderId) },
+                    enabled = enabled,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .padding(start = 40.dp, end = 40.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF690005),
+                        contentColor = Color.White)
+                    ) {
+                    Text("Посмотреть местоположение",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                        )
+                }
             }
         }
         if (uiState.order.status == "ENDED BY WORKER") {
             Row {
-                Button(onClick = { checkPosition(uiState.orderId) }, enabled = enabled) {
-                    Text("Посмотреть местоположение")
+                Button(onClick = { checkPosition(uiState.orderId) },
+                    enabled = enabled,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .padding(start = 40.dp, end = 40.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF690005),
+                        contentColor = Color.White)
+                    ) {
+                    Text("Посмотреть местоположение",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                        )
                 }
                 Button(onClick = {
                     changeStatus("ENDED BY BOTH")
-                }, enabled = enabled) {
-                    Text("Подтвердить окончание")
+                }, enabled = enabled,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .padding(start = 40.dp, end = 40.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF690005),
+                        contentColor = Color.White)
+                    ) {
+                    Text("Подтвердить окончание",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                        )
                 }
             }
         }
     }
     else if (uid == uiState.chat.participants[1]) {
         if (uiState.order.status == "CREATED") {
-            Text("Ожидание подтверждения")
+            Text("Ожидание подтверждения",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF690005),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth())
         }
         if (uiState.order.status == "ACCEPTED") {
             if (hasPermission) {
@@ -314,16 +383,50 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
                     changeStatus("STARTED")
                     Log.d("WALKSERV", "sarted order with id = ${uiState.orderId}")
                     startOrder(context,uiState.orderId)
-                }, enabled = enabled) {
-                    Text("Начать Заказ")
+                }, enabled = enabled,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .padding(start = 40.dp, end = 40.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF690005),
+                        contentColor = Color.White)
+                    ) {
+                    Text("Начать Заказ",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                        )
                 }
             } else {
-                Column {
-                    Text("Перед началом заказа разрешите геолокацию в любом режиме")
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Text(
+                        "Перед началом заказа разрешите геолокацию в любом режиме",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF690005),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                     Button(
-                        onClick = {getPermissions()}
+                        onClick = {getPermissions()},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(45.dp)
+                            .padding(start = 40.dp, end = 40.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF690005),
+                            contentColor = Color.White)
                     ) {
-                        Text("Разрешить геолокацию")
+                        Text("Разрешить геолокацию",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                            )
                     }
                 }
 
@@ -332,13 +435,32 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
         if (uiState.order.status == "STARTED") {
             Button(onClick = {
                 changeStatus("ENDED BY WORKER")
-            }, enabled = enabled) {
-                Text("Прогулка завершена")
+            }, enabled = enabled,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp)
+                    .padding(start = 40.dp, end = 40.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF690005),
+                    contentColor = Color.White)
+                ) {
+                Text("Прогулка завершена",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                    )
             }
         }
         if (uiState.order.status == "ENDED BY WORKER") {
-            Row {
-                Text("Ожидайте подтверждения от клиента и завершите заказ")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text("Ожидайте подтверждения от клиента и завершите заказ",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF690005))
             }
         }
         if (uiState.order.status == "ENDED BY BOTH") {
@@ -346,8 +468,19 @@ private fun ChatInput(text: String, onTextChange: (String) -> Unit,
                 changeStatus("ENDED")
                 stopOrder(context)
                 stopChat()
-                             }, enabled = enabled) {
-                Text("Завершить заказ")
+                             }, enabled = enabled,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp)
+                    .padding(start = 40.dp, end = 40.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF690005),
+                    contentColor = Color.White)
+            ) {
+                Text("Завершить заказ",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold)
             }
         }
     }

@@ -4,10 +4,15 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,10 +29,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pethelper.ui.AppViewModelProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.pethelper.Constants
 import com.example.pethelper.ui.chat.WalkViewModelFactory
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -51,24 +61,12 @@ fun WalkScreen(
     if (hasPermission) {
         val is_pressed by viewModel.locating.collectAsStateWithLifecycle()
 
-        Column {
-            Button(
-                onClick = {
-                    onClick1(orderId)
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Начать геолокацию")
-            }
+        Column (
+            modifier = Modifier
+                .fillMaxSize()
+                .background(brush = Constants.GRADIENT_BRUSH),
+        ){
 
-            Button(
-                onClick = {
-                    onClick2(orderId)
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Закончить геолокацию")
-            }
 
             if (is_pressed) {
                 if (location == null) {
@@ -137,6 +135,41 @@ fun WalkScreen(
                         modifier = modifier.fillMaxSize()
                     )
                 }
+            }
+            Button(
+                onClick = {
+                    onClick1(orderId)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp)
+                    .padding(start = 40.dp, end = 40.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF690005),
+                    contentColor = Color.White)
+            ) {
+                Text("Начать геолокацию",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold)
+            }
+
+            Button(
+                onClick = {
+                    onClick2(orderId)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp)
+                    .padding(start = 40.dp, end = 40.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF690005),
+                    contentColor = Color.White)
+            ) {
+                Text("Закончить геолокацию",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold)
             }
         }
 

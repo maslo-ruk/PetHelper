@@ -4,11 +4,14 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,9 +20,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -43,10 +51,13 @@ import com.example.pethelper.ui.orders.OrderDialogViewModel
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.pethelper.Constants
 import com.example.pethelper.data.fireBaseEntities.FOrder
 import com.google.firebase.firestore.auth.User
 
@@ -59,17 +70,44 @@ fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = Ap
     val uiState by viewModel.uiState.collectAsState()
 
 
-    Scaffold(topBar = { TopAppBar(title = {Text("Доступные заказы")},
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            title = {Text("Доступные заказы",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )},
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(painterResource(id = android.R.drawable.ic_media_previous), contentDescription = "Назад")
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBackIos,
+                    contentDescription = "Назад",
+                    tint = Color.White
+                )
             }
-        }) }) { innerPadding ->
+        },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color(0xFF690005),
+                titleContentColor = Color.White,
+                navigationIconContentColor = Color.White)
+        )
+            }) { innerPadding ->
         LaunchedEffect(Unit) {
             viewModel.startObservingOrders()
         }
-        LazyColumn(modifier = Modifier.padding(innerPadding)) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(brush = Constants.GRADIENT_BRUSH),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(orders) { order ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                 Log.d("STUPIDO", order.id)
                 Log.d("STUPIDO", uiState.ordersOfWorker.size.toString())
                 for (i in uiState.ordersOfWorker) {
@@ -77,6 +115,7 @@ fun AvailableOrders(viewModel: AvailableOrdersViewModel = viewModel(factory = Ap
                     if (i.id == order.id) return@items
                 }
                 OrderCard(order, onOrderClick, uiState.ordersOfWorker) }
+            }
         }
     }
 }
@@ -90,6 +129,9 @@ fun OrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit, myOrders:List<F
             .padding(horizontal = 16.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF690005)
+        )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -102,40 +144,53 @@ fun OrderCard(order: FOrder, onOrderClick:(order: FOrder)->Unit, myOrders:List<F
                             text = "Заказчик: ${order.user.name} ${order.user.surname}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier
+                            modifier = Modifier,
+                            color = Color.White,
                         )
                         Text(
                             text = "Питомец: ${order.pet.breed} ${order.pet.name}",
-                            style = MaterialTheme.typography.bodyMedium
+                            //style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White,
                         )
                         Text(
                             order.notes,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            //color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = Color.White,
                         )
-                        Text(text = "Адрес: ${order.address}", modifier = Modifier)
+                        Text(text = "Адрес: ${order.address}", modifier = Modifier,
+                            color = Color.White,)
                     }
                 }
                 Box() {
                     Column {
                         Text(
                             text = "Дата: ${order.date}",
-                            style = MaterialTheme.typography.labelSmall,
+                            //style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
                             text = "Цена: ${order.price}",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = Color(0xFF690005),
                         )
                     }
                 }
                 Button(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(38.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF690005)),
                     onClick = { onOrderClick(order) }
                 ) {
-                    Text("Отозваться")
+                    Text("Отозваться",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF690005),)
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
