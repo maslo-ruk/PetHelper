@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.ModeComment
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -176,6 +177,7 @@ fun OrderInputs(modifier:Modifier = Modifier,
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded1)
                     },
                     modifier = Modifier.fillMaxWidth()
+                        .menuAnchor()
                         .padding(start = 20.dp, end = 20.dp),
                     shape = RoundedCornerShape(16.dp),
                     leadingIcon = {
