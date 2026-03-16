@@ -35,11 +35,21 @@ class PetViewModel(val fbRepository: FireStoreRepository, val userManager: UserS
             }
         }
     }
+
+    fun deletePet() {
+        viewModelScope.launch {
+            fbRepository.deletePet(petId)
+            _uiState.update { it.copy(isDeleted = true) }
+        }
+    }
+
+
 }
 
 data class PetUiState(
     val pet: FPet = FPet(),
     val error:String = "",
     val isLoading:Boolean = false,
+    val isDeleted:Boolean = false,
     val success:Boolean = false
 )

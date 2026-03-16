@@ -436,6 +436,7 @@ fun AccountInfoScreen(onBack: () -> Unit = {},
 fun PetInfoScreen(onBack: () -> Unit, petId: String?) {
     val viewModel: PetViewModel = viewModel(factory = PetViewModelFactory(petId!!))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val delete = viewModel::deletePet
     if (uiState.isLoading) {
         Text("Загрузка...")
     } else if (uiState.success) {
@@ -517,12 +518,12 @@ fun PetInfoScreen(onBack: () -> Unit, petId: String?) {
                         "Особенности: ${pet.description}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF690005)
+                        color = Color(0xFF461F1F)
                     )
                     Spacer(Modifier.height(20.dp))
                 }
                 Button(
-                    onClick = {},
+                    onClick = {delete()},
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
@@ -534,7 +535,7 @@ fun PetInfoScreen(onBack: () -> Unit, petId: String?) {
                     )
                 ) {
                     Text(
-                        "Изменить",
+                        "Удалить",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -543,6 +544,9 @@ fun PetInfoScreen(onBack: () -> Unit, petId: String?) {
         }
     } else {
         Text(uiState.error)
+    }
+    if (uiState.isDeleted) {
+        onBack()
     }
 }
 

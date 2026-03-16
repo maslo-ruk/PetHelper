@@ -70,6 +70,10 @@ class FireStoreRepository(
             .await()
     }
 
+    suspend fun deletePet(petId:String) {
+        db.collection("pets").document(petId).delete().await()
+    }
+
     suspend fun getPet(petId: String): FPet? {
         return db.collection("pets")
             .document(petId)
